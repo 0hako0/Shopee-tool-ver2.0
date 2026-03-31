@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shopee 商品管理ツール</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=DM+Mono:wght@400;500&display=swap');
+  :root {
+    --orange:#EE4D2D; --orange-pale:#FFF0ED;
+    --dark:#111; --mid:#666; --light:#F5F5F5;
+    --white:#fff; --border:#E8E8E8;
+    --green:#22C55E; --yellow:#F59E0B; --red:#EF4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--light);color:var(--dark);min-height:100vh;padding:20px 16px 60px;}
+  header{text-align:center;margin-bottom:20px;}
+  .logo-chip{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;padding:6px 16px;border-radius:30px;font-size:12px;font-weight:700;letter-spacing:.06em;margin-bottom:10px;}
+  h1{font-size:20px;font-weight:900;}
+  h1 span{color:var(--orange);}
+  .subtitle{font-size:12px;color:var(--mid);margin-top:4px;}
+  .tabs{display:flex;gap:4px;background:var(--white);border-radius:12px;padding:4px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .tab{flex:1;padding:10px 4px;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--mid);background:transparent;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+  .tab.active{background:#EE4D2D!important;color:#fff!important;box-shadow:0 2px 8px rgba(238,77,45,.3);}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadeIn .2s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .card{background:var(--white);border-radius:16px;padding:18px 16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .card-title{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+  .card-title::before{content:'';display:block;width:3px;height:13px;background:var(--orange);border-radius:2px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+  .form-full{grid-column:1/-1;}
+  .field label{display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:4px;}
+  .field input,.field select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:14px;font-family:'DM Mono',monospace;color:var(--dark);background:var(--white);-webkit-appearance:none;transition:border-color .2s;}
+  .field select{font-family:'Noto Sans JP',sans-serif;font-size:13px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--orange);}
+  .add-btn{width:100%;padding:13px;background:#EE4D2D!important;color:white!important;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;letter-spacing:.04em;transition:all .15s;}
+  .add-btn:active{transform:scale(.98);opacity:.9;}
+
+  /* マーケットチェックボックス */
+  .market-checks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+  .market-check-item{position:relative;}
+  .market-check-item input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
+  .market-check-item label{display:flex;align-items:center;justify-content:center;padding:8px 4px;border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;}
+  .market-check-item input[type=checkbox]:checked + label{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
+
+  /* 仕入れ先URL */
+  .supplier-url-list{margin-bottom:8px;}
+  .supplier-url-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+  .supplier-url-row input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);background:var(--white);transition:border-color .2s;}
+  .supplier-url-row input:focus{outline:none;border-color:var(--orange);}
+  .supplier-url-row input::placeholder{font-size:11px;color:#bbb;}
+  .url-label-input{width:80px!important;font-family:'Noto Sans JP',sans-serif!important;font-size:12px!important;}
+  .remove-url-btn{width:30px;height:30px;flex-shrink:0;border:1.5px solid #fecaca;border-radius:8px;background:#FFF5F5;color:var(--red);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+  .add-url-btn{font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);background:var(--orange-pale);border:1.5px dashed var(--orange);border-radius:8px;padding:7px 12px;cursor:pointer;width:100%;}
+
+  /* 商品カード */
+  .empty-state{text-align:center;padding:30px 20px;color:var(--mid);font-size:13px;line-height:1.8;}
+  .empty-state .icon{font-size:32px;margin-bottom:8px;}
+  .product-item{border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;background:var(--white);animation:fadeIn .2s ease;}
+  .product-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+  .product-name{font-size:14px;font-weight:700;color:var(--dark);flex:1;padding-right:8px;}
+  .product-meta{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+  .product-market-count{font-size:10px;background:var(--orange-pale);color:var(--orange);padding:3px 8px;border-radius:6px;white-space:nowrap;font-weight:700;}
+
+  /* 国別利益展開エリア */
+  .markets-area{margin-bottom:8px;}
+  .markets-toggle{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--light);border-radius:8px;cursor:pointer;user-select:none;margin-bottom:0;}
+  .markets-toggle-label{font-size:11px;font-weight:700;color:var(--dark);}
+  .markets-toggle-icon{font-size:11px;color:var(--mid);}
+  .markets-body{display:none;margin-top:6px;}
+  .markets-body.open{display:block;}
+  .market-row{border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;background:var(--white);}
+  .market-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .market-row-name{font-size:12px;font-weight:700;color:var(--dark);}
+  .market-row-badges{display:flex;gap:6px;align-items:center;}
+  .market-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;}
+  .num-box{background:var(--light);border-radius:8px;padding:6px 8px;text-align:center;}
+  .num-box-label{font-size:9px;color:var(--mid);margin-bottom:2px;}
+  .num-box-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--dark);}
+  .market-profit-row{display:flex;justify-content:space-between;align-items:center;}
+  .profit-badge{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;}
+  .profit-badge.pos{color:var(--green);}
+  .profit-badge.neg{color:var(--red);}
+  .margin-chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  .margin-chip.good{background:rgba(34,197,94,.12);color:var(--green);}
+  .margin-chip.ok{background:rgba(245,158,11,.12);color:var(--yellow);}
+  .margin-chip.bad{background:rgba(239,68,68,.12);color:var(--red);}
+
+  /* 価格編集 */
+  .price-edit-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
+  .price-edit-input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);background:var(--white);}
+  .price-edit-input:focus{outline:none;border-color:var(--orange);}
+  .price-save-btn{padding:7px 12px;background:var(--orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;}
+  .price-label{font-size:10px;color:var(--mid);white-space:nowrap;}
+
+  /* 新フラグトグル */
+  .new-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--mid);font-family:'Noto Sans JP',sans-serif;}
+  .new-toggle.active{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.08);}
+
+  /* アクションボタン */
+  .product-actions{display:flex;gap:6px;margin-top:10px;}
+  .action-btn{flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--white);color:var(--mid);transition:all .15s;}
+  .action-btn:active{transform:scale(.97);}
+  .action-btn.ai{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
+  .action-btn.del{border-color:#fecaca;color:var(--red);background:#FFF5F5;flex:0;padding:8px 14px;}
+
+  /* 仕入れ先チェックエリア */
+  .supplier-check-area{margin-top:10px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+  .supplier-check-header{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;user-select:none;}
+  .supplier-check-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--dark);}
+  .checked-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+  .checked-badge.fresh{background:rgba(34,197,94,.12);color:var(--green);}
+  .checked-badge.old{background:rgba(245,158,11,.12);color:var(--yellow);}
+  .checked-badge.never{background:rgba(239,68,68,.12);color:var(--red);}
+  .supplier-check-body{padding:10px 12px;display:none;}
+  .supplier-check-body.open{display:block;}
+  .supplier-url-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+  .supplier-url-item:last-child{border-bottom:none;}
+  .supplier-url-name{font-size:11px;font-weight:700;color:var(--mid);min-width:52px;}
+  .supplier-url-link{flex:1;font-size:12px;color:var(--orange);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;}
+  .check-done-btn{width:100%;margin-top:10px;padding:9px;background:var(--white);border:1.5px solid var(--green);border-radius:8px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--green);cursor:pointer;}
+  .no-url-hint{font-size:12px;color:var(--mid);padding:6px 0;}
+  .no-url-edit-btn{font-size:12px;font-weight:700;color:var(--orange);background:var(--orange-pale);border:1.5px solid var(--orange);border-radius:8px;padding:7px 12px;cursor:pointer;width:100%;margin-top:8px;font-family:'Noto Sans JP',sans-serif;}
+
+  /* モーダル */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:flex-end;justify-content:center;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease;}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px;}
+  .modal-title{font-size:15px;font-weight:900;margin-bottom:4px;}
+  .modal-sub{font-size:12px;color:var(--mid);margin-bottom:16px;}
+  .lang-tabs{display:flex;gap:4px;margin-bottom:12px;}
+  .lang-tab{padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--white);color:var(--mid);}
+  .lang-tab.active{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
+  .desc-box{background:var(--light);border-radius:10px;padding:14px;font-size:13px;line-height:1.8;color:var(--dark);min-height:120px;white-space:pre-wrap;}
+  .loading-dots span{display:inline-block;width:6px;height:6px;background:var(--orange);border-radius:50%;animation:bounce 1.2s infinite;}
+  .loading-dots span:nth-child(2){animation-delay:.2s;}
+  .loading-dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+  .copy-btn{width:100%;padding:13px;background:var(--dark);color:white;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;margin-top:12px;}
+  .close-btn{width:100%;padding:12px;background:var(--light);color:var(--mid);border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px;}
+  .listing-field{background:var(--light);border-radius:10px;padding:10px 12px;margin-bottom:8px;position:relative;}
+  .lf-label{font-size:10px;font-weight:700;color:var(--mid);margin-bottom:4px;letter-spacing:.05em;}
+  .lf-val{font-size:13px;color:var(--dark);line-height:1.6;padding-right:56px;word-break:break-all;}
+  .lf-copy{position:absolute;right:10px;top:12px;padding:5px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);cursor:pointer;white-space:nowrap;}
+
+  /* サマリー */
+  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .summary-box{background:var(--light);border-radius:10px;padding:12px;text-align:center;}
+  .summary-box-label{font-size:10px;color:var(--mid);margin-bottom:4px;}
+  .summary-box-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--dark);}
+  .summary-box-val.orange{color:var(--orange);}
+  .summary-box-val.green{color:var(--green);}
+  .csv-btn{width:100%;padding:13px;background:var(--white);border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--dark);}
+  .tip{font-size:11px;color:var(--mid);text-align:center;line-height:1.7;margin-top:8px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-chip">🛍️ Shopee Japan</div>
+  <h1>商品<span>管理</span>ツール</h1>
+  <p class="subtitle">一括管理・利益計算・AI説明文生成</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('add')">追加</button>
+  <button class="tab" onclick="switchTab('list')">一覧</button>
+  <button class="tab" onclick="switchTab('research')">🔍 調査</button>
+  <button class="tab" onclick="switchTab('summary')">集計</button>
+  <button class="tab" onclick="switchTab('settings')">設定</button>
+</div>
+
+<!-- ── ADD PANEL ── -->
+<div class="panel active" id="panel-add">
+  <div class="card">
+    <div class="card-title">商品情報を入力</div>
+    <div class="form-grid">
+      <div class="field form-full">
+        <label>商品名（日本語）</label>
+        <input type="text" id="f-name" placeholder="例：ルック 防カビくん煙剤">
+      </div>
+      <div class="field">
+        <label>仕入れ値（円）</label>
+        <input type="number" id="f-cost" placeholder="500" inputmode="numeric" oninput="previewPrices()">
+      </div>
+      <div class="field">
+        <label>重量</label>
+        <select id="f-weight" onchange="previewPrices()">
+          <option value="0">〜100g</option>
+          <option value="1">〜250g</option>
+          <option value="2" selected>〜500g</option>
+          <option value="3">〜1kg</option>
+          <option value="4">〜2kg</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>カテゴリー</label>
+        <select id="f-category">
+          <option value="Home & Living">Home &amp; Living</option>
+          <option value="Health">Health</option>
+          <option value="Beauty">Beauty</option>
+          <option value="Food & Beverages">Food &amp; Beverages</option>
+          <option value="Mom & Baby">Mom &amp; Baby</option>
+          <option value="Sports & Outdoors">Sports &amp; Outdoors</option>
+          <option value="Hobbies & Collections">Hobbies &amp; Collections</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- マーケット選択 -->
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">出品マーケット（複数選択可）</label>
+      <div class="market-checks">
+        <div class="market-check-item"><input type="checkbox" id="mc-tw" value="tw" onchange="previewPrices()"><label for="mc-tw">🇹🇼 台湾</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-th" value="th" onchange="previewPrices()"><label for="mc-th">🇹🇭 タイ</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-ph" value="ph" onchange="previewPrices()"><label for="mc-ph">🇵🇭 フィリピン</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-my" value="my" onchange="previewPrices()"><label for="mc-my">🇲🇾 マレーシア</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-vn" value="vn" onchange="previewPrices()"><label for="mc-vn">🇻🇳 ベトナム</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-sg" value="sg" onchange="previewPrices()"><label for="mc-sg">🇸🇬 SG</label></div>
+      </div>
+    </div>
+
+    <!-- 価格プレビュー -->
+    <div id="price-preview" style="display:none;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">
+        推奨価格プレビュー
+        <span style="font-size:10px;font-weight:400;color:var(--mid);margin-left:4px;">目標利益率 <span id="preview-target-margin"></span>% で自動計算</span>
+      </div>
+      <div id="price-preview-list"></div>
+      <p style="font-size:11px;color:var(--mid);margin-top:6px;">追加後に国別で手動修正できます</p>
+    </div>
+
+    <!-- 仕入れ先URL -->
+    <div style="margin-bottom:12px;">
+      <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">仕入れ先URL（複数登録可・全マーケット共通）</label>
+      <div class="supplier-url-list" id="supplier-url-list">
+        <div class="supplier-url-row">
+          <input type="text" class="url-label-input" placeholder="Amazon" value="Amazon">
+          <input type="url" class="url-input" placeholder="https://www.amazon.co.jp/...">
+          <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
+        </div>
+        <div class="supplier-url-row">
+          <input type="text" class="url-label-input" placeholder="楽天" value="楽天">
+          <input type="url" class="url-input" placeholder="https://item.rakuten.co.jp/...">
+          <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
+        </div>
+      </div>
+      <button type="button" class="add-url-btn" onclick="addUrlRow()">＋ 仕入れ先を追加</button>
+    </div>
+
+    <button class="add-btn" onclick="addProduct()">商品を追加する</button>
+  </div>
+  <p class="tip">追加した商品は「一覧」タブで確認できます</p>
+</div>
+
+<!-- ── LIST PANEL ── -->
+<div class="panel" id="panel-list">
+  <div id="product-list">
+    <div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>
+  </div>
+</div>
+
+<!-- ── RESEARCH PANEL ── -->
+<div class="panel" id="panel-research">
+  <div class="card">
+    <div class="card-title">🔎 Shopee価格リサーチ</div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;">日本語で入力するとAIが自動翻訳して各国Shopeeで検索できます</div>
+    <div class="field form-full" style="margin-bottom:8px;">
+      <label>商品名（日本語）</label>
+      <input type="text" id="search-keyword" placeholder="例：ルック 防カビくん煙剤">
+    </div>
+    <button class="add-btn" onclick="translateKeyword()" id="translate-btn" style="margin-bottom:10px;">🌐 翻訳して検索準備</button>
+    <div id="translated-keywords" style="display:none;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:6px;">翻訳結果（編集できます）</div>
+      <div class="field form-full" style="margin-bottom:6px;"><label>英語</label><input type="text" id="search-keyword-en" placeholder="英語キーワード"></div>
+      <div class="field form-full" style="margin-bottom:6px;"><label>中国語（台湾向け）</label><input type="text" id="search-keyword-zh" placeholder="中国語キーワード"></div>
+      <div class="field form-full" style="margin-bottom:6px;"><label>タイ語</label><input type="text" id="search-keyword-th" placeholder="タイ語キーワード"></div>
+      <div class="field form-full" style="margin-bottom:10px;"><label>ベトナム語</label><input type="text" id="search-keyword-vn" placeholder="ベトナム語キーワード"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onclick="openShopee('tw')" style="padding:10px;background:var(--orange-pale);color:var(--orange);border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">🛍 台湾</button>
+        <button onclick="openShopee('sg')" style="padding:10px;background:var(--orange-pale);color:var(--orange);border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">🛍 シンガポール</button>
+        <button onclick="openShopee('th')" style="padding:10px;background:var(--orange-pale);color:var(--orange);border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">🛍 タイ</button>
+        <button onclick="openShopee('my')" style="padding:10px;background:var(--orange-pale);color:var(--orange);border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">🛍 マレーシア</button>
+        <button onclick="openShopee('ph')" style="padding:10px;background:var(--orange-pale);color:var(--orange);border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">🛍 フィリピン</button>
+        <button onclick="openShopee('vn')" style="padding:10px;background:var(--orange-pale);color:var(--orange);border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;">🛍 ベトナム</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">💱 為替計算機</div>
+    <div class="form-grid" style="margin-bottom:10px;">
+      <div class="field"><label>金額（円）</label><input type="number" id="calc-jpy" placeholder="1500" inputmode="numeric" oninput="calcExchange()"></div>
+      <div class="field"><label>マーケット</label>
+        <select id="calc-market" onchange="calcExchange()">
+          <option value="tw">台湾 NT$</option><option value="sg">シンガポール S$</option>
+          <option value="th">タイ ฿</option><option value="my">マレーシア RM</option>
+          <option value="ph">フィリピン ₱</option><option value="vn">ベトナム ₫</option>
+        </select>
+      </div>
+    </div>
+    <div id="calc-result" style="display:none;background:var(--orange-pale);border-radius:10px;padding:14px;text-align:center;">
+      <div style="font-size:11px;color:var(--mid);margin-bottom:4px;">換算結果</div>
+      <div id="calc-value" style="font-size:24px;font-weight:700;color:var(--orange);font-family:'DM Mono',monospace;"></div>
+      <div id="calc-rate" style="font-size:11px;color:var(--mid);margin-top:4px;"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🤖 AIマーケットリサーチ</div>
+    <div class="field" style="margin-bottom:12px;"><label>国・マーケット</label>
+      <select id="r-market" onchange="renderMonthlyRecommend()">
+        <option value="台湾">台湾</option><option value="タイ">タイ</option>
+        <option value="フィリピン">フィリピン</option><option value="マレーシア">マレーシア</option>
+        <option value="ベトナム">ベトナム</option><option value="シンガポール">シンガポール</option>
+      </select>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">今月のおすすめジャンル <span style="font-weight:400;color:var(--mid);">（タップでAI分析）</span></div>
+    <div id="monthly-recommend"></div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+      <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">カテゴリーを指定して調べる</div>
+      <div class="form-grid" style="margin-bottom:10px;">
+        <div class="field form-full">
+          <select id="r-category">
+            <option value="Home & Living">Home &amp; Living</option><option value="Health">Health</option>
+            <option value="Beauty">Beauty</option><option value="Food & Beverages">Food &amp; Beverages</option>
+            <option value="Hobbies & Collections">Hobbies &amp; Collections</option><option value="Sports & Outdoors">Sports &amp; Outdoors</option>
+          </select>
+        </div>
+      </div>
+      <button class="add-btn" onclick="runResearch()" id="research-btn">🔍 この国×カテゴリーで調べる</button>
+      <div style="font-size:11px;color:var(--mid);margin-top:6px;text-align:center;">※ Gemini APIキーが必要です</div>
+    </div>
+  </div>
+  <div id="research-result" style="display:none;">
+    <div class="card"><div class="card-title" id="research-title">調査結果</div><div id="research-content" style="font-size:13px;line-height:1.9;color:var(--dark);"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📅 セール・トレンドカレンダー</div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;">無在庫でも事前に出品準備・価格調整のタイミングがわかります</div>
+    <div id="calendar-list"></div>
+  </div>
+</div>
+
+<!-- ── SUMMARY PANEL ── -->
+<div class="panel" id="panel-summary">
+  <div class="card">
+    <div class="card-title">全体集計</div>
+    <div class="summary-grid">
+      <div class="summary-box"><div class="summary-box-label">登録商品数</div><div class="summary-box-val orange" id="s-count">0</div></div>
+      <div class="summary-box"><div class="summary-box-label">出品マーケット数</div><div class="summary-box-val orange" id="s-listings">0</div></div>
+      <div class="summary-box"><div class="summary-box-label">平均利益率</div><div class="summary-box-val green" id="s-margin">-%</div></div>
+      <div class="summary-box"><div class="summary-box-label">合計想定利益</div><div class="summary-box-val green" id="s-profit">¥0</div></div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+      <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">仕入れ先確認状況</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div class="summary-box"><div class="summary-box-label" style="color:var(--green);">✅ 確認済み</div><div class="summary-box-val" id="s-checked" style="font-size:18px;">0</div></div>
+        <div class="summary-box"><div class="summary-box-label" style="color:var(--yellow);">⚠️ 要再確認</div><div class="summary-box-val" id="s-stale" style="font-size:18px;">0</div></div>
+        <div class="summary-box"><div class="summary-box-label" style="color:var(--red);">❌ 未確認</div><div class="summary-box-val" id="s-unchecked" style="font-size:18px;">0</div></div>
+      </div>
+      <p class="tip" style="margin-top:6px;">確認済み＝7日以内　要再確認＝7〜30日　未確認＝未設定または30日超</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">為替レート <span id="rate-updated" style="font-size:10px;font-weight:400;color:var(--mid);margin-left:6px;">取得中...</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="summary-box"><div class="summary-box-label">台湾 NT$</div><div class="summary-box-val" id="rate-tw" style="font-size:14px;">-</div></div>
+      <div class="summary-box"><div class="summary-box-label">シンガポール S$</div><div class="summary-box-val" id="rate-sg" style="font-size:14px;">-</div></div>
+      <div class="summary-box"><div class="summary-box-label">タイ ฿</div><div class="summary-box-val" id="rate-th" style="font-size:14px;">-</div></div>
+      <div class="summary-box"><div class="summary-box-label">マレーシア RM</div><div class="summary-box-val" id="rate-my" style="font-size:14px;">-</div></div>
+      <div class="summary-box"><div class="summary-box-label">フィリピン ₱</div><div class="summary-box-val" id="rate-ph" style="font-size:14px;">-</div></div>
+      <div class="summary-box"><div class="summary-box-label">ベトナム ₫</div><div class="summary-box-val" id="rate-vn" style="font-size:14px;">-</div></div>
+    </div>
+    <p class="tip" style="margin-top:8px;">¥1 = 各通貨の金額（open.er-api.com より自動取得）</p>
+  </div>
+  <div class="card">
+    <div class="card-title">データ出力</div>
+    <button class="csv-btn" onclick="exportCSV()">📄 CSVでダウンロード</button>
+    <p class="tip">商品×マーケットごとの利益・利益率・確認日を出力</p>
+  </div>
+</div>
+
+<!-- ── DESCRIPTION MODAL ── -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">商品説明文</div>
+    <div class="modal-sub" id="modal-sub">AIが自動生成します</div>
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="switchLang('ja',this)">日本語</button>
+      <button class="lang-tab" onclick="switchLang('en',this)">英語</button>
+      <button class="lang-tab" onclick="switchLang('zh',this)">中国語</button>
+      <button class="lang-tab" id="tab-th" style="display:none;" onclick="switchLang('th',this)">タイ語</button>
+      <button class="lang-tab" id="tab-vn" style="display:none;" onclick="switchLang('vn',this)">ベトナム語</button>
+    </div>
+    <div class="desc-box" id="desc-content"><div class="loading-dots"><span></span><span></span><span></span></div></div>
+    <button class="copy-btn" onclick="copyDesc()">📋 説明文をコピー</button>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin-bottom:10px;">📋 出品用データ一括コピー</div>
+      <div class="listing-field"><div class="lf-label">商品タイトル（英語）</div><div class="lf-val" id="lv-title-en">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-en',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">商品タイトル（中国語）</div><div class="lf-val" id="lv-title-zh">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-zh',this)">コピー</button></div>
+      <div class="listing-field" id="lf-title-th" style="display:none;"><div class="lf-label">商品タイトル（タイ語）</div><div class="lf-val" id="lv-title-th">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-th',this)">コピー</button></div>
+      <div class="listing-field" id="lf-title-vn" style="display:none;"><div class="lf-label">商品タイトル（ベトナム語）</div><div class="lf-val" id="lv-title-vn">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-vn',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">カテゴリー</div><div class="lf-val" id="lv-category">-</div><button class="lf-copy" onclick="copyField('lv-category',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">推奨販売価格</div><div class="lf-val" id="lv-price">-</div><button class="lf-copy" onclick="copyField('lv-price',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">商品説明（日本語）</div><div class="lf-val" id="lv-desc-ja" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-ja',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">商品説明（英語）</div><div class="lf-val" id="lv-desc-en" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-en',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">商品説明（中国語）</div><div class="lf-val" id="lv-desc-zh" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-zh',this)">コピー</button></div>
+      <div class="listing-field" id="lf-desc-th" style="display:none;"><div class="lf-label">商品説明（タイ語）</div><div class="lf-val" id="lv-desc-th" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-th',this)">コピー</button></div>
+      <div class="listing-field" id="lf-desc-vn" style="display:none;"><div class="lf-label">商品説明（ベトナム語）</div><div class="lf-val" id="lv-desc-vn" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-vn',this)">コピー</button></div>
+      <button class="copy-btn" style="background:var(--dark);margin-top:4px;" onclick="copyAllListing()">📦 全データをまとめてコピー</button>
+    </div>
+    <button class="close-btn" onclick="closeModal()">閉じる</button>
+  </div>
+</div>
+
+<!-- ── SETTINGS PANEL ── -->
+<div class="panel" id="panel-settings">
+  <div class="card">
+    <div class="card-title">目標利益率</div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>目標利益率（%）— 自動価格計算・警告表示に使用</label>
+      <div style="position:relative;">
+        <input type="number" id="target-margin-input" placeholder="20" inputmode="numeric" style="padding-right:40px;">
+        <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">%</span>
+      </div>
+    </div>
+    <button class="add-btn" onclick="saveTargetMargin()">保存する</button>
+    <div id="margin-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">手数料設定</div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.7;">未入力の場合はデフォルト値を使用します。</div>
+    <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">共通手数料</div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="field"><label>SLS手数料（%）</label><div style="position:relative;"><input type="number" id="fee-sls" placeholder="1.75" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>Payoneer手数料（%）</label><div style="position:relative;"><input type="number" id="fee-payoneer" placeholder="2.0" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">販売手数料（国別）</div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="field"><label>台湾（%）</label><div style="position:relative;"><input type="number" id="fee-tw" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>シンガポール（%）</label><div style="position:relative;"><input type="number" id="fee-sg" placeholder="7" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>タイ（%）</label><div style="position:relative;"><input type="number" id="fee-th" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>マレーシア（%）</label><div style="position:relative;"><input type="number" id="fee-my" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>フィリピン（%）</label><div style="position:relative;"><input type="number" id="fee-ph" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>ベトナム（%）</label><div style="position:relative;"><input type="number" id="fee-vn" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+    </div>
+    <button class="add-btn" onclick="saveFeeSettings()">手数料を保存する</button>
+    <div id="fee-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">AI設定（Gemini API）</div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Gemini APIキー</label>
+      <div style="position:relative;">
+        <input type="password" id="gemini-key-input" placeholder="AIza..." style="padding-right:70px;">
+        <button onclick="toggleKeyVisibility()" id="toggle-vis-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+      </div>
+    </div>
+    <button class="add-btn" onclick="saveApiKey()">APIキーを保存する</button>
+    <div id="key-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">使い方</div>
+    <div style="font-size:12px;color:var(--mid);line-height:1.9;">
+      1. Google AI Studio でAPIキーを取得<br>
+      2. 上の入力欄に貼り付けて「保存」をタップ<br>
+      3. 商品一覧の「🤖 説明文生成」ボタンが使えます<br><br>
+      <span style="color:var(--green);font-weight:700;">✅ 無料枠あり・キーはこの端末のみに保存</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONSTANTS ──
+const DEFAULT_SLS = 1.75, DEFAULT_PAYONEER = 2.0;
+const DEFAULT_SALE_FEE = {tw:6,th:6,ph:6,my:6,vn:6,sg:7};
+const marketNames = {tw:'台湾',th:'タイ',ph:'フィリピン',my:'マレーシア',vn:'ベトナム',sg:'シンガポール'};
+const unitMap = {sg:'S$',tw:'NT$',th:'฿',my:'RM',ph:'₱',vn:'₫'};
+const shippingByMarket = {
+  tw:[250,320,450,700,1100],th:[300,380,520,800,1300],
+  ph:[350,430,600,900,1400],my:[300,380,520,800,1300],
+  vn:[280,360,490,760,1200],sg:[250,310,430,680,1050],
+};
+const ALL_MARKETS = ['tw','th','ph','my','vn','sg'];
+
+function loadFees() {
+  const s = JSON.parse(localStorage.getItem('fee_settings')||'{}');
+  return {
+    sls:parseFloat(s.sls)||DEFAULT_SLS, payoneer:parseFloat(s.payoneer)||DEFAULT_PAYONEER,
+    tw:parseFloat(s.tw)||DEFAULT_SALE_FEE.tw, th:parseFloat(s.th)||DEFAULT_SALE_FEE.th,
+    ph:parseFloat(s.ph)||DEFAULT_SALE_FEE.ph, my:parseFloat(s.my)||DEFAULT_SALE_FEE.my,
+    vn:parseFloat(s.vn)||DEFAULT_SALE_FEE.vn, sg:parseFloat(s.sg)||DEFAULT_SALE_FEE.sg,
+  };
+}
+let fees = loadFees();
+let exchangeRates = {sg:0.011,tw:0.22,th:0.24,my:0.031,ph:0.38,vn:165.0};
+
+// ── 価格自動計算 ──
+// 目標利益率から必要な販売価格（円）を逆算
+// margin = (price - cost - shipping - saleFee - slsFee - payoneer) / price
+// price * (1 - saleFeeRate/100 - sls/100 - payoneer/100) = cost + shipping + price*0 → solve
+function calcAutoPrice(cost, weight, market, isNew) {
+  const shipping = shippingByMarket[market][weight];
+  const saleFeeRate = isNew ? 0 : fees[market];
+  const totalFeeRate = (saleFeeRate + fees.sls + fees.payoneer) / 100;
+  const margin = targetMargin / 100;
+  // price * (1 - totalFeeRate - margin) = cost + shipping
+  const denom = 1 - totalFeeRate - margin;
+  if (denom <= 0) return null;
+  return Math.ceil((cost + shipping) / denom);
+}
+
+function calcProfit(price, cost, weight, market, isNew) {
+  const shipping = shippingByMarket[market][weight];
+  const saleFeeRate = isNew ? 0 : fees[market];
+  const saleFee = price * saleFeeRate / 100;
+  const slsFee = price * fees.sls / 100;
+  const payoneer = price * fees.payoneer / 100;
+  const profit = price - cost - shipping - saleFee - slsFee - payoneer;
+  const margin = (profit / price) * 100;
+  const localPrice = price * exchangeRates[market];
+  return {profit, margin, shipping, localPrice};
+}
+
+function fmt(n) { return '¥' + Math.abs(Math.round(n)).toLocaleString(); }
+function fmtPct(n) { return Math.round(n*10)/10 + '%'; }
+
+// ── DATA MIGRATION ──
+function migrateProduct(p) {
+  // 旧形式（market + price）→ 新形式（markets オブジェクト）
+  if (!p.markets) {
+    p.markets = {};
+    if (p.market && p.price) {
+      p.markets[p.market] = {
+        price: p.price,
+        isNew: p.isNew || false,
+      };
+    }
+    delete p.market; delete p.price; delete p.isNew;
+  }
+  if (!p.supplier_urls) {
+    p.supplier_urls = [];
+    if (p.url) { p.supplier_urls.push({label:'リンク', url:p.url}); delete p.url; }
+  }
+  if (!p.last_checked) p.last_checked = null;
+  return p;
+}
+
+let products = JSON.parse(localStorage.getItem('shopee_products')||'[]').map(migrateProduct);
+let targetMargin = parseFloat(localStorage.getItem('target_margin')||'20');
+let currentDesc = {};
+let currentLang = 'ja';
+let currentProduct = null;
+
+function save() {
+  try { localStorage.setItem('shopee_products', JSON.stringify(products)); } catch(e) {}
+}
+
+// ── EXCHANGE RATES ──
+async function updateExchangeRates() {
+  try {
+    const resp = await fetch('https://open.er-api.com/v6/latest/JPY');
+    const data = await resp.json();
+    if (data && data.rates) {
+      exchangeRates.sg=data.rates.SGD; exchangeRates.tw=data.rates.TWD;
+      exchangeRates.th=data.rates.THB; exchangeRates.my=data.rates.MYR;
+      exchangeRates.ph=data.rates.PHP; exchangeRates.vn=data.rates.VND;
+      renderList(); renderRates();
+      const now = new Date();
+      const el = document.getElementById('rate-updated');
+      if (el) el.textContent = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 更新';
+    }
+  } catch(e) {
+    renderRates();
+    const el = document.getElementById('rate-updated');
+    if (el) el.textContent = '固定レート使用中';
+  }
+}
+
+function renderRates() {
+  const fmt4 = n => (!n||isNaN(n)) ? '-' : n<1 ? n.toFixed(4) : n.toFixed(2);
+  ['tw','sg','th','my','ph','vn'].forEach(k => {
+    const el = document.getElementById('rate-'+k);
+    if (el) el.textContent = fmt4(exchangeRates[k]);
+  });
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  const tabIds = ['add','list','research','summary','settings'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabIds[i]===tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  if (tab==='list') renderList();
+  if (tab==='summary') { renderSummary(); renderRates(); }
+  if (tab==='settings') { loadKeyToInput(); loadTargetMargin(); loadFeeToInput(); }
+  if (tab==='research') { renderCalendar(); renderMonthlyRecommend(); }
+}
+
+// ── PRICE PREVIEW (追加フォーム) ──
+function previewPrices() {
+  const cost = parseFloat(document.getElementById('f-cost').value);
+  const weight = parseInt(document.getElementById('f-weight').value);
+  const selected = ALL_MARKETS.filter(m => document.getElementById('mc-'+m)?.checked);
+  const previewEl = document.getElementById('price-preview');
+  const listEl = document.getElementById('price-preview-list');
+  document.getElementById('preview-target-margin').textContent = targetMargin;
+
+  if (!cost || selected.length === 0) { previewEl.style.display='none'; return; }
+  previewEl.style.display = 'block';
+
+  listEl.innerHTML = selected.map(m => {
+    const price = calcAutoPrice(cost, weight, m, false);
+    if (!price) return `<div style="font-size:12px;color:var(--red);padding:4px 0;">${marketNames[m]}：計算不可（手数料設定を確認）</div>`;
+    const c = calcProfit(price, cost, weight, m, false);
+    const local = Math.round(c.localPrice).toLocaleString();
+    const unit = unitMap[m];
+    return `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--light);border-radius:8px;margin-bottom:4px;">
+      <span style="font-size:12px;font-weight:700;color:var(--dark);">${marketNames[m]}</span>
+      <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--dark);">${fmt(price)}</span>
+      <span style="font-size:11px;color:var(--mid);">→ ${unit}${local}</span>
+      <span style="font-size:11px;font-weight:700;color:var(--green);">${Math.round(c.margin*10)/10}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ── URL ROW HELPERS ──
+function addUrlRow(label, url) {
+  const list = document.getElementById('supplier-url-list');
+  const row = document.createElement('div');
+  row.className = 'supplier-url-row';
+  row.innerHTML = `
+    <input type="text" class="url-label-input" placeholder="名前" value="${label||''}">
+    <input type="url" class="url-input" placeholder="https://..." value="${url||''}">
+    <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>`;
+  list.appendChild(row);
+}
+function removeUrlRow(btn) {
+  if (document.getElementById('supplier-url-list').children.length <= 1) return;
+  btn.parentElement.remove();
+}
+function getSupplierUrls() {
+  const result = [];
+  document.querySelectorAll('#supplier-url-list .supplier-url-row').forEach(row => {
+    const label = row.querySelector('.url-label-input').value.trim();
+    const url   = row.querySelector('.url-input').value.trim();
+    if (url) result.push({label: label||'リンク', url});
+  });
+  return result;
+}
+function clearUrlRows() {
+  document.getElementById('supplier-url-list').innerHTML = `
+    <div class="supplier-url-row">
+      <input type="text" class="url-label-input" placeholder="Amazon" value="Amazon">
+      <input type="url" class="url-input" placeholder="https://www.amazon.co.jp/...">
+      <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
+    </div>
+    <div class="supplier-url-row">
+      <input type="text" class="url-label-input" placeholder="楽天" value="楽天">
+      <input type="url" class="url-input" placeholder="https://item.rakuten.co.jp/...">
+      <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
+    </div>`;
+}
+
+// ── ADD ──
+function addProduct() {
+  const name = document.getElementById('f-name').value.trim();
+  const cost = parseFloat(document.getElementById('f-cost').value);
+  const weight = parseInt(document.getElementById('f-weight').value);
+  const selected = ALL_MARKETS.filter(m => document.getElementById('mc-'+m)?.checked);
+  if (!name) { alert('商品名を入力してください'); return; }
+  if (!cost) { alert('仕入れ値を入力してください'); return; }
+  if (selected.length === 0) { alert('マーケットを1つ以上選択してください'); return; }
+
+  const markets = {};
+  selected.forEach(m => {
+    const price = calcAutoPrice(cost, weight, m, false);
+    markets[m] = { price: price || 0, isNew: false };
+  });
+
+  products.push({
+    id: Date.now(), name, cost, weight,
+    category: document.getElementById('f-category').value,
+    markets,
+    supplier_urls: getSupplierUrls(),
+    last_checked: null,
+  });
+  save();
+
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-cost').value = '';
+  ALL_MARKETS.forEach(m => { const el = document.getElementById('mc-'+m); if(el) el.checked=false; });
+  document.getElementById('price-preview').style.display = 'none';
+  clearUrlRows();
+
+  const btn = document.querySelector('#panel-add .add-btn');
+  btn.textContent = '✅ 追加しました！';
+  setTimeout(() => { btn.textContent = '商品を追加する'; }, 1500);
+}
+
+// ── LIST ──
+function renderList() {
+  const el = document.getElementById('product-list');
+  if (products.length === 0) {
+    el.innerHTML = `<div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>`;
+    return;
+  }
+  el.innerHTML = products.map(p => {
+    const marketKeys = Object.keys(p.markets||{});
+    const allProfits = marketKeys.map(m => calcProfit(p.markets[m].price, p.cost, p.weight, m, p.markets[m].isNew));
+    const avgMargin = allProfits.length ? allProfits.reduce((a,c)=>a+c.margin,0)/allProfits.length : 0;
+    const bestMargin = allProfits.length ? Math.max(...allProfits.map(c=>c.margin)) : 0;
+
+    // 仕入れ先チェック
+    const status = getCheckStatus(p.last_checked);
+    const statusLabel = {fresh:'確認済み',old:'要再確認',never:'未確認'}[status];
+    const checkLabel = getCheckLabel(p.last_checked);
+
+    // 国別展開
+    const marketsHtml = marketKeys.map(m => {
+      const md = p.markets[m];
+      const c = calcProfit(md.price, p.cost, p.weight, m, md.isNew);
+      const margin = Math.round(c.margin*10)/10;
+      const belowTarget = margin < targetMargin;
+      const chipClass = margin>=15?'good':margin>=5?'ok':'bad';
+      const localStr = unitMap[m] + Math.round(c.localPrice).toLocaleString();
+      const warningHtml = belowTarget ? `<div style="font-size:10px;color:var(--red);margin-top:4px;">⚠️ 目標利益率（${targetMargin}%）を下回っています</div>` : '';
+      return `
+      <div class="market-row">
+        <div class="market-row-header">
+          <span class="market-row-name">${marketNames[m]}</span>
+          <div class="market-row-badges">
+            <button class="new-toggle ${md.isNew?'active':''}" onclick="toggleNew(${p.id},'${m}')">
+              ${md.isNew?'✅ 90日以内':'90日以内'}
+            </button>
+          </div>
+        </div>
+        <div class="market-nums">
+          <div class="num-box">
+            <div class="num-box-label">販売価格（円）</div>
+            <div class="num-box-val">${fmt(md.price)}</div>
+          </div>
+          <div class="num-box" style="border:1px solid var(--orange);background:var(--orange-pale);">
+            <div class="num-box-label" style="color:var(--orange);font-weight:700;">現地価格</div>
+            <div class="num-box-val" style="color:var(--orange);font-size:11px;">${localStr}</div>
+          </div>
+          <div class="num-box">
+            <div class="num-box-label">送料</div>
+            <div class="num-box-val">${fmt(c.shipping)}</div>
+          </div>
+        </div>
+        <div class="market-profit-row">
+          <div>
+            <span class="profit-badge ${c.profit>=0?'pos':'neg'}">${c.profit<0?'−':''}${fmt(c.profit)}</span>
+            <span style="font-size:11px;color:var(--mid);margin-left:4px;">利益</span>
+          </div>
+          <span class="margin-chip ${chipClass}">${margin}%</span>
+        </div>
+        ${warningHtml}
+        <div class="price-edit-row">
+          <span class="price-label">価格修正：</span>
+          <input type="number" class="price-edit-input" id="price-input-${p.id}-${m}" value="${md.price}" inputmode="numeric">
+          <button class="price-save-btn" onclick="savePrice(${p.id},'${m}')">更新</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    let supplierBody = '';
+    if (p.supplier_urls && p.supplier_urls.length > 0) {
+      supplierBody = p.supplier_urls.map(s => `
+        <div class="supplier-url-item">
+          <span class="supplier-url-name">${s.label}</span>
+          <a href="${s.url}" target="_blank" class="supplier-url-link">🔗 在庫・価格を確認</a>
+        </div>`).join('');
+      supplierBody += `<button class="check-done-btn" onclick="markChecked(${p.id})">✅ 確認しました（今日の日付で記録）</button>`;
+    } else {
+      supplierBody = `<p class="no-url-hint">仕入れ先URLが登録されていません</p>
+        <button class="no-url-edit-btn" onclick="editProduct(${p.id})">✏️ 編集して追加する</button>`;
+    }
+
+    const overallChip = avgMargin>=15?'good':avgMargin>=5?'ok':'bad';
+
+    return `
+    <div class="product-item">
+      <div class="product-header">
+        <div class="product-name">${p.name}</div>
+        <div class="product-meta">
+          <span class="product-market-count">${marketKeys.length}マーケット</span>
+          <span class="margin-chip ${overallChip}" style="font-size:10px;">${Math.round(avgMargin*10)/10}%均</span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--mid);margin-bottom:8px;">仕入れ：${fmt(p.cost)}　重量：${['〜100g','〜250g','〜500g','〜1kg','〜2kg'][p.weight]}</div>
+
+      <div class="markets-area">
+        <div class="markets-toggle" onclick="toggleMarkets(this)">
+          <span class="markets-toggle-label">📊 国別利益を見る</span>
+          <span class="markets-toggle-icon">▼</span>
+        </div>
+        <div class="markets-body">
+          ${marketsHtml}
+        </div>
+      </div>
+
+      <div class="supplier-check-area">
+        <div class="supplier-check-header" onclick="toggleCheckArea(this)">
+          <div class="supplier-check-header-left">
+            📦 仕入れ先チェック
+            <span class="checked-badge ${status}">${statusLabel}</span>
+            <span style="font-size:10px;color:var(--mid);font-weight:400;">${checkLabel}</span>
+          </div>
+          <span style="font-size:11px;color:var(--mid);" class="check-toggle-icon">▼</span>
+        </div>
+        <div class="supplier-check-body">${supplierBody}</div>
+      </div>
+
+      <div class="product-actions">
+        <button class="action-btn ai" onclick="openModal(${p.id})">🤖 説明文生成</button>
+        <button class="action-btn" onclick="editProduct(${p.id})" style="border-color:#93c5fd;color:#3b82f6;background:#eff6ff;">✏️ 編集</button>
+        <button class="action-btn del" onclick="deleteProduct(${p.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMarkets(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.markets-toggle-icon');
+  const isOpen = body.classList.toggle('open');
+  icon.textContent = isOpen ? '▲' : '▼';
+}
+function toggleCheckArea(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.check-toggle-icon');
+  const isOpen = body.classList.toggle('open');
+  icon.textContent = isOpen ? '▲' : '▼';
+}
+
+function savePrice(id, market) {
+  const p = products.find(x => x.id===id);
+  if (!p) return;
+  const val = parseFloat(document.getElementById(`price-input-${id}-${market}`).value);
+  if (!val || val <= 0) { alert('正しい価格を入力してください'); return; }
+  p.markets[market].price = val;
+  save();
+  renderList();
+}
+
+function toggleNew(id, market) {
+  const p = products.find(x => x.id===id);
+  if (!p || !p.markets[market]) return;
+  p.markets[market].isNew = !p.markets[market].isNew;
+  save();
+  renderList();
+}
+
+function markChecked(id) {
+  const p = products.find(x => x.id===id);
+  if (!p) return;
+  p.last_checked = new Date().toISOString();
+  save(); renderList(); renderSummary();
+}
+
+function deleteProduct(id) {
+  products = products.filter(p => p.id!==id);
+  save(); renderList(); renderSummary();
+}
+
+function getCheckStatus(lc) {
+  if (!lc) return 'never';
+  const days = (Date.now()-new Date(lc).getTime())/(1000*60*60*24);
+  if (days<=7) return 'fresh';
+  if (days<=30) return 'old';
+  return 'never';
+}
+function getCheckLabel(lc) {
+  if (!lc) return '未確認';
+  const days = Math.floor((Date.now()-new Date(lc).getTime())/(1000*60*60*24));
+  if (days===0) return '今日確認済み';
+  if (days<=7) return days+'日前に確認';
+  if (days<=30) return days+'日前（要再確認）';
+  return days+'日前（期限切れ）';
+}
+
+// ── EDIT ──
+function editProduct(id) {
+  const p = products.find(x => x.id===id);
+  if (!p) return;
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-cost').value = p.cost;
+  document.getElementById('f-weight').value = p.weight;
+  document.getElementById('f-category').value = p.category;
+  ALL_MARKETS.forEach(m => {
+    const el = document.getElementById('mc-'+m);
+    if (el) el.checked = !!p.markets[m];
+  });
+  const list = document.getElementById('supplier-url-list');
+  list.innerHTML = '';
+  (p.supplier_urls||[]).forEach(s => addUrlRow(s.label, s.url));
+  if (!p.supplier_urls||p.supplier_urls.length===0) clearUrlRows();
+  products = products.filter(x => x.id!==id);
+  save();
+  switchTab('add');
+  previewPrices();
+  const btn = document.querySelector('#panel-add .add-btn');
+  btn.textContent = '✏️ 更新する';
+  setTimeout(() => { btn.textContent = '商品を追加する'; }, 3000);
+}
+
+// ── SUMMARY ──
+function renderSummary() {
+  const count = products.length;
+  document.getElementById('s-count').textContent = count;
+  let listings = 0, allMargins = [], totalProfit = 0;
+  products.forEach(p => {
+    Object.entries(p.markets||{}).forEach(([m, md]) => {
+      listings++;
+      const c = calcProfit(md.price, p.cost, p.weight, m, md.isNew);
+      allMargins.push(c.margin);
+      totalProfit += c.profit;
+    });
+  });
+  document.getElementById('s-listings').textContent = listings;
+  document.getElementById('s-margin').textContent = allMargins.length ? fmtPct(allMargins.reduce((a,b)=>a+b,0)/allMargins.length) : '-%';
+  document.getElementById('s-profit').textContent = (totalProfit<0?'−':'')+fmt(totalProfit);
+  document.getElementById('s-profit').className = 'summary-box-val '+(totalProfit>=0?'green':'');
+  let checked=0,stale=0,unchecked=0;
+  products.forEach(p => {
+    const s = getCheckStatus(p.last_checked);
+    if (s==='fresh') checked++; else if (s==='old') stale++; else unchecked++;
+  });
+  document.getElementById('s-checked').textContent = checked;
+  document.getElementById('s-stale').textContent = stale;
+  document.getElementById('s-unchecked').textContent = unchecked;
+}
+
+// ── CSV ──
+function exportCSV() {
+  if (products.length===0) { alert('商品がありません'); return; }
+  const header = '商品名,マーケット,仕入れ値,販売価格,送料,利益,利益率,最終確認日\n';
+  const rows = [];
+  products.forEach(p => {
+    Object.entries(p.markets||{}).forEach(([m,md]) => {
+      const c = calcProfit(md.price, p.cost, p.weight, m, md.isNew);
+      const checked = p.last_checked ? new Date(p.last_checked).toLocaleDateString('ja-JP') : '未確認';
+      rows.push(`"${p.name}",${marketNames[m]},${p.cost},${md.price},${c.shipping},${Math.round(c.profit)},${Math.round(c.margin*10)/10}%,${checked}`);
+    });
+  });
+  const blob = new Blob(['\uFEFF'+header+rows.join('\n')], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='shopee_products.csv'; a.click(); URL.revokeObjectURL(url);
+}
+
+// ── AI MODAL ──
+async function openModal(id) {
+  const p = products.find(x => x.id===id);
+  if (!p) return;
+  currentProduct = p;
+  const marketKeys = Object.keys(p.markets||{});
+  const firstMarket = marketKeys[0] || 'tw';
+  const isThaiMarket = marketKeys.includes('th');
+  const isVnMarket   = marketKeys.includes('vn');
+  currentDesc = {}; currentLang = 'ja';
+
+  document.getElementById('tab-th').style.display = isThaiMarket?'':'none';
+  document.getElementById('tab-vn').style.display = isVnMarket?'':'none';
+  document.getElementById('lf-title-th').style.display = isThaiMarket?'':'none';
+  document.getElementById('lf-title-vn').style.display = isVnMarket?'':'none';
+  document.getElementById('lf-desc-th').style.display  = isThaiMarket?'':'none';
+  document.getElementById('lf-desc-vn').style.display  = isVnMarket?'':'none';
+
+  document.querySelectorAll('.lang-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.getElementById('modal-title').textContent = p.name;
+  document.getElementById('modal-sub').textContent = 'AIが出品用データを生成中...';
+  document.getElementById('desc-content').innerHTML = `<div class="loading-dots"><span></span><span></span><span></span></div>`;
+  ['lv-title-en','lv-title-zh','lv-title-th','lv-title-vn','lv-desc-ja','lv-desc-en','lv-desc-zh','lv-desc-th','lv-desc-vn'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.textContent='生成中...';
+  });
+  const marketNamesStr = marketKeys.map(m=>marketNames[m]).join('・');
+  document.getElementById('lv-category').textContent = p.category;
+  document.getElementById('lv-price').textContent = marketKeys.map(m=>`${marketNames[m]}:${fmt(p.markets[m].price)}`).join(' / ');
+  document.getElementById('modal').classList.add('open');
+
+  const prompt = `あなたはShopeeで${marketNamesStr}に日本製品を販売するプロのECセラーです。以下の商品の出品用データを生成してください。
+
+商品名: ${p.name}
+カテゴリー: ${p.category}
+出品マーケット: ${marketNamesStr}
+
+以下のJSON形式のみで返答してください（マークダウン不要）:
+{
+  "title_en": "English product title (max 100 chars, include 'Japan' or 'Japanese')",
+  "title_zh": "中文商品標題（最多100字，包含「日本」或「日製」）",
+  ${isThaiMarket?'"title_th": "ชื่อสินค้าภาษาไทย (ไม่เกิน 100 ตัวอักษร)",':''}
+  ${isVnMarket?'"title_vn": "Tên sản phẩm tiếng Việt (tối đa 100 ký tự)",':''}
+  "ja": "日本語の商品説明文（200〜300文字）",
+  "en": "English product description (150-200 words, emphasize Japanese quality)",
+  "zh": "中文商品描述（150〜200字，強調日本製品）"
+  ${isThaiMarket?', "th": "คำอธิบายสินค้าภาษาไทย (150-200 คำ)"':''}
+  ${isVnMarket?', "vn": "Mô tả sản phẩm tiếng Việt (150-200 từ)"':''}
+}`;
+
+  try {
+    const apiKey = localStorage.getItem('gemini_api_key')||'';
+    if (!apiKey) {
+      document.getElementById('desc-content').textContent = '⚙️ APIキーが未設定です。「設定」タブから登録してください。';
+      return;
+    }
+    let resp, data;
+    for (let attempt=0; attempt<3; attempt++) {
+      resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      });
+      data = await resp.json();
+      if (resp.status!==429) break;
+      document.getElementById('modal-sub').textContent = `混雑中。リトライ中（${attempt+1}/3）...`;
+      await new Promise(r=>setTimeout(r,10000));
+    }
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
+    currentDesc = parsed;
+    document.getElementById('modal-sub').textContent = '生成完了！各項目をコピーして使ってください';
+    document.getElementById('desc-content').textContent = currentDesc[currentLang]||'';
+    document.getElementById('lv-title-en').textContent = parsed.title_en||'-';
+    document.getElementById('lv-title-zh').textContent = parsed.title_zh||'-';
+    document.getElementById('lv-desc-ja').textContent  = parsed.ja||'-';
+    document.getElementById('lv-desc-en').textContent  = parsed.en||'-';
+    document.getElementById('lv-desc-zh').textContent  = parsed.zh||'-';
+    if (parsed.title_th) document.getElementById('lv-title-th').textContent = parsed.title_th;
+    if (parsed.title_vn) document.getElementById('lv-title-vn').textContent = parsed.title_vn;
+    if (parsed.th) document.getElementById('lv-desc-th').textContent = parsed.th;
+    if (parsed.vn) document.getElementById('lv-desc-vn').textContent = parsed.vn;
+  } catch(e) {
+    document.getElementById('desc-content').textContent = '生成に失敗しました。再度お試しください。';
+  }
+}
+
+function copyField(elId, btn) {
+  const text = document.getElementById(elId).textContent;
+  if (!text||text==='生成中...'||text==='生成失敗') return;
+  navigator.clipboard.writeText(text).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+  const orig=btn.textContent; btn.textContent='✅'; setTimeout(()=>{btn.textContent=orig;},1500);
+}
+function copyAllListing() {
+  if (!currentProduct) return;
+  const p = currentProduct;
+  const text = [`【商品名】${p.name}`,`【タイトル(英)】${currentDesc.title_en||'-'}`,`【タイトル(中)】${currentDesc.title_zh||'-'}`,`【カテゴリー】${p.category}`,``,`【説明文・日本語】`,currentDesc.ja||'-',``,`【説明文・英語】`,currentDesc.en||'-',``,`【説明文・中国語】`,currentDesc.zh||'-'].join('\n');
+  navigator.clipboard.writeText(text).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+  const btn=document.querySelector('[onclick="copyAllListing()"]');
+  btn.textContent='✅ コピーしました！'; setTimeout(()=>{btn.textContent='📦 全データをまとめてコピー';},1800);
+}
+function switchLang(lang, btn) {
+  currentLang=lang;
+  document.querySelectorAll('.lang-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('desc-content').textContent = currentDesc[lang]||'（まだ生成されていません）';
+}
+function copyDesc() {
+  const text=currentDesc[currentLang];
+  if (!text){alert('説明文がまだ生成されていません');return;}
+  navigator.clipboard.writeText(text).then(()=>{const btn=document.querySelector('.copy-btn');btn.textContent='✅ コピーしました！';setTimeout(()=>{btn.textContent='📋 コピーする';},1500);}).catch(()=>{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
+
+// ── SETTINGS ──
+function saveApiKey(){const key=document.getElementById('gemini-key-input').value.trim();if(!key){alert('APIキーを入力してください');return;}try{localStorage.setItem('gemini_api_key',key);}catch(e){}const st=document.getElementById('key-status');st.innerHTML='✅ 保存しました！';st.style.color='var(--green)';setTimeout(()=>{st.textContent='';},2000);}
+function loadKeyToInput(){const key=localStorage.getItem('gemini_api_key')||'';document.getElementById('gemini-key-input').value=key;if(key){const st=document.getElementById('key-status');st.innerHTML='✅ APIキーが設定されています';st.style.color='var(--green)';}}
+function toggleKeyVisibility(){const inp=document.getElementById('gemini-key-input');const btn=document.getElementById('toggle-vis-btn');if(inp.type==='password'){inp.type='text';btn.textContent='隠す';}else{inp.type='password';btn.textContent='表示';}}
+function saveFeeSettings(){const saved={sls:document.getElementById('fee-sls').value||DEFAULT_SLS,payoneer:document.getElementById('fee-payoneer').value||DEFAULT_PAYONEER,tw:document.getElementById('fee-tw').value||DEFAULT_SALE_FEE.tw,th:document.getElementById('fee-th').value||DEFAULT_SALE_FEE.th,ph:document.getElementById('fee-ph').value||DEFAULT_SALE_FEE.ph,my:document.getElementById('fee-my').value||DEFAULT_SALE_FEE.my,vn:document.getElementById('fee-vn').value||DEFAULT_SALE_FEE.vn,sg:document.getElementById('fee-sg').value||DEFAULT_SALE_FEE.sg};try{localStorage.setItem('fee_settings',JSON.stringify(saved));}catch(e){}fees=loadFees();renderList();renderSummary();const st=document.getElementById('fee-status');st.innerHTML='✅ 保存しました！';st.style.color='var(--green)';setTimeout(()=>{st.textContent='';},2000);}
+function loadFeeToInput(){const s=JSON.parse(localStorage.getItem('fee_settings')||'{}');['sls','payoneer','tw','sg','th','my','ph','vn'].forEach(k=>{const el=document.getElementById('fee-'+k);if(el)el.value=s[k]||'';});}
+function saveTargetMargin(){const val=parseFloat(document.getElementById('target-margin-input').value);if(isNaN(val)||val<0){alert('正しい数値を入力してください');return;}targetMargin=val;try{localStorage.setItem('target_margin',val);}catch(e){}const st=document.getElementById('margin-status');st.innerHTML='✅ 保存しました！（目標：'+val+'%）';st.style.color='var(--green)';setTimeout(()=>{st.textContent='';},2000);renderList();}
+function loadTargetMargin(){document.getElementById('target-margin-input').value=targetMargin;}
+
+// ── SHOPEE SEARCH ──
+const shopeeUrls={tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
+async function translateKeyword(){const keyword=document.getElementById('search-keyword').value.trim();if(!keyword){alert('商品名を入力してください');return;}const apiKey=localStorage.getItem('gemini_api_key')||'';if(!apiKey){alert('設定タブからGemini APIキーを登録してください');return;}const btn=document.getElementById('translate-btn');btn.textContent='翻訳中...';btn.disabled=true;const prompt=`以下の日本語の商品名をShopee検索用キーワードに翻訳してください。商品名: ${keyword}\nJSON形式のみで返答（マークダウン不要）:\n{"en":"2-5 words","zh":"2-4個詞","th":"2-4 คำ","vn":"2-4 từ"}`;try{const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});const data=await resp.json();const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());document.getElementById('search-keyword-en').value=parsed.en||'';document.getElementById('search-keyword-zh').value=parsed.zh||'';document.getElementById('search-keyword-th').value=parsed.th||'';document.getElementById('search-keyword-vn').value=parsed.vn||'';document.getElementById('translated-keywords').style.display='block';}catch(e){document.getElementById('search-keyword-en').value=keyword;document.getElementById('translated-keywords').style.display='block';alert('翻訳に失敗しました。');}finally{btn.textContent='🌐 翻訳して検索準備';btn.disabled=false;}}
+function openShopee(market){const ja=document.getElementById('search-keyword').value.trim();const en=document.getElementById('search-keyword-en')?.value?.trim()||'';const zh=document.getElementById('search-keyword-zh')?.value?.trim()||'';const th=document.getElementById('search-keyword-th')?.value?.trim()||'';const vn=document.getElementById('search-keyword-vn')?.value?.trim()||'';if(!ja&&!en&&!zh){alert('商品名を入力してください');return;}let kw=en||ja;if(market==='tw')kw=zh||en||ja;if(market==='th')kw=th||en||ja;if(market==='vn')kw=vn||en||ja;window.open(shopeeUrls[market]+encodeURIComponent(kw),'_blank');}
+function calcExchange(){const jpy=parseFloat(document.getElementById('calc-jpy').value);const market=document.getElementById('calc-market').value;const resultEl=document.getElementById('calc-result');if(!jpy||isNaN(jpy)){resultEl.style.display='none';return;}const rate=exchangeRates[market];const converted=jpy*rate;const unit=unitMap[market];const fmt2=market==='vn'?Math.round(converted).toLocaleString():(converted<100?converted.toFixed(2):Math.round(converted).toLocaleString());document.getElementById('calc-value').textContent=unit+' '+fmt2;document.getElementById('calc-rate').textContent=`¥1 = ${rate<1?rate.toFixed(4):rate.toFixed(2)} ${unit}（自動取得レート）`;resultEl.style.display='block';}
+
+// ── TREND CALENDAR ──
+const trendEvents=[
+  {month:1,day:1,name:'元旦セール',markets:['台湾','シンガポール','マレーシア'],tags:['全般'],tip:'新年向けギフト・生活用品が狙い目'},
+  {month:1,day:25,name:'旧正月（春節）',markets:['台湾','シンガポール','マレーシア','ベトナム'],tags:['ギフト','掃除用品'],tip:'家の掃除・新生活グッズが売れる。2〜3週前から準備を'},
+  {month:2,day:14,name:'バレンタインデー',markets:['台湾','シンガポール','フィリピン','タイ'],tags:['美容','ギフト'],tip:'コスメ・スキンケアのギフトセットが人気'},
+  {month:4,day:1,name:'ソンクラーン（タイ正月）',markets:['タイ'],tags:['防水','アウトドア'],tip:'防水グッズ・アウトドア用品が需要増'},
+  {month:4,day:15,name:'Shopee 4.15セール',markets:['全マーケット'],tags:['全般'],tip:'プラットフォーム全体セール'},
+  {month:5,day:5,name:'Shopee 5.5セール',markets:['全マーケット'],tags:['全般'],tip:'母の日前後と重なる'},
+  {month:5,day:12,name:'母の日',markets:['台湾','シンガポール','フィリピン','マレーシア'],tags:['美容','ギフト'],tip:'コスメ・キッチン用品のギフト需要が高まる'},
+  {month:6,day:6,name:'Shopee 6.6セール',markets:['全マーケット'],tags:['全般'],tip:'夏向け商品・健康グッズが好調'},
+  {month:7,day:7,name:'Shopee 7.7セール',markets:['全マーケット'],tags:['全般'],tip:'日焼け止め・冷感グッズが人気'},
+  {month:8,day:8,name:'Shopee 8.8セール',markets:['全マーケット'],tags:['全般'],tip:'大型セール。仕入れ先の在庫確認を'},
+  {month:9,day:9,name:'Shopee 9.9スーパーショッピングデー',markets:['全マーケット'],tags:['全般'],tip:'年間最大級セール。2週前から準備を'},
+  {month:10,day:10,name:'Shopee 10.10セール',markets:['全マーケット'],tags:['全般'],tip:'11.11への助走'},
+  {month:10,day:31,name:'ハロウィン',markets:['台湾','シンガポール','フィリピン'],tags:['雑貨','コスメ'],tip:'コスメ・お菓子関連が需要増'},
+  {month:11,day:11,name:'11.11 ショッピングデー（最大セール）',markets:['全マーケット'],tags:['全般'],tip:'年間最大！1ヶ月前から準備を'},
+  {month:12,day:12,name:'12.12 年末大セール',markets:['全マーケット'],tags:['全般'],tip:'クリスマス需要と重なりギフト系が売れる'},
+  {month:12,day:25,name:'クリスマス',markets:['台湾','シンガポール','フィリピン','マレーシア'],tags:['ギフト','雑貨'],tip:'プレゼント需要。ギフト向け日本製品が好評'},
+];
+const monthlyBase={
+  1:{theme:'新年・旧正月準備',reason:'新年の新生活スタートと旧正月準備が重なる',items:['掃除用品','収納ボックス','加湿器','保湿クリーム','日用品まとめ買い','防災グッズ','鍋・調理器具','空気清浄機フィルター','タオルセット','ルームフレグランス']},
+  2:{theme:'バレンタイン・旧正月',reason:'バレンタインとアジア圏の旧正月ギフト需要が重なる',items:['スキンケア','コスメ','ギフトセット','入浴剤','ハンドクリーム','アイクリーム','美容液','マスクパック','ネイルケア','ルームフレグランス']},
+  3:{theme:'新生活・春支度',reason:'新学期・新生活シーズン',items:['収納グッズ','キッチン用品','文具','アロマ','洗濯グッズ','掃除道具','食器','ランチボックス','エコバッグ','インテリア雑貨']},
+  4:{theme:'春・暑さ対策',reason:'ソンクラーン・暑さ対策シーズン',items:['日焼け止め','虫除け','冷感タオル','携帯扇風機','防水グッズ','水筒・ボトル','帽子・日傘','冷却スプレー','UVカットウェア','スポーツサングラス']},
+  5:{theme:'母の日・初夏',reason:'母の日ギフト需要がピーク',items:['スキンケア','ハンドクリーム','キッチン雑貨','フェイスマスク','美容オイル','アロマキャンドル','入浴剤','ヘアケア','食器・カップ','エコ用品']},
+  6:{theme:'雨季・夏準備',reason:'東南アジアの雨季。日本の防カビ・除湿グッズが刺さる',items:['除湿剤','防カビグッズ','冷感タオル','制汗グッズ','消臭スプレー','防水スプレー','冷感インナー','携帯扇風機','日焼け止め','アイスノン']},
+  7:{theme:'真夏・UV対策',reason:'最も暑い時期。日本製UVケア商品は差別化できる',items:['日焼け止め','冷感グッズ','虫除け','UV美容液','冷感スプレー','水筒・ボトル','冷感マスク','日傘','アフターサンケア','スポーツドリンク']},
+  8:{theme:'8.8セール・夏本番',reason:'8.8ビッグセール',items:['健康グッズ','美容家電','スポーツ用品','ダイエット用品','サプリメント','マッサージグッズ','ヘアアイロン','電動歯ブラシ','フィットネス用品','スキンケアセット']},
+  9:{theme:'9.9スーパーセール',reason:'年間最大級セールの一つ',items:['スキンケア','日用品まとめ','キッチン用品','ヘルスケア','美容液','掃除グッズ','収納用品','食品・お菓子','インテリア','ペット用品']},
+  10:{theme:'秋・乾燥対策',reason:'乾燥シーズン突入。保湿系スキンケアの需要が上がる',items:['保湿クリーム','ボディケア','リップケア','ヘアオイル','ハンドマスク','保湿パック','美容オイル','入浴剤','加湿器','コスメ']},
+  11:{theme:'11.11 最大セール',reason:'年間最大のショッピングデー',items:['スキンケアセット','美容家電','キッチン家電','健康食品','ヘアケアセット','サプリメント','収納グッズ','インテリア雑貨','ペット用品','掃除ロボット']},
+  12:{theme:'12.12・年末・ギフト',reason:'クリスマスギフトと12.12セール、年末大掃除需要が重なる',items:['ギフトセット','スキンケア','掃除用品','お菓子・食品','アロマグッズ','キッチン用品','タオルセット','入浴剤セット','文具セット','雑貨']},
+};
+const countryOverrides={台湾:{1:['花粉対策マスク','空気清浄機'],6:['防カビグッズ','除湿剤'],9:['中秋節ギフト']},シンガポール:{6:['除湿剤','冷感グッズ','虫除けスプレー']},タイ:{4:['防水グッズ','ソンクラーン関連'],6:['熱中症対策グッズ']},マレーシア:{4:['ハリラヤギフト','スキンケア'],6:['除湿剤','防カビグッズ']},フィリピン:{6:['防水グッズ','台風対策用品'],9:['美白スキンケア']},ベトナム:{1:['テトギフト','縁起物'],6:['雨季対策グッズ'],9:['中秋節ギフト']}};
+function getMonthlyItems(market,month){const base=monthlyBase[month];const overrides=countryOverrides[market]?.[month]||[];return{theme:base.theme,items:[...new Set([...overrides,...base.items])].slice(0,10)};}
+function renderMonthlyRecommend(){const el=document.getElementById('monthly-recommend');if(!el)return;const month=new Date().getMonth()+1;const market=document.getElementById('r-market')?.value||'台湾';const rec=getMonthlyItems(market,month);if(!rec)return;el.innerHTML=`<div style="margin-bottom:8px;"><span style="font-size:12px;font-weight:700;color:var(--orange);">${month}月 ${market}：${rec.theme}</span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">${rec.items.map(item=>`<button onclick="runResearchWithGenre('${item}')" style="background:var(--orange-pale);color:var(--orange);font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1.5px solid var(--orange);cursor:pointer;">${item}</button>`).join('')}</div><div style="font-size:11px;color:var(--mid);background:var(--light);border-radius:8px;padding:8px 10px;line-height:1.7;">💡 ${monthlyBase[month].reason}</div>`;}
+function renderCalendar(){const el=document.getElementById('calendar-list');if(!el)return;const now=new Date();const upcoming=[];for(let offset=0;offset<=180;offset++){const d=new Date(now);d.setDate(d.getDate()+offset);trendEvents.forEach(ev=>{if(ev.month===d.getMonth()+1&&ev.day===d.getDate())upcoming.push({...ev,date:d,daysLeft:offset});});}if(upcoming.length===0){el.innerHTML='<div style="text-align:center;color:var(--mid);font-size:13px;padding:16px;">今後180日間の主要イベントはありません</div>';return;}el.innerHTML=upcoming.map(ev=>{const isToday=ev.daysLeft===0;const isSoon=ev.daysLeft<=14;const urgency=isToday?'#EF4444':isSoon?'#F59E0B':'var(--border)';const urgencyBg=isToday?'rgba(239,68,68,.06)':isSoon?'rgba(245,158,11,.06)':'var(--white)';const daysStr=isToday?'🔴 今日！':ev.daysLeft<=7?`🟡 あと${ev.daysLeft}日`:`あと${ev.daysLeft}日`;const tagsStr=ev.tags.map(t=>`<span style="display:inline-block;background:var(--orange-pale);color:var(--orange);font-size:10px;padding:1px 6px;border-radius:4px;margin-right:3px;">${t}</span>`).join('');return`<div style="border:1.5px solid ${urgency};border-radius:10px;padding:12px;margin-bottom:10px;background:${urgencyBg};"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;color:var(--dark);flex:1;">${ev.name}</div><div style="font-size:11px;color:var(--mid);white-space:nowrap;margin-left:8px;">${ev.date.getMonth()+1}/${ev.date.getDate()}（${daysStr}）</div></div><div style="font-size:11px;color:var(--mid);margin-bottom:6px;">📍 ${ev.markets.join('・')}</div><div style="margin-bottom:6px;">${tagsStr}</div><div style="font-size:11px;color:var(--dark);background:var(--light);border-radius:6px;padding:6px 8px;">💡 ${ev.tip}</div></div>`;}).join('');}
+
+async function doResearch(market,genre){const apiKey=localStorage.getItem('gemini_api_key')||'';if(!apiKey){alert('設定タブからGemini APIキーを登録してください');return;}const btn=document.getElementById('research-btn');btn.textContent='調査中...';btn.disabled=true;const resultEl=document.getElementById('research-result');const contentEl=document.getElementById('research-content');const titleEl=document.getElementById('research-title');resultEl.style.display='none';const prompt=`あなたはShopee越境ECの専門家です。${market}マーケットで「${genre}」ジャンルの日本製品を無在庫で販売する場合のおすすめ商品を5品教えてください。\n\n各商品について：\n- 商品名・ブランド名\n- ${market}で売れる理由\n- 日本製ならではの強み\n- 想定価格帯（現地通貨・円換算）\n\nAmazonや楽天で仕入れられる商品を優先してください。`;try{let resp,data;for(let attempt=0;attempt<3;attempt++){resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});data=await resp.json();if(resp.status!==429)break;contentEl.textContent=`混雑中。リトライ（${attempt+1}/3）...`;resultEl.style.display='block';await new Promise(r=>setTimeout(r,10000));}const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'結果を取得できませんでした';titleEl.textContent=`${market} × ${genre} のおすすめ商品`;contentEl.innerHTML=text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');resultEl.style.display='block';resultEl.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){alert('調査に失敗しました。');}finally{btn.textContent='🔍 この国×カテゴリーで調べる';btn.disabled=false;}}
+function runResearch(){doResearch(document.getElementById('r-market').value,document.getElementById('r-category').value);}
+function runResearchWithGenre(genre){doResearch(document.getElementById('r-market').value,genre);}
+
+// ── INIT ──
+renderList(); renderSummary(); updateExchangeRates();
+
+window.switchTab=switchTab; window.addProduct=addProduct; window.addUrlRow=addUrlRow;
+window.removeUrlRow=removeUrlRow; window.previewPrices=previewPrices;
+window.deleteProduct=deleteProduct; window.editProduct=editProduct;
+window.savePrice=savePrice; window.toggleNew=toggleNew;
+window.markChecked=markChecked; window.toggleCheckArea=toggleCheckArea;
+window.toggleMarkets=toggleMarkets; window.runResearch=runResearch;
+window.runResearchWithGenre=runResearchWithGenre; window.openModal=openModal;
+window.closeModal=closeModal; window.closeModalOutside=closeModalOutside;
+window.switchLang=switchLang; window.copyDesc=copyDesc;
+window.copyField=copyField; window.copyAllListing=copyAllListing;
+window.saveApiKey=saveApiKey; window.saveTargetMargin=saveTargetMargin;
+window.saveFeeSettings=saveFeeSettings; window.toggleKeyVisibility=toggleKeyVisibility;
+window.translateKeyword=translateKeyword; window.openShopee=openShopee;
+window.calcExchange=calcExchange;
+</script>
+</body>
+</html>
