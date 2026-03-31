@@ -1120,7 +1120,71 @@ function getMonthlyItems(market,month){const base=monthlyBase[month];const overr
 function renderMonthlyRecommend(){const el=document.getElementById('monthly-recommend');if(!el)return;const month=new Date().getMonth()+1;const market=document.getElementById('r-market')?.value||'台湾';const rec=getMonthlyItems(market,month);if(!rec)return;el.innerHTML=`<div style="margin-bottom:8px;"><span style="font-size:12px;font-weight:700;color:var(--orange);">${month}月 ${market}：${rec.theme}</span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">${rec.items.map(item=>`<button onclick="runResearchWithGenre('${item}')" style="background:var(--orange-pale);color:var(--orange);font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1.5px solid var(--orange);cursor:pointer;">${item}</button>`).join('')}</div><div style="font-size:11px;color:var(--mid);background:var(--light);border-radius:8px;padding:8px 10px;line-height:1.7;">💡 ${monthlyBase[month].reason}</div>`;}
 function renderCalendar(){const el=document.getElementById('calendar-list');if(!el)return;const now=new Date();const upcoming=[];for(let offset=0;offset<=180;offset++){const d=new Date(now);d.setDate(d.getDate()+offset);trendEvents.forEach(ev=>{if(ev.month===d.getMonth()+1&&ev.day===d.getDate())upcoming.push({...ev,date:d,daysLeft:offset});});}if(upcoming.length===0){el.innerHTML='<div style="text-align:center;color:var(--mid);font-size:13px;padding:16px;">今後180日間の主要イベントはありません</div>';return;}el.innerHTML=upcoming.map(ev=>{const isToday=ev.daysLeft===0;const isSoon=ev.daysLeft<=14;const urgency=isToday?'#EF4444':isSoon?'#F59E0B':'var(--border)';const urgencyBg=isToday?'rgba(239,68,68,.06)':isSoon?'rgba(245,158,11,.06)':'var(--white)';const daysStr=isToday?'🔴 今日！':ev.daysLeft<=7?`🟡 あと${ev.daysLeft}日`:`あと${ev.daysLeft}日`;const tagsStr=ev.tags.map(t=>`<span style="display:inline-block;background:var(--orange-pale);color:var(--orange);font-size:10px;padding:1px 6px;border-radius:4px;margin-right:3px;">${t}</span>`).join('');return`<div style="border:1.5px solid ${urgency};border-radius:10px;padding:12px;margin-bottom:10px;background:${urgencyBg};"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;color:var(--dark);flex:1;">${ev.name}</div><div style="font-size:11px;color:var(--mid);white-space:nowrap;margin-left:8px;">${ev.date.getMonth()+1}/${ev.date.getDate()}（${daysStr}）</div></div><div style="font-size:11px;color:var(--mid);margin-bottom:6px;">📍 ${ev.markets.join('・')}</div><div style="margin-bottom:6px;">${tagsStr}</div><div style="font-size:11px;color:var(--dark);background:var(--light);border-radius:6px;padding:6px 8px;">💡 ${ev.tip}</div></div>`;}).join('');}
 
-async function doResearch(market,genre){const apiKey=localStorage.getItem('gemini_api_key')||'';if(!apiKey){alert('設定タブからGemini APIキーを登録してください');return;}const btn=document.getElementById('research-btn');btn.textContent='調査中...';btn.disabled=true;const resultEl=document.getElementById('research-result');const contentEl=document.getElementById('research-content');const titleEl=document.getElementById('research-title');resultEl.style.display='none';const prompt=`あなたはShopee越境ECの専門家です。${market}マーケットで「${genre}」ジャンルの日本製品を無在庫で販売する場合のおすすめ商品を5品教えてください。\n\n各商品について：\n- 商品名・ブランド名\n- ${market}で売れる理由\n- 日本製ならではの強み\n- 想定価格帯（現地通貨・円換算）\n\nAmazonや楽天で仕入れられる商品を優先してください。`;try{let resp,data;for(let attempt=0;attempt<3;attempt++){resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});data=await resp.json();if(resp.status!==429)break;contentEl.textContent=`混雑中。リトライ（${attempt+1}/3）...`;resultEl.style.display='block';await new Promise(r=>setTimeout(r,10000));}const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'結果を取得できませんでした';titleEl.textContent=`${market} × ${genre} のおすすめ商品`;contentEl.innerHTML=text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');resultEl.style.display='block';resultEl.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){alert('調査に失敗しました。');}finally{btn.textContent='🔍 この国×カテゴリーで調べる';btn.disabled=false;}}
+async function doResearch(market,genre){
+  const apiKey=localStorage.getItem('gemini_api_key')||'';
+  if(!apiKey){alert('設定タブからGemini APIキーを登録してください');return;}
+  const btn=document.getElementById('research-btn');
+  btn.textContent='調査中...';btn.disabled=true;
+  const resultEl=document.getElementById('research-result');
+  const contentEl=document.getElementById('research-content');
+  const titleEl=document.getElementById('research-title');
+  resultEl.style.display='none';
+
+  const prompt=`あなたはShopee越境ECの専門家です。${market}マーケットで「${genre}」ジャンルの日本製品を無在庫で販売する場合のおすすめ商品を5品教えてください。AmazonやYahoo!ショッピング・楽天で仕入れられる実在の商品を優先してください。
+
+以下のJSON形式のみで返答してください（マークダウン・コードブロック不要）:
+{"items":[{"name":"商品名（ブランド名含む正式名称）","amazon_keyword":"Amazon検索用キーワード（日本語・3〜6語）","reason":"${market}で売れる理由（1〜2文）","strength":"日本製ならではの強み（1文）","price_local":"現地価格帯（例: NT$300-500）","price_jpy":"円換算（例: 約1,200〜2,000円）"}]}`;
+
+  try{
+    let resp,data;
+    for(let attempt=0;attempt<3;attempt++){
+      resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
+      });
+      data=await resp.json();
+      if(resp.status!==429)break;
+      contentEl.textContent=`混雑中。リトライ（${attempt+1}/3）...`;
+      resultEl.style.display='block';
+      await new Promise(r=>setTimeout(r,10000));
+    }
+    const raw=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const clean=raw.replace(/```json|```/g,'').trim();
+    let items=[];
+    try{ items=JSON.parse(clean).items||[]; }catch(e){ items=[]; }
+
+    titleEl.textContent=`${market} × ${genre} のおすすめ商品`;
+
+    if(items.length===0){
+      // パース失敗時はテキストをそのまま表示
+      contentEl.innerHTML=clean.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    } else {
+      contentEl.innerHTML = items.map((item,i)=>{
+        const amzUrl='https://www.amazon.co.jp/s?k='+encodeURIComponent(item.amazon_keyword||item.name);
+        const rakuUrl='https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(item.amazon_keyword||item.name)+'/';
+        const yahooUrl='https://shopping.yahoo.co.jp/search?p='+encodeURIComponent(item.amazon_keyword||item.name);
+        return `
+        <div style="border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--white);">
+          <div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:6px;">${i+1}. ${item.name}</div>
+          <div style="font-size:12px;color:var(--mid);margin-bottom:4px;line-height:1.6;">📍 <strong style="color:var(--dark);">売れる理由：</strong>${item.reason}</div>
+          <div style="font-size:12px;color:var(--mid);margin-bottom:4px;line-height:1.6;">🇯🇵 <strong style="color:var(--dark);">日本製の強み：</strong>${item.strength}</div>
+          <div style="font-size:12px;color:var(--mid);margin-bottom:8px;line-height:1.6;">💰 <strong style="color:var(--dark);">価格帯：</strong>${item.price_local}（${item.price_jpy}）</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <a href="${amzUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#FF9900;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 Amazon</a>
+            <a href="${rakuUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#BF0000;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 楽天</a>
+            <a href="${yahooUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:#FF0033;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 Yahoo!</a>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    resultEl.style.display='block';
+    resultEl.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    alert('調査に失敗しました。');
+  }finally{
+    btn.textContent='🔍 この国×カテゴリーで調べる';btn.disabled=false;
+  }
+}
 function runResearch(){doResearch(document.getElementById('r-market').value,document.getElementById('r-category').value);}
 function runResearchWithGenre(genre){doResearch(document.getElementById('r-market').value,genre);}
 
