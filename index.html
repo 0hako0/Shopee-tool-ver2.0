@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -37,125 +38,126 @@
   .add-btn{width:100%;padding:13px;background:#EE4D2D!important;color:white!important;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;letter-spacing:.04em;transition:all .15s;}
   .add-btn:active{transform:scale(.98);opacity:.9;}
 
-  /* マーケットチェックボックス */
-  .market-checks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
-  .market-check-item{position:relative;}
-  .market-check-item input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
-  .market-check-item label{display:flex;align-items:center;justify-content:center;padding:8px 4px;border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;}
-  .market-check-item input[type=checkbox]:checked + label{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
+/* マーケットチェックボックス */
+.market-checks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.market-check-item{position:relative;}
+.market-check-item input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
+.market-check-item label{display:flex;align-items:center;justify-content:center;padding:8px 4px;border:1.5px solid var(–border);border-radius:9px;font-size:12px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;color:var(–mid);cursor:pointer;transition:all .15s;text-align:center;}
+.market-check-item input[type=checkbox]:checked + label{border-color:var(–orange);color:var(–orange);background:var(–orange-pale);}
 
-  /* 仕入れ先URL */
-  .supplier-url-list{margin-bottom:8px;}
-  .supplier-url-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
-  .supplier-url-row input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);background:var(--white);transition:border-color .2s;}
-  .supplier-url-row input:focus{outline:none;border-color:var(--orange);}
-  .supplier-url-row input::placeholder{font-size:11px;color:#bbb;}
-  .url-label-input{width:80px!important;font-family:'Noto Sans JP',sans-serif!important;font-size:12px!important;}
-  .remove-url-btn{width:30px;height:30px;flex-shrink:0;border:1.5px solid #fecaca;border-radius:8px;background:#FFF5F5;color:var(--red);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-  .add-url-btn{font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);background:var(--orange-pale);border:1.5px dashed var(--orange);border-radius:8px;padding:7px 12px;cursor:pointer;width:100%;}
+/* 仕入れ先URL */
+.supplier-url-list{margin-bottom:8px;}
+.supplier-url-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.supplier-url-row input{flex:1;padding:10px 12px;border:1.5px solid var(–border);border-radius:9px;font-size:13px;font-family:‘DM Mono’,monospace;color:var(–dark);background:var(–white);transition:border-color .2s;}
+.supplier-url-row input:focus{outline:none;border-color:var(–orange);}
+.supplier-url-row input::placeholder{font-size:11px;color:#bbb;}
+.url-label-input{width:80px!important;font-family:‘Noto Sans JP’,sans-serif!important;font-size:12px!important;}
+.remove-url-btn{width:30px;height:30px;flex-shrink:0;border:1.5px solid #fecaca;border-radius:8px;background:#FFF5F5;color:var(–red);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.add-url-btn{font-size:12px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;color:var(–orange);background:var(–orange-pale);border:1.5px dashed var(–orange);border-radius:8px;padding:7px 12px;cursor:pointer;width:100%;}
 
-  /* 商品カード */
-  .empty-state{text-align:center;padding:30px 20px;color:var(--mid);font-size:13px;line-height:1.8;}
-  .empty-state .icon{font-size:32px;margin-bottom:8px;}
-  .product-item{border:1.5px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px;background:var(--white);animation:fadeIn .2s ease;}
-  .product-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
-  .product-name{font-size:14px;font-weight:700;color:var(--dark);flex:1;padding-right:8px;}
-  .product-meta{display:flex;gap:6px;align-items:center;flex-shrink:0;}
-  .product-market-count{font-size:10px;background:var(--orange-pale);color:var(--orange);padding:3px 8px;border-radius:6px;white-space:nowrap;font-weight:700;}
+/* 商品カード */
+.empty-state{text-align:center;padding:30px 20px;color:var(–mid);font-size:13px;line-height:1.8;}
+.empty-state .icon{font-size:32px;margin-bottom:8px;}
+.product-item{border:1.5px solid var(–border);border-radius:12px;padding:13px 14px;margin-bottom:10px;background:var(–white);animation:fadeIn .2s ease;}
+.product-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.product-name{font-size:14px;font-weight:700;color:var(–dark);flex:1;padding-right:8px;}
+.product-meta{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.product-market-count{font-size:10px;background:var(–orange-pale);color:var(–orange);padding:3px 8px;border-radius:6px;white-space:nowrap;font-weight:700;}
 
-  /* 国別利益展開エリア */
-  .markets-area{margin-bottom:8px;}
-  .markets-toggle{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--light);border-radius:8px;cursor:pointer;user-select:none;margin-bottom:0;}
-  .markets-toggle-label{font-size:11px;font-weight:700;color:var(--dark);}
-  .markets-toggle-icon{font-size:11px;color:var(--mid);}
-  .markets-body{display:none;margin-top:6px;}
-  .markets-body.open{display:block;}
-  .market-row{border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:6px;background:var(--white);}
-  .market-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-  .market-row-name{font-size:12px;font-weight:700;color:var(--dark);}
-  .market-row-badges{display:flex;gap:6px;align-items:center;}
-  .market-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;}
-  .num-box{background:var(--light);border-radius:8px;padding:6px 8px;text-align:center;}
-  .num-box-label{font-size:9px;color:var(--mid);margin-bottom:2px;}
-  .num-box-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--dark);}
-  .market-profit-row{display:flex;justify-content:space-between;align-items:center;}
-  .profit-badge{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;}
-  .profit-badge.pos{color:var(--green);}
-  .profit-badge.neg{color:var(--red);}
-  .margin-chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
-  .margin-chip.good{background:rgba(34,197,94,.12);color:var(--green);}
-  .margin-chip.ok{background:rgba(245,158,11,.12);color:var(--yellow);}
-  .margin-chip.bad{background:rgba(239,68,68,.12);color:var(--red);}
+/* 国別利益展開エリア */
+.markets-area{margin-bottom:8px;}
+.markets-toggle{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(–light);border-radius:8px;cursor:pointer;user-select:none;margin-bottom:0;}
+.markets-toggle-label{font-size:11px;font-weight:700;color:var(–dark);}
+.markets-toggle-icon{font-size:11px;color:var(–mid);}
+.markets-body{display:none;margin-top:6px;}
+.markets-body.open{display:block;}
+.market-row{border:1.5px solid var(–border);border-radius:10px;padding:10px 12px;margin-bottom:6px;background:var(–white);}
+.market-row-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.market-row-name{font-size:12px;font-weight:700;color:var(–dark);}
+.market-row-badges{display:flex;gap:6px;align-items:center;}
+.market-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px;}
+.num-box{background:var(–light);border-radius:8px;padding:6px 8px;text-align:center;}
+.num-box-label{font-size:9px;color:var(–mid);margin-bottom:2px;}
+.num-box-val{font-family:‘DM Mono’,monospace;font-size:12px;font-weight:500;color:var(–dark);}
+.market-profit-row{display:flex;justify-content:space-between;align-items:center;}
+.profit-badge{font-family:‘DM Mono’,monospace;font-size:15px;font-weight:500;}
+.profit-badge.pos{color:var(–green);}
+.profit-badge.neg{color:var(–red);}
+.margin-chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.margin-chip.good{background:rgba(34,197,94,.12);color:var(–green);}
+.margin-chip.ok{background:rgba(245,158,11,.12);color:var(–yellow);}
+.margin-chip.bad{background:rgba(239,68,68,.12);color:var(–red);}
 
-  /* 価格編集 */
-  .price-edit-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
-  .price-edit-input{flex:1;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);background:var(--white);}
-  .price-edit-input:focus{outline:none;border-color:var(--orange);}
-  .price-save-btn{padding:7px 12px;background:var(--orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;}
-  .price-label{font-size:10px;color:var(--mid);white-space:nowrap;}
+/* 価格編集 */
+.price-edit-row{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.price-edit-input{flex:1;padding:7px 10px;border:1.5px solid var(–border);border-radius:8px;font-size:13px;font-family:‘DM Mono’,monospace;color:var(–dark);background:var(–white);}
+.price-edit-input:focus{outline:none;border-color:var(–orange);}
+.price-save-btn{padding:7px 12px;background:var(–orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;cursor:pointer;white-space:nowrap;}
+.price-label{font-size:10px;color:var(–mid);white-space:nowrap;}
 
-  /* 新フラグトグル */
-  .new-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--mid);font-family:'Noto Sans JP',sans-serif;}
-  .new-toggle.active{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.08);}
+/* 新フラグトグル */
+.new-toggle{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;cursor:pointer;border:1.5px solid var(–border);background:var(–white);color:var(–mid);font-family:‘Noto Sans JP’,sans-serif;}
+.new-toggle.active{border-color:var(–green);color:var(–green);background:rgba(34,197,94,.08);}
 
-  /* アクションボタン */
-  .product-actions{display:flex;gap:6px;margin-top:10px;}
-  .action-btn{flex:1;padding:8px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--white);color:var(--mid);transition:all .15s;}
-  .action-btn:active{transform:scale(.97);}
-  .action-btn.ai{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
-  .action-btn.del{border-color:#fecaca;color:var(--red);background:#FFF5F5;flex:0;padding:8px 14px;}
+/* アクションボタン */
+.product-actions{display:flex;gap:6px;margin-top:10px;}
+.action-btn{flex:1;padding:8px;border:1.5px solid var(–border);border-radius:8px;font-size:12px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;cursor:pointer;background:var(–white);color:var(–mid);transition:all .15s;}
+.action-btn:active{transform:scale(.97);}
+.action-btn.ai{border-color:var(–orange);color:var(–orange);background:var(–orange-pale);}
+.action-btn.del{border-color:#fecaca;color:var(–red);background:#FFF5F5;flex:0;padding:8px 14px;}
 
-  /* 仕入れ先チェックエリア */
-  .supplier-check-area{margin-top:10px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
-  .supplier-check-header{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;user-select:none;}
-  .supplier-check-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--dark);}
-  .checked-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
-  .checked-badge.fresh{background:rgba(34,197,94,.12);color:var(--green);}
-  .checked-badge.old{background:rgba(245,158,11,.12);color:var(--yellow);}
-  .checked-badge.never{background:rgba(239,68,68,.12);color:var(--red);}
-  .supplier-check-body{padding:10px 12px;display:none;}
-  .supplier-check-body.open{display:block;}
-  .supplier-url-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
-  .supplier-url-item:last-child{border-bottom:none;}
-  .supplier-url-name{font-size:11px;font-weight:700;color:var(--mid);min-width:52px;}
-  .supplier-url-link{flex:1;font-size:12px;color:var(--orange);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;}
-  .check-done-btn{width:100%;margin-top:10px;padding:9px;background:var(--white);border:1.5px solid var(--green);border-radius:8px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--green);cursor:pointer;}
-  .no-url-hint{font-size:12px;color:var(--mid);padding:6px 0;}
-  .no-url-edit-btn{font-size:12px;font-weight:700;color:var(--orange);background:var(--orange-pale);border:1.5px solid var(--orange);border-radius:8px;padding:7px 12px;cursor:pointer;width:100%;margin-top:8px;font-family:'Noto Sans JP',sans-serif;}
+/* 仕入れ先チェックエリア */
+.supplier-check-area{margin-top:10px;border:1.5px solid var(–border);border-radius:10px;overflow:hidden;}
+.supplier-check-header{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(–light);cursor:pointer;user-select:none;}
+.supplier-check-header-left{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(–dark);}
+.checked-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.checked-badge.fresh{background:rgba(34,197,94,.12);color:var(–green);}
+.checked-badge.old{background:rgba(245,158,11,.12);color:var(–yellow);}
+.checked-badge.never{background:rgba(239,68,68,.12);color:var(–red);}
+.supplier-check-body{padding:10px 12px;display:none;}
+.supplier-check-body.open{display:block;}
+.supplier-url-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(–border);}
+.supplier-url-item:last-child{border-bottom:none;}
+.supplier-url-name{font-size:11px;font-weight:700;color:var(–mid);min-width:52px;}
+.supplier-url-link{flex:1;font-size:12px;color:var(–orange);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;}
+.check-done-btn{width:100%;margin-top:10px;padding:9px;background:var(–white);border:1.5px solid var(–green);border-radius:8px;font-size:12px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;color:var(–green);cursor:pointer;}
+.no-url-hint{font-size:12px;color:var(–mid);padding:6px 0;}
+.no-url-edit-btn{font-size:12px;font-weight:700;color:var(–orange);background:var(–orange-pale);border:1.5px solid var(–orange);border-radius:8px;padding:7px 12px;cursor:pointer;width:100%;margin-top:8px;font-family:‘Noto Sans JP’,sans-serif;}
 
-  /* モーダル */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:flex-end;justify-content:center;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--white);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease;}
-  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-  .modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;margin:0 auto 16px;}
-  .modal-title{font-size:15px;font-weight:900;margin-bottom:4px;}
-  .modal-sub{font-size:12px;color:var(--mid);margin-bottom:16px;}
-  .lang-tabs{display:flex;gap:4px;margin-bottom:12px;}
-  .lang-tab{padding:6px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--white);color:var(--mid);}
-  .lang-tab.active{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
-  .desc-box{background:var(--light);border-radius:10px;padding:14px;font-size:13px;line-height:1.8;color:var(--dark);min-height:120px;white-space:pre-wrap;}
-  .loading-dots span{display:inline-block;width:6px;height:6px;background:var(--orange);border-radius:50%;animation:bounce 1.2s infinite;}
-  .loading-dots span:nth-child(2){animation-delay:.2s;}
-  .loading-dots span:nth-child(3){animation-delay:.4s;}
-  @keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
-  .copy-btn{width:100%;padding:13px;background:var(--dark);color:white;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;margin-top:12px;}
-  .close-btn{width:100%;padding:12px;background:var(--light);color:var(--mid);border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;margin-top:8px;}
-  .listing-field{background:var(--light);border-radius:10px;padding:10px 12px;margin-bottom:8px;position:relative;}
-  .lf-label{font-size:10px;font-weight:700;color:var(--mid);margin-bottom:4px;letter-spacing:.05em;}
-  .lf-val{font-size:13px;color:var(--dark);line-height:1.6;padding-right:56px;word-break:break-all;}
-  .lf-copy{position:absolute;right:10px;top:12px;padding:5px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);cursor:pointer;white-space:nowrap;}
+/* モーダル */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:flex-end;justify-content:center;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(–white);border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-height:85vh;overflow-y:auto;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(–border);border-radius:4px;margin:0 auto 16px;}
+.modal-title{font-size:15px;font-weight:900;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(–mid);margin-bottom:16px;}
+.lang-tabs{display:flex;gap:4px;margin-bottom:12px;}
+.lang-tab{padding:6px 14px;border:1.5px solid var(–border);border-radius:8px;font-size:12px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;cursor:pointer;background:var(–white);color:var(–mid);}
+.lang-tab.active{border-color:var(–orange);color:var(–orange);background:var(–orange-pale);}
+.desc-box{background:var(–light);border-radius:10px;padding:14px;font-size:13px;line-height:1.8;color:var(–dark);min-height:120px;white-space:pre-wrap;}
+.loading-dots span{display:inline-block;width:6px;height:6px;background:var(–orange);border-radius:50%;animation:bounce 1.2s infinite;}
+.loading-dots span:nth-child(2){animation-delay:.2s;}
+.loading-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.copy-btn{width:100%;padding:13px;background:var(–dark);color:white;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;cursor:pointer;margin-top:12px;}
+.close-btn{width:100%;padding:12px;background:var(–light);color:var(–mid);border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;cursor:pointer;margin-top:8px;}
+.listing-field{background:var(–light);border-radius:10px;padding:10px 12px;margin-bottom:8px;position:relative;}
+.lf-label{font-size:10px;font-weight:700;color:var(–mid);margin-bottom:4px;letter-spacing:.05em;}
+.lf-val{font-size:13px;color:var(–dark);line-height:1.6;padding-right:56px;word-break:break-all;}
+.lf-copy{position:absolute;right:10px;top:12px;padding:5px 10px;background:var(–white);border:1.5px solid var(–border);border-radius:7px;font-size:11px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;color:var(–orange);cursor:pointer;white-space:nowrap;}
 
-  /* サマリー */
-  .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
-  .summary-box{background:var(--light);border-radius:10px;padding:12px;text-align:center;}
-  .summary-box-label{font-size:10px;color:var(--mid);margin-bottom:4px;}
-  .summary-box-val{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--dark);}
-  .summary-box-val.orange{color:var(--orange);}
-  .summary-box-val.green{color:var(--green);}
-  .csv-btn{width:100%;padding:13px;background:var(--white);border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--dark);}
-  .tip{font-size:11px;color:var(--mid);text-align:center;line-height:1.7;margin-top:8px;}
+/* サマリー */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.summary-box{background:var(–light);border-radius:10px;padding:12px;text-align:center;}
+.summary-box-label{font-size:10px;color:var(–mid);margin-bottom:4px;}
+.summary-box-val{font-family:‘DM Mono’,monospace;font-size:20px;font-weight:500;color:var(–dark);}
+.summary-box-val.orange{color:var(–orange);}
+.summary-box-val.green{color:var(–green);}
+.csv-btn{width:100%;padding:13px;background:var(–white);border:1.5px solid var(–border);border-radius:11px;font-size:14px;font-weight:700;font-family:‘Noto Sans JP’,sans-serif;cursor:pointer;color:var(–dark);}
+.tip{font-size:11px;color:var(–mid);text-align:center;line-height:1.7;margin-top:8px;}
 </style>
+
 </head>
 <body>
 <header>
@@ -173,6 +175,7 @@
 </div>
 
 <!-- ── ADD PANEL ── -->
+
 <div class="panel active" id="panel-add">
   <div class="card">
     <div class="card-title">商品情報を入力</div>
@@ -209,53 +212,57 @@
       </div>
     </div>
 
-    <!-- マーケット選択 -->
-    <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">出品マーケット（複数選択可）</label>
-      <div class="market-checks">
-        <div class="market-check-item"><input type="checkbox" id="mc-tw" value="tw" onchange="previewPrices()"><label for="mc-tw">🇹🇼 台湾</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-th" value="th" onchange="previewPrices()"><label for="mc-th">🇹🇭 タイ</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-ph" value="ph" onchange="previewPrices()"><label for="mc-ph">🇵🇭 フィリピン</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-my" value="my" onchange="previewPrices()"><label for="mc-my">🇲🇾 マレーシア</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-vn" value="vn" onchange="previewPrices()"><label for="mc-vn">🇻🇳 ベトナム</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-sg" value="sg" onchange="previewPrices()"><label for="mc-sg">🇸🇬 SG</label></div>
-      </div>
-    </div>
+```
+<!-- マーケット選択 -->
+<div style="margin-bottom:12px;">
+  <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">出品マーケット（複数選択可）</label>
+  <div class="market-checks">
+    <div class="market-check-item"><input type="checkbox" id="mc-tw" value="tw" onchange="previewPrices()"><label for="mc-tw">🇹🇼 台湾</label></div>
+    <div class="market-check-item"><input type="checkbox" id="mc-th" value="th" onchange="previewPrices()"><label for="mc-th">🇹🇭 タイ</label></div>
+    <div class="market-check-item"><input type="checkbox" id="mc-ph" value="ph" onchange="previewPrices()"><label for="mc-ph">🇵🇭 フィリピン</label></div>
+    <div class="market-check-item"><input type="checkbox" id="mc-my" value="my" onchange="previewPrices()"><label for="mc-my">🇲🇾 マレーシア</label></div>
+    <div class="market-check-item"><input type="checkbox" id="mc-vn" value="vn" onchange="previewPrices()"><label for="mc-vn">🇻🇳 ベトナム</label></div>
+    <div class="market-check-item"><input type="checkbox" id="mc-sg" value="sg" onchange="previewPrices()"><label for="mc-sg">🇸🇬 SG</label></div>
+  </div>
+</div>
 
-    <!-- 価格プレビュー -->
-    <div id="price-preview" style="display:none;margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">
-        推奨価格プレビュー
-        <span style="font-size:10px;font-weight:400;color:var(--mid);margin-left:4px;">目標利益率 <span id="preview-target-margin"></span>% で自動計算</span>
-      </div>
-      <div id="price-preview-list"></div>
-      <p style="font-size:11px;color:var(--mid);margin-top:6px;">追加後に国別で手動修正できます</p>
-    </div>
+<!-- 価格プレビュー -->
+<div id="price-preview" style="display:none;margin-bottom:12px;">
+  <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">
+    推奨価格プレビュー
+    <span style="font-size:10px;font-weight:400;color:var(--mid);margin-left:4px;">目標利益率 <span id="preview-target-margin"></span>% で自動計算</span>
+  </div>
+  <div id="price-preview-list"></div>
+  <p style="font-size:11px;color:var(--mid);margin-top:6px;">追加後に国別で手動修正できます</p>
+</div>
 
-    <!-- 仕入れ先URL -->
-    <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">仕入れ先URL（複数登録可・全マーケット共通）</label>
-      <div class="supplier-url-list" id="supplier-url-list">
-        <div class="supplier-url-row">
-          <input type="text" class="url-label-input" placeholder="Amazon" value="Amazon">
-          <input type="url" class="url-input" placeholder="https://www.amazon.co.jp/...">
-          <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
-        </div>
-        <div class="supplier-url-row">
-          <input type="text" class="url-label-input" placeholder="楽天" value="楽天">
-          <input type="url" class="url-input" placeholder="https://item.rakuten.co.jp/...">
-          <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
-        </div>
-      </div>
-      <button type="button" class="add-url-btn" onclick="addUrlRow()">＋ 仕入れ先を追加</button>
+<!-- 仕入れ先URL -->
+<div style="margin-bottom:12px;">
+  <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">仕入れ先URL（複数登録可・全マーケット共通）</label>
+  <div class="supplier-url-list" id="supplier-url-list">
+    <div class="supplier-url-row">
+      <input type="text" class="url-label-input" placeholder="Amazon" value="Amazon">
+      <input type="url" class="url-input" placeholder="https://www.amazon.co.jp/...">
+      <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
     </div>
+    <div class="supplier-url-row">
+      <input type="text" class="url-label-input" placeholder="楽天" value="楽天">
+      <input type="url" class="url-input" placeholder="https://item.rakuten.co.jp/...">
+      <button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>
+    </div>
+  </div>
+  <button type="button" class="add-url-btn" onclick="addUrlRow()">＋ 仕入れ先を追加</button>
+</div>
 
-    <button class="add-btn" onclick="addProduct()">商品を追加する</button>
+<button class="add-btn" onclick="addProduct()">商品を追加する</button>
+```
+
   </div>
   <p class="tip">追加した商品は「一覧」タブで確認できます</p>
 </div>
 
 <!-- ── LIST PANEL ── -->
+
 <div class="panel" id="panel-list">
   <div id="product-list">
     <div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>
@@ -263,6 +270,7 @@
 </div>
 
 <!-- ── RESEARCH PANEL ── -->
+
 <div class="panel" id="panel-research">
   <div class="card">
     <div class="card-title">🔎 Shopee価格リサーチ</div>
@@ -343,6 +351,7 @@
 </div>
 
 <!-- ── SUMMARY PANEL ── -->
+
 <div class="panel" id="panel-summary">
   <div class="card">
     <div class="card-title">全体集計</div>
@@ -382,6 +391,7 @@
 </div>
 
 <!-- ── DESCRIPTION MODAL ── -->
+
 <div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -416,6 +426,7 @@
 </div>
 
 <!-- ── SETTINGS PANEL ── -->
+
 <div class="panel" id="panel-settings">
   <div class="card">
     <div class="card-title">目標利益率</div>
@@ -817,8 +828,9 @@ function renderList() {
       </div>
 
       <div class="product-actions">
-        <button class="action-btn ai" onclick="openModal(${p.id})">🤖 説明文生成</button>
-        <button class="action-btn" onclick="editProduct(${p.id})" style="border-color:#93c5fd;color:#3b82f6;background:#eff6ff;">✏️ 編集</button>
+        <button class="action-btn ${getSavedDesc(p.id)?'ai':'action-btn-disabled'}" onclick="showDesc(${p.id})" ${getSavedDesc(p.id)?'':'style="opacity:.4;cursor:default;"'}>📄 説明文表示</button>
+        <button class="action-btn ai" onclick="openModal(${p.id})">🔄 再生成</button>
+        <button class="action-btn" onclick="editProduct(${p.id})" style="border-color:#93c5fd;color:#3b82f6;background:#eff6ff;flex:0;padding:8px 10px;">✏️</button>
         <button class="action-btn del" onclick="deleteProduct(${p.id})">🗑</button>
       </div>
     </div>`;
@@ -954,7 +966,53 @@ function exportCSV() {
   a.href=url; a.download='shopee_products.csv'; a.click(); URL.revokeObjectURL(url);
 }
 
-// ── AI MODAL ──
+// ── 説明文 localStorage helpers ──
+function saveDesc(id, desc) {
+  try { localStorage.setItem('desc_'+id, JSON.stringify(desc)); } catch(e) {}
+}
+function getSavedDesc(id) {
+  try { const s=localStorage.getItem('desc_'+id); return s?JSON.parse(s):null; } catch(e) { return null; }
+}
+
+// 保存済みを表示（API消費なし）
+function showDesc(id) {
+  const p = products.find(x => x.id===id);
+  if (!p) return;
+  const saved = getSavedDesc(id);
+  if (!saved) { alert('保存済みの説明文がありません。「🔄 再生成」で生成してください。'); return; }
+  currentProduct = p;
+  currentDesc = saved;
+  currentLang = 'ja';
+
+  const marketKeys = Object.keys(p.markets||{});
+  const isThaiMarket = marketKeys.includes('th');
+  const isVnMarket   = marketKeys.includes('vn');
+  document.getElementById('tab-th').style.display = isThaiMarket?'':'none';
+  document.getElementById('tab-vn').style.display = isVnMarket?'':'none';
+  document.getElementById('lf-title-th').style.display = isThaiMarket?'':'none';
+  document.getElementById('lf-title-vn').style.display = isVnMarket?'':'none';
+  document.getElementById('lf-desc-th').style.display  = isThaiMarket?'':'none';
+  document.getElementById('lf-desc-vn').style.display  = isVnMarket?'':'none';
+
+  document.querySelectorAll('.lang-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.getElementById('modal-title').textContent = p.name;
+  document.getElementById('modal-sub').textContent = '保存済みの説明文を表示しています';
+  document.getElementById('desc-content').textContent = saved.ja||'';
+  document.getElementById('lv-category').textContent = p.category;
+  document.getElementById('lv-price').textContent = marketKeys.map(m=>`${marketNames[m]}:${fmt(p.markets[m].price)}`).join(' / ');
+  document.getElementById('lv-title-en').textContent = saved.title_en||'-';
+  document.getElementById('lv-title-zh').textContent = saved.title_zh||'-';
+  document.getElementById('lv-desc-ja').textContent  = saved.ja||'-';
+  document.getElementById('lv-desc-en').textContent  = saved.en||'-';
+  document.getElementById('lv-desc-zh').textContent  = saved.zh||'-';
+  if (saved.title_th) document.getElementById('lv-title-th').textContent = saved.title_th;
+  if (saved.title_vn) document.getElementById('lv-title-vn').textContent = saved.title_vn;
+  if (saved.th) document.getElementById('lv-desc-th').textContent = saved.th;
+  if (saved.vn) document.getElementById('lv-desc-vn').textContent = saved.vn;
+  document.getElementById('modal').classList.add('open');
+}
+
+// ── AI MODAL（再生成） ──
 async function openModal(id) {
   const p = products.find(x => x.id===id);
   if (!p) return;
@@ -1023,7 +1081,8 @@ async function openModal(id) {
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text||'';
     const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
     currentDesc = parsed;
-    document.getElementById('modal-sub').textContent = '生成完了！各項目をコピーして使ってください';
+    saveDesc(p.id, parsed); // ← 自動保存
+    document.getElementById('modal-sub').textContent = '生成完了！保存しました ✅';
     document.getElementById('desc-content').textContent = currentDesc[currentLang]||'';
     document.getElementById('lv-title-en').textContent = parsed.title_en||'-';
     document.getElementById('lv-title-zh').textContent = parsed.title_zh||'-';
@@ -1198,6 +1257,7 @@ window.savePrice=savePrice; window.toggleNew=toggleNew;
 window.markChecked=markChecked; window.toggleCheckArea=toggleCheckArea;
 window.toggleMarkets=toggleMarkets; window.runResearch=runResearch;
 window.runResearchWithGenre=runResearchWithGenre; window.openModal=openModal;
+window.showDesc=showDesc; window.getSavedDesc=getSavedDesc;
 window.closeModal=closeModal; window.closeModalOutside=closeModalOutside;
 window.switchLang=switchLang; window.copyDesc=copyDesc;
 window.copyField=copyField; window.copyAllListing=copyAllListing;
@@ -1206,5 +1266,6 @@ window.saveFeeSettings=saveFeeSettings; window.toggleKeyVisibility=toggleKeyVisi
 window.translateKeyword=translateKeyword; window.openShopee=openShopee;
 window.calcExchange=calcExchange;
 </script>
+
 </body>
 </html>
