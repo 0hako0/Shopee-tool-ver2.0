@@ -827,11 +827,15 @@ function renderList() {
         <div class="supplier-check-body">${supplierBody}</div>
       </div>
 
-      <div class="product-actions">
-        <button class="action-btn ${getSavedDesc(p.id)?'ai':'action-btn-disabled'}" onclick="showDesc(${p.id})" ${getSavedDesc(p.id)?'':'style="opacity:.4;cursor:default;"'}>📄 説明文表示</button>
-        <button class="action-btn ai" onclick="openModal(${p.id})">🔄 再生成</button>
-        <button class="action-btn" onclick="editProduct(${p.id})" style="border-color:#93c5fd;color:#3b82f6;background:#eff6ff;flex:0;padding:8px 10px;">✏️</button>
-        <button class="action-btn del" onclick="deleteProduct(${p.id})">🗑</button>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">
+        <div style="display:flex;gap:6px;">
+          <button class="action-btn ${getSavedDesc(p.id)?'ai':''}" onclick="${getSavedDesc(p.id)?'showDesc('+p.id+')':''}" style="${getSavedDesc(p.id)?'':'opacity:.35;cursor:default;border-color:var(--border);color:var(--mid);background:var(--white);'}flex:1;padding:8px;">📄 説明文を表示</button>
+          <button class="action-btn ai" onclick="openModal(${p.id})" style="flex:1;padding:8px;">🔄 再生成</button>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="action-btn" onclick="editProduct(${p.id})" style="flex:1;border-color:#93c5fd;color:#3b82f6;background:#eff6ff;">✏️ 編集</button>
+          <button class="action-btn del" onclick="deleteProduct(${p.id})" style="flex:0;padding:8px 20px;">🗑 削除</button>
+        </div>
       </div>
     </div>`;
   }).join('');
