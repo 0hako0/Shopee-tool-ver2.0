@@ -409,6 +409,40 @@
       <div class="listing-field"><div class="lf-label">商品説明（中国語）</div><div class="lf-val" id="lv-desc-zh" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-zh',this)">コピー</button></div>
       <div class="listing-field" id="lf-desc-th" style="display:none;"><div class="lf-label">商品説明（タイ語）</div><div class="lf-val" id="lv-desc-th" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-th',this)">コピー</button></div>
       <div class="listing-field" id="lf-desc-vn" style="display:none;"><div class="lf-label">商品説明（ベトナム語）</div><div class="lf-val" id="lv-desc-vn" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-desc-vn',this)">コピー</button></div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin:14px 0 8px;">🛒 Shopeeセラーセンター入力用</div>
+      <div class="listing-field"><div class="lf-label">Brand</div><div class="lf-val" id="lv-brand">生成中...</div><button class="lf-copy" onclick="copyField('lv-brand',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Region of Origin</div><div class="lf-val" id="lv-origin">Japan</div><button class="lf-copy" onclick="copyField('lv-origin',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Material</div><div class="lf-val" id="lv-material">生成中...</div><button class="lf-copy" onclick="copyField('lv-material',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Features（最大5個）</div><div class="lf-val" id="lv-features" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-features',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Stock</div><div class="lf-val" id="lv-stock">10000000</div><button class="lf-copy" onclick="copyField('lv-stock',this)">コピー</button></div>
+      <div class="listing-field">
+        <div class="lf-label">Weight (kg) <span style="font-weight:400;color:#aaa;">Amazonで確認して上書きできます</span></div>
+        <div style="display:flex;gap:6px;align-items:center;padding-right:0;">
+          <input type="number" id="lv-weight-kg-input" step="0.001" inputmode="decimal"
+            style="flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="font-size:12px;color:var(--mid);">kg</span>
+          <button onclick="saveShippingSpec()" style="padding:6px 12px;background:var(--orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;">保存</button>
+          <button onclick="copyInputVal('lv-weight-kg-input',this)" style="padding:6px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);cursor:pointer;white-space:nowrap;">コピー</button>
+        </div>
+      </div>
+      <div class="listing-field">
+        <div class="lf-label">Parcel Size W × L × H (cm) <span style="font-weight:400;color:#aaa;">Amazonで確認して上書きできます</span></div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <input type="number" id="lv-parcel-w" inputmode="numeric" placeholder="W"
+            style="width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="color:var(--mid);font-size:12px;">×</span>
+          <input type="number" id="lv-parcel-l" inputmode="numeric" placeholder="L"
+            style="width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="color:var(--mid);font-size:12px;">×</span>
+          <input type="number" id="lv-parcel-h" inputmode="numeric" placeholder="H"
+            style="width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="font-size:11px;color:var(--mid);">cm</span>
+          <button onclick="saveShippingSpec()" style="padding:6px 10px;background:var(--orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;white-space:nowrap;">保存</button>
+          <button onclick="copyParcelSize(this)" style="padding:6px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);cursor:pointer;white-space:nowrap;">コピー</button>
+        </div>
+      </div>
+
       <button class="copy-btn" style="background:var(--dark);margin-top:4px;" onclick="copyAllListing()">📦 全データをまとめてコピー</button>
     </div>
     <button class="close-btn" onclick="closeModal()">閉じる</button>
@@ -1068,6 +1102,17 @@ function showDesc(id) {
   if (saved.title_vn) document.getElementById('lv-title-vn').textContent = saved.title_vn;
   if (saved.th) document.getElementById('lv-desc-th').textContent = saved.th;
   if (saved.vn) document.getElementById('lv-desc-vn').textContent = saved.vn;
+
+  // Shopeeセラーセンター用項目（保存済みから復元）
+  document.getElementById('lv-brand').textContent = saved.brand || '-';
+  document.getElementById('lv-material').textContent = saved.material || '-';
+  document.getElementById('lv-features').textContent = (saved.features||[]).join('\n');
+  const wkMap = ['0.08','0.2','0.4','0.8','1.5'];
+  const savedSpec2 = getSavedShippingSpec(p.id);
+  document.getElementById('lv-weight-kg-input').value = savedSpec2.weight || (wkMap[p.weight]||'0.4');
+  document.getElementById('lv-parcel-w').value = savedSpec2.w || saved.parcel_w || '';
+  document.getElementById('lv-parcel-l').value = savedSpec2.l || saved.parcel_l || '';
+  document.getElementById('lv-parcel-h').value = savedSpec2.h || saved.parcel_h || '';
   document.getElementById('modal').classList.add('open');
 }
 
@@ -1101,6 +1146,9 @@ async function openModal(id) {
   document.getElementById('lv-price').textContent = marketKeys.map(m=>`${marketNames[m]}:${fmt(p.markets[m].price)}`).join(' / ');
   document.getElementById('modal').classList.add('open');
 
+  const weightKgMap = ['0.08','0.2','0.4','0.8','1.5'];
+  const weightKg = weightKgMap[p.weight] || '0.4';
+
   const prompt = `あなたはShopeeで${marketNamesStr}に日本製品を販売するプロのECセラーです。以下の商品の出品用データを生成してください。
 
 商品名: ${p.name}
@@ -1118,6 +1166,11 @@ async function openModal(id) {
   "zh": "中文商品描述（150〜200字，強調日本製品）"
   ${isThaiMarket?', "th": "คำอธิบายสินค้าภาษาไทย (150-200 คำ)"':''}
   ${isVnMarket?', "vn": "Mô tả sản phẩm tiếng Việt (150-200 từ)"':''}
+  ,"brand": "ブランド名（英語表記 例: KAI, Kao, Lion）","material": "主な素材（英語1〜3語 例: Stainless Steel）",
+  "features": ["特徴1（英語・15文字以内）","特徴2","特徴3","特徴4","特徴5"],
+  "parcel_w": "梱包幅（整数cmのみ 例: 15）",
+  "parcel_l": "梱包長さ（整数cmのみ）",
+  "parcel_h": "梱包高さ（整数cmのみ）"
 }`;
 
   try {
@@ -1152,9 +1205,65 @@ async function openModal(id) {
     if (parsed.title_vn) document.getElementById('lv-title-vn').textContent = parsed.title_vn;
     if (parsed.th) document.getElementById('lv-desc-th').textContent = parsed.th;
     if (parsed.vn) document.getElementById('lv-desc-vn').textContent = parsed.vn;
+
+    // Shopeeセラーセンター用項目
+    document.getElementById('lv-brand').textContent = parsed.brand || '-';
+    document.getElementById('lv-material').textContent = parsed.material || '-';
+    document.getElementById('lv-features').textContent = (parsed.features||[]).join('\n');
+    // 保存済みがあればそちらを優先、なければAI推測値をセット
+    const savedSpec = getSavedShippingSpec(p.id);
+    document.getElementById('lv-weight-kg-input').value = savedSpec.weight || weightKg;
+    document.getElementById('lv-parcel-w').value = savedSpec.w || parsed.parcel_w || '';
+    document.getElementById('lv-parcel-l').value = savedSpec.l || parsed.parcel_l || '';
+    document.getElementById('lv-parcel-h').value = savedSpec.h || parsed.parcel_h || '';
   } catch(e) {
     document.getElementById('desc-content').textContent = '生成に失敗しました。再度お試しください。';
   }
+}
+
+// ── Shipping Spec 保存・コピー ──
+function getSavedShippingSpec(id) {
+  try { return JSON.parse(localStorage.getItem('shipping_'+id)||'{}'); } catch(e) { return {}; }
+}
+function saveShippingSpec() {
+  if (!currentProduct) return;
+  const id = currentProduct.id;
+  const spec = {
+    weight: document.getElementById('lv-weight-kg-input').value,
+    w: document.getElementById('lv-parcel-w').value,
+    l: document.getElementById('lv-parcel-l').value,
+    h: document.getElementById('lv-parcel-h').value,
+  };
+  try { localStorage.setItem('shipping_'+id, JSON.stringify(spec)); } catch(e) {}
+  // ボタンを両方「保存しました」に
+  document.querySelectorAll('[onclick="saveShippingSpec()"]').forEach(btn => {
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = '保存'; }, 1500);
+  });
+}
+function copyInputVal(inputId, btn) {
+  const val = document.getElementById(inputId).value;
+  if (!val) return;
+  navigator.clipboard.writeText(val).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  const orig = btn.textContent; btn.textContent = '✅';
+  setTimeout(() => { btn.textContent = orig; }, 1500);
+}
+function copyParcelSize(btn) {
+  const w = document.getElementById('lv-parcel-w').value || '-';
+  const l = document.getElementById('lv-parcel-l').value || '-';
+  const h = document.getElementById('lv-parcel-h').value || '-';
+  const text = w + ' × ' + l + ' × ' + h;
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  });
+  const orig = btn.textContent; btn.textContent = '✅';
+  setTimeout(() => { btn.textContent = orig; }, 1500);
 }
 
 function copyField(elId, btn) {
@@ -1474,6 +1583,9 @@ window.addPendingItem=addPendingItem;
 window.removePendingItem=removePendingItem;
 window.toggleCompetitor=toggleCompetitor;
 window.saveCompetitorNote=saveCompetitorNote;
+window.saveShippingSpec=saveShippingSpec;
+window.copyInputVal=copyInputVal;
+window.copyParcelSize=copyParcelSize;
 </script>
 </body>
 </html>
