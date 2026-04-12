@@ -612,7 +612,11 @@ function getDeeplKey() {
 function renderSpecFields(parsed, category) {
   var area = document.getElementById('lv-spec-fields-area');
   if (!area) return;
-  var sf = parsed.spec_fields || {};
+  var sf = parsed.spec_fields;
+  if (!sf || typeof sf !== 'object' || Array.isArray(sf) || Object.keys(sf).length === 0) {
+    area.innerHTML = '<div style="font-size:11px;color:var(--mid);padding:8px 0;">スペック情報がありません。再生成してください。</div>';
+    return;
+  }
   var labelMap = {
     formulation:'Formulation', skin_type:'Skin Type',
     skin_care_benefits:'Skin Care Benefits', ingredient_preference:'Ingredient Preference',
@@ -620,20 +624,21 @@ function renderSpecFields(parsed, category) {
     quantity:'Quantity', ingredient:'Ingredient', shelf_life:'Shelf Life',
     material_detail:'Material', color:'Color', size_detail:'Size', age_range:'Age Range',
   };
-  if (Object.keys(sf).length === 0) {
-    area.innerHTML = '<div style="font-size:11px;color:var(--mid);padding:8px 0;">スペック情報がありません。再生成してください。</div>';
-    return;
-  }
-  var html = '';
+  area.innerHTML = '';
   Object.keys(sf).forEach(function(key) {
     var val = sf[key];
     var label = labelMap[key] || key;
     var elId = 'lv-spec-' + key;
-    html += '<div class="listing-field"><div class="lf-label">'+label+'</div>'
-      +'<div class="lf-val" id="'+elId+'" style="word-break:break-all;">'+val+'</div>'
-      +'<button class="lf-copy" onclick="copyField(\''+elId+'\',this)">コピー</button></div>';
+    var btn = document.createElement('button');
+    btn.className = 'lf-copy';
+    btn.setAttribute('onclick', "copyField('" + elId + "',this)");
+    btn.textContent = 'コピー';
+    var div = document.createElement('div');
+    div.className = 'listing-field';
+    div.innerHTML = '<div class="lf-label">'+label+'</div><div class="lf-val" id="'+elId+'" style="word-break:break-all;">'+val+'</div>';
+    div.appendChild(btn);
+    area.appendChild(div);
   });
-  area.innerHTML = html;
 }
 function saveDeeplKey() {
   const key = document.getElementById('deepl-key-input').value.trim();
@@ -1282,11 +1287,25 @@ async function openModal(id){
 
         const prefixes={en:'【Direct from Japan】',zh:'【日本直送】',th:'【ส่งตรงจากญี่ปุ่น】',vn:'【Giao thẳng từ Nhật】'};
 
-        // タイトル翻訳（商品名からプレフィックスを除去してから翻訳）
+        // タイトル翻訳（プレフィックスを除去してから翻訳）
         try{
-          var rawName=p.name.replace(/[【［][^】］]*[】］]\s*/g,'').trim();
-          const t=await deeplTranslate(rawName,targetCode);
-          if(t){var tc=t.replace(/[\u3010\uff3b][^\u3011\uff3d]*[\u3011\uff3d]\s*/g,'').trim();parsed['title_'+lang]=(prefixes[lang]||'')+' '+tc;}
+          var _n=p.name;
+          // 【...】形式のプレフィックスを除去
+          while(_n.indexOf('【')>=0 && _n.indexOf('】')>=0){
+            var _s=_n.indexOf('【'), _e=_n.indexOf('】');
+            if(_s<_e) _n=(_n.slice(0,_s)+_n.slice(_e+1)).trim();
+            else break;
+          }
+          var _t=await deeplTranslate(_n.trim(),targetCode);
+          if(_t){
+            // 翻訳結果からも除去
+            while(_t.indexOf('【')>=0 && _t.indexOf('】')>=0){
+              var _s2=_t.indexOf('【'), _e2=_t.indexOf('】');
+              if(_s2<_e2) _t=(_t.slice(0,_s2)+_t.slice(_e2+1)).trim();
+              else break;
+            }
+            parsed['title_'+lang]=(prefixes[lang]||'')+' '+_t.trim();
+          }
         }catch(e){}
 
         // キャッチコピー翻訳
@@ -1397,7 +1416,7 @@ function buildPromptWithDeepL(name,category,marketNamesStr,isThaiMarket,isVnMark
     +'  "material": "主な素材・成分（英語1〜5語）",\n'
     +'  "ingredient": "主要成分（英語）",\n'
     +'  "features": ["Feature1 (max 15 chars)","Feature2","Feature3","Feature4","Feature5"],\n'
-    +'  "spec_fields": "(カテゴリー別スペックは下記参照)",\n'
+    +'  "spec_fields": {"key1":"value1","key2":"value2"} ※必ずオブジェクト形式で。文字列不可。キーと値は英語で。,\n'
     +'  "parcel_w": "梱包幅（整数のみ 例:15）",\n'
     +'  "parcel_l": "梱包長さ（整数のみ）",\n'
     +'  "parcel_h": "梱包高さ（整数のみ）"\n'
