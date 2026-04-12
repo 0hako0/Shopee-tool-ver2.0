@@ -1224,7 +1224,7 @@ function syncJpyPrice(id,market){
 }
 function toggleNew(id,market){const p=products.find(function(x){return x.id===id;});if(!p||!p.markets[market])return;p.markets[market].isNew=!p.markets[market].isNew;save();renderList();}
 function markChecked(id){const p=products.find(function(x){return x.id===id;});if(!p)return;p.last_checked=new Date().toISOString();save();renderList();renderSummary();}
-function deleteProduct(id){products=products.filter(function(p){return p.id!==id;});save();renderList();renderSummary();}
+function deleteProduct(id){const p=products.find(function(x){return x.id===id;});if(!p)return;if(!confirm('「'+p.name+'」を削除しますか？\n\nこの操作は元に戻せません。'))return;products=products.filter(function(x){return x.id!==id;});save();renderList();renderSummary();}
 function getCheckStatus(lc){if(!lc)return'never';const days=(Date.now()-new Date(lc).getTime())/(1000*60*60*24);if(days<=7)return'fresh';if(days<=30)return'old';return'never';}
 function getCheckLabel(lc){if(!lc)return'未確認';const days=Math.floor((Date.now()-new Date(lc).getTime())/(1000*60*60*24));if(days===0)return'今日確認済み';if(days<=7)return days+'日前に確認';if(days<=30)return days+'日前（要再確認）';return days+'日前（期限切れ）';}
 
