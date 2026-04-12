@@ -300,20 +300,33 @@
   </div>
   <div class="card">
     <div class="card-title">💱 為替計算機</div>
-    <div class="form-grid" style="margin-bottom:10px;">
-      <div class="field"><label>金額（円）</label><input type="number" id="calc-jpy" placeholder="1500" inputmode="numeric" oninput="calcExchange()"></div>
-      <div class="field"><label>マーケット</label>
-        <select id="calc-market" onchange="calcExchange()">
-          <option value="tw">台湾 NT$</option><option value="sg">シンガポール S$</option>
-          <option value="th">タイ ฿</option><option value="my">マレーシア RM</option>
-          <option value="ph">フィリピン ₱</option><option value="vn">ベトナム ₫</option>
-        </select>
+    <div class="field" style="margin-bottom:10px;"><label>マーケット</label>
+      <select id="calc-market" onchange="calcExchange();calcExchangeReverse()">
+        <option value="tw">台湾 NT$</option><option value="sg">シンガポール S$</option>
+        <option value="th">タイ ฿</option><option value="my">マレーシア RM</option>
+        <option value="ph">フィリピン ₱</option><option value="vn">ベトナム ₫</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:end;margin-bottom:10px;">
+      <div class="field" style="margin-bottom:0;">
+        <label>円 → 現地通貨</label>
+        <input type="number" id="calc-jpy" placeholder="1500" inputmode="numeric" oninput="calcExchange()">
+      </div>
+      <div style="text-align:center;padding-bottom:10px;font-size:18px;color:var(--mid);">⇄</div>
+      <div class="field" style="margin-bottom:0;">
+        <label id="calc-local-label">現地通貨 → 円</label>
+        <input type="number" id="calc-local" placeholder="300" inputmode="numeric" oninput="calcExchangeReverse()">
       </div>
     </div>
-    <div id="calc-result" style="display:none;background:var(--orange-pale);border-radius:10px;padding:14px;text-align:center;">
-      <div style="font-size:11px;color:var(--mid);margin-bottom:4px;">換算結果</div>
-      <div id="calc-value" style="font-size:24px;font-weight:700;color:var(--orange);font-family:'DM Mono',monospace;"></div>
+    <div id="calc-result" style="display:none;background:var(--orange-pale);border-radius:10px;padding:14px;text-align:center;margin-bottom:8px;">
+      <div style="font-size:11px;color:var(--mid);margin-bottom:4px;">円 → 現地通貨</div>
+      <div id="calc-value" style="font-size:22px;font-weight:700;color:var(--orange);font-family:'DM Mono',monospace;"></div>
       <div id="calc-rate" style="font-size:11px;color:var(--mid);margin-top:4px;"></div>
+    </div>
+    <div id="calc-result-reverse" style="display:none;background:#EDF7F0;border-radius:10px;padding:14px;text-align:center;">
+      <div style="font-size:11px;color:var(--mid);margin-bottom:4px;">現地通貨 → 円</div>
+      <div id="calc-value-reverse" style="font-size:22px;font-weight:700;color:var(--green);font-family:'DM Mono',monospace;"></div>
+      <div id="calc-rate-reverse" style="font-size:11px;color:var(--mid);margin-top:4px;"></div>
     </div>
   </div>
   <div class="card">
@@ -1560,7 +1573,35 @@ function loadTargetMargin(){document.getElementById('target-margin-input').value
 
 const shopeeUrls={tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
 function openShopee(market){const ja=document.getElementById('search-keyword').value.trim();const en=document.getElementById('search-keyword-en')?.value?.trim()||'';const zh=document.getElementById('search-keyword-zh')?.value?.trim()||'';const th=document.getElementById('search-keyword-th')?.value?.trim()||'';const vn=document.getElementById('search-keyword-vn')?.value?.trim()||'';if(!ja&&!en&&!zh){alert('商品名を入力してください');return;}let kw=en||ja;if(market==='tw')kw=zh||en||ja;if(market==='th')kw=th||en||ja;if(market==='vn')kw=vn||en||ja;window.open(shopeeUrls[market]+encodeURIComponent(kw),'_blank');}
-function calcExchange(){const jpy=parseFloat(document.getElementById('calc-jpy').value);const market=document.getElementById('calc-market').value;const resultEl=document.getElementById('calc-result');if(!jpy||isNaN(jpy)){resultEl.style.display='none';return;}const rate=exchangeRates[market];const converted=jpy*rate;const unit=unitMap[market];const fmt2=market==='vn'?Math.round(converted).toLocaleString():(converted<100?converted.toFixed(2):Math.round(converted).toLocaleString());document.getElementById('calc-value').textContent=unit+' '+fmt2;document.getElementById('calc-rate').textContent='¥1 = '+(rate<1?rate.toFixed(4):rate.toFixed(2))+' '+unit+'（自動取得レート）';resultEl.style.display='block';}
+function calcExchange(){
+  const jpy=parseFloat(document.getElementById('calc-jpy').value);
+  const market=document.getElementById('calc-market').value;
+  const resultEl=document.getElementById('calc-result');
+  if(!jpy||isNaN(jpy)){resultEl.style.display='none';return;}
+  const rate=exchangeRates[market];
+  const converted=jpy*rate;
+  const unit=unitMap[market];
+  const fmt2=market==='vn'?Math.round(converted).toLocaleString():(converted<100?converted.toFixed(2):Math.round(converted).toLocaleString());
+  document.getElementById('calc-value').textContent=unit+' '+fmt2;
+  document.getElementById('calc-rate').textContent='¥1 = '+(rate<1?rate.toFixed(4):rate.toFixed(2))+' '+unit+'（自動取得レート）';
+  resultEl.style.display='block';
+  // ラベル更新
+  var lbl=document.getElementById('calc-local-label');
+  if(lbl)lbl.textContent=unit+' → 円';
+}
+function calcExchangeReverse(){
+  const local=parseFloat(document.getElementById('calc-local').value);
+  const market=document.getElementById('calc-market').value;
+  const resultEl=document.getElementById('calc-result-reverse');
+  if(!local||isNaN(local)){resultEl.style.display='none';return;}
+  const rate=exchangeRates[market];
+  const unit=unitMap[market];
+  const jpy=local/rate;
+  const jpyFmt=jpy>=10?Math.round(jpy).toLocaleString():jpy.toFixed(2);
+  document.getElementById('calc-value-reverse').textContent='¥'+jpyFmt;
+  document.getElementById('calc-rate-reverse').textContent=unit+'1 = ¥'+(1/rate<1?(1/rate).toFixed(4):(1/rate).toFixed(2))+'（自動取得レート）';
+  resultEl.style.display='block';
+}
 
 const trendEvents=[
   {month:1,day:1,name:'元旦セール',markets:['台湾','シンガポール','マレーシア'],tags:['全般'],tip:'新年向けギフト・生活用品が狙い目'},
