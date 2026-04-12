@@ -1286,7 +1286,7 @@ async function openModal(id){
         try{
           var rawName=p.name.replace(/[【［][^】］]*[】］]\s*/g,'').trim();
           const t=await deeplTranslate(rawName,targetCode);
-          if(t)parsed['title_'+lang]=(prefixes[lang]||'')+' '+t;
+          if(t){var tc=t.replace(/[\u3010\uff3b][^\u3011\uff3d]*[\u3011\uff3d]\s*/g,'').trim();parsed['title_'+lang]=(prefixes[lang]||'')+' '+tc;}
         }catch(e){}
 
         // キャッチコピー翻訳
