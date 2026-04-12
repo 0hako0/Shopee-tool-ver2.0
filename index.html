@@ -401,29 +401,26 @@
   </div>
 </div>
 
-<!-- ── DESCRIPTION MODAL ── -->
-<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modal-title">商品説明文</div>
-    <div class="modal-sub" id="modal-sub">AIが自動生成します</div>
-    <div class="lang-tabs">
-      <button class="lang-tab active" onclick="switchLang('ja',this)">日本語</button>
-      <button class="lang-tab" onclick="switchLang('en',this)">英語</button>
-      <button class="lang-tab" onclick="switchLang('zh',this)">中国語</button>
-      <button class="lang-tab" id="tab-th" style="display:none;" onclick="switchLang('th',this)">タイ語</button>
-      <button class="lang-tab" id="tab-vn" style="display:none;" onclick="switchLang('vn',this)">ベトナム語</button>
+<!-- ── SETTINGS PANEL ── -->
+<div class="panel" id="panel-settings">
+  <div class="card">
+    <div class="card-title">目標利益率</div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>目標利益率（%）— 自動価格計算・警告表示に使用</label>
+      <div style="position:relative;">
+        <input type="number" id="target-margin-input" placeholder="20" inputmode="numeric" style="padding-right:40px;">
+        <span style="position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid);">%</span>
+      </div>
     </div>
-    <div class="desc-box" id="desc-content"><div class="loading-dots"><span></span><span></span><span></span></div></div>
-    <button class="copy-btn" onclick="copyDesc()">📋 説明文をコピー</button>
-    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
-      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin-bottom:10px;">📋 出品用データ一括コピー</div>
-      <div class="listing-field"><div class="lf-label">商品タイトル（英語）</div><div class="lf-val" id="lv-title-en">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-en',this)">コピー</button></div>
-      <div class="listing-field"><div class="lf-label">商品タイトル（中国語）</div><div class="lf-val" id="lv-title-zh">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-zh',this)">コピー</button></div>
-      <div class="listing-field" id="lf-title-th" style="display:none;"><div class="lf-label">商品タイトル（タイ語）</div><div class="lf-val" id="lv-title-th">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-th',this)">コピー</button></div>
-      <div class="listing-field" id="lf-title-vn" style="display:none;"><div class="lf-label">商品タイトル（ベトナム語）</div><div class="lf-val" id="lv-title-vn">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-vn',this)">コピー</button></div>
-      <div class="listing-field"><div class="lf-label">カテゴリー</div><div class="lf-val" id="lv-category">-</div><button class="lf-copy" onclick="copyField('lv-category',this)">コピー</button></div>
-      <div class="listing-field"><div class="lf-label">推奨販売価格</div><div class="lf-val" id="lv-price">-</div><button class="lf-copy" onclick="copyField('lv-price',this)">コピー</button></div>
+    <button class="add-btn" onclick="saveTargetMargin()">保存する</button>
+    <div id="margin-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">手数料設定</div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.7;">未入力の場合はデフォルト値を使用します。</div>
+    <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">共通手数料</div>
+    <div class="form-grid" style="margin-bottom:12px;">
+      <div class="field"><label>SLS手数料（%）</label><div style="position:relative;"><input type="number" id="fee-sls" placeholder="1.75" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
       <div class="field"><label>Payoneer手数料（%）</label><div style="position:relative;"><input type="number" id="fee-payoneer" placeholder="2.0" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">販売手数料（国別）</div>
@@ -438,8 +435,6 @@
     <button class="add-btn" onclick="saveFeeSettings()">手数料を保存する</button>
     <div id="fee-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
   </div>
-
-  <!-- ── 禁止カテゴリ一覧 ── -->
   <div class="card">
     <div class="card-title">🚫 各国の禁止・要申請カテゴリ</div>
     <div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.7;">
@@ -456,8 +451,6 @@
     </div>
     <div id="restriction-table-area"></div>
   </div>
-
-  <!-- ── AI設定（Gemini API） ── -->
   <div class="card">
     <div class="card-title">AI設定（Gemini API）</div>
     <div class="field" style="margin-bottom:12px;">
@@ -470,8 +463,6 @@
     <button class="add-btn" onclick="saveApiKey()">APIキーを保存する</button>
     <div id="key-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
   </div>
-
-  <!-- ── DeepL API設定（NEW） ── -->
   <div class="card">
     <div class="card-title" style="display:flex;align-items:center;gap:8px;">
       🌐 翻訳設定（DeepL API）
@@ -504,7 +495,6 @@
       4. APIキーをコピーして上の欄に貼り付け
     </div>
   </div>
-
   <div class="card">
     <div class="card-title">使い方</div>
     <div style="font-size:12px;color:var(--mid);line-height:1.9;">
@@ -517,6 +507,71 @@
     </div>
   </div>
 </div>
+
+<!-- ── DESCRIPTION MODAL ── -->
+<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">商品説明文</div>
+    <div class="modal-sub" id="modal-sub">AIが自動生成します</div>
+    <div class="lang-tabs">
+      <button class="lang-tab active" onclick="switchLang('ja',this)">日本語</button>
+      <button class="lang-tab" onclick="switchLang('en',this)">英語</button>
+      <button class="lang-tab" onclick="switchLang('zh',this)">中国語</button>
+      <button class="lang-tab" id="tab-th" style="display:none;" onclick="switchLang('th',this)">タイ語</button>
+      <button class="lang-tab" id="tab-vn" style="display:none;" onclick="switchLang('vn',this)">ベトナム語</button>
+    </div>
+    <div class="desc-box" id="desc-content"><div class="loading-dots"><span></span><span></span><span></span></div></div>
+    <button class="copy-btn" onclick="copyDesc()">📋 説明文をコピー</button>
+    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin-bottom:10px;">📋 出品用データ一括コピー</div>
+      <div class="listing-field"><div class="lf-label">商品タイトル（英語）</div><div class="lf-val" id="lv-title-en">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-en',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">商品タイトル（中国語）</div><div class="lf-val" id="lv-title-zh">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-zh',this)">コピー</button></div>
+      <div class="listing-field" id="lf-title-th" style="display:none;"><div class="lf-label">商品タイトル（タイ語）</div><div class="lf-val" id="lv-title-th">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-th',this)">コピー</button></div>
+      <div class="listing-field" id="lf-title-vn" style="display:none;"><div class="lf-label">商品タイトル（ベトナム語）</div><div class="lf-val" id="lv-title-vn">生成中...</div><button class="lf-copy" onclick="copyField('lv-title-vn',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">カテゴリー</div><div class="lf-val" id="lv-category">-</div><button class="lf-copy" onclick="copyField('lv-category',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">推奨販売価格</div><div class="lf-val" id="lv-price">-</div><button class="lf-copy" onclick="copyField('lv-price',this)">コピー</button></div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin:14px 0 8px;">🛒 Shopeeセラーセンター入力用</div>
+      <div class="listing-field"><div class="lf-label">Brand</div><div class="lf-val" id="lv-brand">生成中...</div><button class="lf-copy" onclick="copyField('lv-brand',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Region of Origin</div><div class="lf-val" id="lv-origin">Japan</div><button class="lf-copy" onclick="copyField('lv-origin',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Material</div><div class="lf-val" id="lv-material">生成中...</div><button class="lf-copy" onclick="copyField('lv-material',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Ingredient</div><div class="lf-val" id="lv-ingredient">生成中...</div><button class="lf-copy" onclick="copyField('lv-ingredient',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Features（最大5個）</div><div class="lf-val" id="lv-features" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-features',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">Stock</div><div class="lf-val" id="lv-stock">10000000</div><button class="lf-copy" onclick="copyField('lv-stock',this)">コピー</button></div>
+      <div class="listing-field">
+        <div class="lf-label">Weight (kg)</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="number" id="lv-weight-kg-input" step="0.001" inputmode="decimal" style="flex:1;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="font-size:12px;color:var(--mid);">kg</span>
+          <button onclick="saveShippingSpec()" style="padding:6px 12px;background:var(--orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;">保存</button>
+          <button onclick="copyInputVal('lv-weight-kg-input',this)" style="padding:6px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);cursor:pointer;">コピー</button>
+        </div>
+      </div>
+      <div class="listing-field">
+        <div class="lf-label">Parcel Size W × L × H (cm)</div>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <input type="number" id="lv-parcel-w" inputmode="numeric" placeholder="W" style="width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="color:var(--mid);font-size:12px;">×</span>
+          <input type="number" id="lv-parcel-l" inputmode="numeric" placeholder="L" style="width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="color:var(--mid);font-size:12px;">×</span>
+          <input type="number" id="lv-parcel-h" inputmode="numeric" placeholder="H" style="width:60px;padding:6px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);">
+          <span style="font-size:11px;color:var(--mid);">cm</span>
+          <button onclick="saveShippingSpec()" style="padding:6px 10px;background:var(--orange);color:white;border:none;border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;">保存</button>
+          <button onclick="copyParcelSize(this)" style="padding:6px 10px;background:var(--white);border:1.5px solid var(--border);border-radius:7px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--orange);cursor:pointer;">コピー</button>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin:14px 0 8px;">📝 カテゴリー別スペック（Specification）</div>
+      <div id="lv-spec-fields-area"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin:14px 0 8px;">🎯 こんな方におすすめ</div>
+      <div class="listing-field"><div class="lf-label">ターゲット（日本語）</div><div class="lf-val" id="lv-target-ja" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-target-ja',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">ターゲット（英語）</div><div class="lf-val" id="lv-target-en" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-target-en',this)">コピー</button></div>
+      <button class="copy-btn" style="background:var(--dark);margin-top:4px;" onclick="copyAllListing()">📦 全データをまとめてコピー</button>
+    </div>
+    <button class="close-btn" onclick="closeModal()">閉じる</button>
+  </div>
+</div>
+
 
 <script>
 // ────────────────────────────────────────────
