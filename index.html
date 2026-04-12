@@ -1238,44 +1238,57 @@ async function openModal(id){
       if(isThaiMarket)deeplLangs.push('th');
       if(isVnMarket)deeplLangs.push('vn');
 
-      // 各言語・各フィールドを翻訳
+      // 各言語・各フィールドを順番に翻訳（並列ではなく直列で安定動作）
       for(const lang of deeplLangs){
         const targetCode=DEEPL_LANG_MAP[lang];
         if(!targetCode)continue;
 
-        // タイトル翻訳（日本語タイトルから）
-        const translatedTitle=await deeplTranslate(p.name,targetCode);
-        if(translatedTitle){
-          // タイトルにプレフィックスを付与
-          const prefixes={en:'【Direct from Japan】',zh:'【日本直送】',th:'【ส่งตรงจากญี่ปุ่น】',vn:'【Giao thẳng từ Nhật】'};
-          parsed['title_'+lang]=(prefixes[lang]||'')+' '+translatedTitle;
-        }
+        const prefixes={en:'【Direct from Japan】',zh:'【日本直送】',th:'【ส่งตรงจากญี่ปุ่น】',vn:'【Giao thẳng từ Nhật】'};
+
+        // タイトル翻訳
+        try{
+          const t=await deeplTranslate(p.name,targetCode);
+          if(t)parsed['title_'+lang]=(prefixes[lang]||'')+' '+t;
+        }catch(e){}
 
         // キャッチコピー翻訳
-        if(parsed.catchcopy_ja){
-          const tc=await deeplTranslate(parsed.catchcopy_ja,targetCode);
-          if(tc)parsed['catchcopy_'+lang]=tc;
+        try{
+          if(parsed.catchcopy_ja){
+            const t=await deeplTranslate(parsed.catchcopy_ja,targetCode);
+            if(t)parsed['catchcopy_'+lang]=t;
+          }
+        }catch(e){}
+
+        // features翻訳（1件ずつ）
+        parsed['features_'+lang]=[];
+        if(parsed.features_ja&&parsed.features_ja.length){
+          for(const item of parsed.features_ja){
+            try{const t=await deeplTranslate(item,targetCode);if(t)parsed['features_'+lang].push(t);}catch(e){}
+          }
         }
 
-        // features翻訳
-        if(parsed.features_ja&&parsed.features_ja.length){
-          const translated=await Promise.all(parsed.features_ja.map(f=>deeplTranslate(f,targetCode)));
-          parsed['features_'+lang]=translated.filter(Boolean);
-        }
-        // steps翻訳
+        // steps翻訳（1件ずつ）
+        parsed['steps_'+lang]=[];
         if(parsed.steps_ja&&parsed.steps_ja.length){
-          const translated=await Promise.all(parsed.steps_ja.map(s=>deeplTranslate(s,targetCode)));
-          parsed['steps_'+lang]=translated.filter(Boolean);
+          for(const item of parsed.steps_ja){
+            try{const t=await deeplTranslate(item,targetCode);if(t)parsed['steps_'+lang].push(t);}catch(e){}
+          }
         }
-        // uses翻訳
+
+        // uses翻訳（1件ずつ）
+        parsed['uses_'+lang]=[];
         if(parsed.uses_ja&&parsed.uses_ja.length){
-          const translated=await Promise.all(parsed.uses_ja.map(u=>deeplTranslate(u,targetCode)));
-          parsed['uses_'+lang]=translated.filter(Boolean);
+          for(const item of parsed.uses_ja){
+            try{const t=await deeplTranslate(item,targetCode);if(t)parsed['uses_'+lang].push(t);}catch(e){}
+          }
         }
-        // warnings翻訳
+
+        // warnings翻訳（1件ずつ）
+        parsed['warnings_'+lang]=[];
         if(parsed.warnings_ja&&parsed.warnings_ja.length){
-          const translated=await Promise.all(parsed.warnings_ja.map(w=>deeplTranslate(w,targetCode)));
-          parsed['warnings_'+lang]=translated.filter(Boolean);
+          for(const item of parsed.warnings_ja){
+            try{const t=await deeplTranslate(item,targetCode);if(t)parsed['warnings_'+lang].push(t);}catch(e){}
+          }
         }
 
         parsed[lang]=formatDesc(parsed,lang,p.name);
