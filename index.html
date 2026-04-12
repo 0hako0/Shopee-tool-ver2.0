@@ -463,6 +463,13 @@
         </div>
       </div>
 
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin:14px 0 8px;">📝 カテゴリー別スペック（Specification）</div>
+      <div id="lv-spec-fields-area"></div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.08em;margin:14px 0 8px;">🎯 こんな方におすすめ</div>
+      <div class="listing-field"><div class="lf-label">ターゲット（日本語）</div><div class="lf-val" id="lv-target-ja" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-target-ja',this)">コピー</button></div>
+      <div class="listing-field"><div class="lf-label">ターゲット（英語）</div><div class="lf-val" id="lv-target-en" style="white-space:pre-wrap;">生成中...</div><button class="lf-copy" onclick="copyField('lv-target-en',this)">コピー</button></div>
+
       <button class="copy-btn" style="background:var(--dark);margin-top:4px;" onclick="copyAllListing()">📦 全データをまとめてコピー</button>
     </div>
     <button class="close-btn" onclick="closeModal()">閉じる</button>
@@ -601,6 +608,33 @@ function getDeeplKey() {
   return localStorage.getItem('deepl_api_key') || '';
 }
 
+// ── スペック欄を動的に描画 ──
+function renderSpecFields(parsed, category) {
+  var area = document.getElementById('lv-spec-fields-area');
+  if (!area) return;
+  var sf = parsed.spec_fields || {};
+  var labelMap = {
+    formulation:'Formulation', skin_type:'Skin Type',
+    skin_care_benefits:'Skin Care Benefits', ingredient_preference:'Ingredient Preference',
+    specialty_type:'Specialty Type', volume_ml:'Volume (ml)',
+    quantity:'Quantity', ingredient:'Ingredient', shelf_life:'Shelf Life',
+    material_detail:'Material', color:'Color', size_detail:'Size', age_range:'Age Range',
+  };
+  if (Object.keys(sf).length === 0) {
+    area.innerHTML = '<div style="font-size:11px;color:var(--mid);padding:8px 0;">スペック情報がありません。再生成してください。</div>';
+    return;
+  }
+  var html = '';
+  Object.keys(sf).forEach(function(key) {
+    var val = sf[key];
+    var label = labelMap[key] || key;
+    var elId = 'lv-spec-' + key;
+    html += '<div class="listing-field"><div class="lf-label">'+label+'</div>'
+      +'<div class="lf-val" id="'+elId+'" style="word-break:break-all;">'+val+'</div>'
+      +'<button class="lf-copy" onclick="copyField(\''+elId+'\',this)">コピー</button></div>';
+  });
+  area.innerHTML = html;
+}
 function saveDeeplKey() {
   const key = document.getElementById('deepl-key-input').value.trim();
   if (!key) { alert('DeepL APIキーを入力してください'); return; }
@@ -1105,11 +1139,11 @@ function getSavedDesc(id){try{const s=localStorage.getItem('desc_'+id);return s?
 function formatDesc(parsed,lang,productName){
   var SEP='━━━━━━━━━━━━━━━━━━━';
   var configs={
-    ja:{flag:'🇯🇵【日本直送】',whyTitle:'【選ばれる理由】',featureIcon:'✨ ',howTitle:'🎯 使い方',qualityTitle:'⭐ 日本製品質保証',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出荷情報',shipLines:['✅ 日本から直送','✅ 迅速発送（1〜2営業日）','✅ 正規品保証'],closing:'今すぐ注文して、日本品質を体験しよう！✨'},
+    ja:{flag:'🇯🇵【日本直送】',whyTitle:'【選ばれる理由】',featureIcon:'✨ ',howTitle:'🎯 使い方',qualityTitle:'⭐ 日本製品質保証',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出荷情報',shipLines:['✅ 日本から直送'],closing:'今すぐ注文して、日本品質を体験しよう！✨'},
     zh:{flag:'🇯🇵【日本直送】',whyTitle:'【為什麼選擇這個商品？】',featureIcon:'✨ ',howTitle:'🎯 使用方法（超簡單！）',qualityTitle:'⭐ 日本製品質保證',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出貨資訊',shipLines:['✅ 台灣直送','✅ 現貨供應','✅ 快速出貨（1-2個工作天）','✅ 完整包裝，確保品質'],closing:'立即下單，體驗日本品質的魅力！✨'},
-    en:{flag:'🇯🇵【Direct from Japan】',whyTitle:'【Why choose this?】',featureIcon:'✨ ',howTitle:'🎯 How to Use',qualityTitle:'⭐ Japanese Quality Guaranteed',useIcon:'✅ ',warnTitle:'⚠️ Precautions',warnIcon:'• ',shipTitle:'🚚 Shipping Info',shipLines:['✅ Ships directly from Japan','✅ Fast shipping (1-2 business days)','✅ Authentic product guaranteed'],closing:'Order now and experience Japanese quality! ✨'},
-    th:{flag:'🇯🇵【ส่งตรงจากญี่ปุ่น】',whyTitle:'【ทำไมต้องเลือกสินค้านี้？】',featureIcon:'✨ ',howTitle:'🎯 วิธีใช้งาน',qualityTitle:'⭐ รับประกันคุณภาพจากญี่ปุ่น',useIcon:'✅ ',warnTitle:'⚠️ ข้อควรระวัง',warnIcon:'• ',shipTitle:'🚚 ข้อมูลการจัดส่ง',shipLines:['✅ จัดส่งตรงจากญี่ปุ่น','✅ จัดส่งเร็ว (1-2 วันทำการ)','✅ สินค้าแท้รับประกัน'],closing:'สั่งซื้อเลยวันนี้! ✨'},
-    vn:{flag:'🇯🇵【Giao thẳng từ Nhật】',whyTitle:'【Tại sao chọn sản phẩm này？】',featureIcon:'✨ ',howTitle:'🎯 Cách sử dụng',qualityTitle:'⭐ Chất lượng Nhật Bản đảm bảo',useIcon:'✅ ',warnTitle:'⚠️ Lưu ý',warnIcon:'• ',shipTitle:'🚚 Thông tin vận chuyển',shipLines:['✅ Giao hàng trực tiếp từ Nhật Bản','✅ Giao hàng nhanh (1-2 ngày làm việc)','✅ Hàng chính hãng đảm bảo'],closing:'Đặt hàng ngay hôm nay! ✨'},
+    en:{flag:'🇯🇵【Direct from Japan】',whyTitle:'【Why choose this?】',featureIcon:'✨ ',howTitle:'🎯 How to Use',qualityTitle:'⭐ Japanese Quality Guaranteed',useIcon:'✅ ',warnTitle:'⚠️ Precautions',warnIcon:'• ',shipTitle:'🚚 Shipping Info',shipLines:['✅ Ships directly from Japan'],closing:'Order now and experience Japanese quality! ✨'},
+    th:{flag:'🇯🇵【ส่งตรงจากญี่ปุ่น】',whyTitle:'【ทำไมต้องเลือกสินค้านี้？】',featureIcon:'✨ ',howTitle:'🎯 วิธีใช้งาน',qualityTitle:'⭐ รับประกันคุณภาพจากญี่ปุ่น',useIcon:'✅ ',warnTitle:'⚠️ ข้อควรระวัง',warnIcon:'• ',shipTitle:'🚚 ข้อมูลการจัดส่ง',shipLines:['✅ จัดส่งตรงจากญี่ปุ่น'],closing:'สั่งซื้อเลยวันนี้! ✨'},
+    vn:{flag:'🇯🇵【Giao thẳng từ Nhật】',whyTitle:'【Tại sao chọn sản phẩm này？】',featureIcon:'✨ ',howTitle:'🎯 Cách sử dụng',qualityTitle:'⭐ Chất lượng Nhật Bản đảm bảo',useIcon:'✅ ',warnTitle:'⚠️ Lưu ý',warnIcon:'• ',shipTitle:'🚚 Thông tin vận chuyển',shipLines:['✅ Giao hàng trực tiếp từ Nhật Bản'],closing:'Đặt hàng ngay hôm nay! ✨'},
   };
   var c=configs[lang]||configs.en;
   var features=parsed['features_'+lang]||[];
@@ -1164,6 +1198,9 @@ function showDesc(id){
   document.getElementById('lv-brand').textContent=saved.brand||'-';
   document.getElementById('lv-material').textContent=saved.material||'-';
   document.getElementById('lv-features').textContent=(saved.features||[]).join('\n');
+  renderSpecFields(saved, p.category);
+  document.getElementById('lv-target-ja').textContent=(saved.target_ja||[]).join('\n')||'-';
+  document.getElementById('lv-target-en').textContent=(saved.target_en||[]).join('\n')||'-';
   const wkMap=['0.08','0.2','0.4','0.8','1.5'];
   const savedSpec2=getSavedShippingSpec(p.id);
   document.getElementById('lv-weight-kg-input').value=savedSpec2.weight||(wkMap[p.weight]||'0.4');
@@ -1248,7 +1285,10 @@ async function openModal(id){
         // タイトル翻訳
         try{
           const t=await deeplTranslate(p.name,targetCode);
-          if(t)parsed['title_'+lang]=(prefixes[lang]||'')+' '+t;
+          if(t){
+            const cleaned=t.split('】').pop().trim();
+            parsed['title_'+lang]=(prefixes[lang]||'')+' '+cleaned;
+          }
         }catch(e){}
 
         // キャッチコピー翻訳
@@ -1291,6 +1331,14 @@ async function openModal(id){
           }
         }
 
+        // target翻訳（1件ずつ）
+        parsed['target_'+lang]=[];
+        if(parsed.target_ja&&parsed.target_ja.length){
+          for(const item of parsed.target_ja){
+            try{const t=await deeplTranslate(item,targetCode);if(t)parsed['target_'+lang].push(t);}catch(e){}
+          }
+        }
+
         parsed[lang]=formatDesc(parsed,lang,p.name);
       }
 
@@ -1320,6 +1368,11 @@ async function openModal(id){
     document.getElementById('lv-brand').textContent=parsed.brand||'-';
     document.getElementById('lv-material').textContent=parsed.material||'-';
     document.getElementById('lv-features').textContent=(parsed.features||[]).join('\n');
+    // スペック欄
+    renderSpecFields(parsed, p.category);
+    // ターゲット欄
+    document.getElementById('lv-target-ja').textContent=(parsed.target_ja||[]).join('\n')||'-';
+    document.getElementById('lv-target-en').textContent=(parsed.target_en||[]).join('\n')||'-';
     const savedSpec=getSavedShippingSpec(p.id);
     document.getElementById('lv-weight-kg-input').value=savedSpec.weight||weightKg;
     document.getElementById('lv-parcel-w').value=savedSpec.w||parsed.parcel_w||'';
@@ -1334,20 +1387,52 @@ async function openModal(id){
 function buildPromptWithDeepL(name,category,marketNamesStr,isThaiMarket,isVnMarket){
   return 'あなたはShopeeで'+marketNamesStr+'に日本製品を販売するプロのECセラーです。\n'
     +'商品名: '+name+'\nカテゴリー: '+category+'\n出品マーケット: '+marketNamesStr+'\n\n'
-    +'日本語のみで以下のJSON形式で返答してください（マークダウン・コードブロック不要）。翻訳は別途行うので日本語だけ丁寧に書いてください。\n\n'
+    +'日本語のみで以下のJSON形式で返答してください（マークダウン・コードブロック不要）。翻訳は別途行うので日本語だけ丁寧・具体的に書いてください。\n\n'
     +'{\n'
-    +'  "catchcopy_ja": "日本語キャッチコピー1文（20〜30字・インパクト重視）",\n'
-    +'  "features_ja": ["特徴1（15〜20字）","特徴2","特徴3","特徴4"],\n'
-    +'  "steps_ja": ["手順1（簡潔に）","手順2","手順3"],\n'
-    +'  "uses_ja": ["用途1","用途2","用途3","用途4"],\n'
-    +'  "warnings_ja": ["注意事項1","注意事項2"],\n'
+    +'  "catchcopy_ja": "日本語キャッチコピー1文（25〜35字・購買意欲を高めるインパクト重視）",\n'
+    +'  "features_ja": ["特徴1（具体的な数値や成分名を入れて20〜30字）","特徴2","特徴3","特徴4","特徴5"],\n'
+    +'  "steps_ja": ["手順1（具体的に）","手順2","手順3","手順4"],\n'
+    +'  "uses_ja": ["用途1（具体的なシーンや対象者を入れて）","用途2","用途3","用途4","用途5"],\n'
+    +'  "warnings_ja": ["注意事項1","注意事項2","注意事項3"],\n'
+    +'  "target_ja": ["こんな方におすすめ1（具体的な悩みや状況）","こんな方におすすめ2","こんな方におすすめ3"],\n'
     +'  "brand": "ブランド名（英語表記）",\n'
-    +'  "material": "主な素材（英語1〜3語）",\n'
+    +'  "material": "主な素材・成分（英語1〜5語）",\n'
+    +'  "ingredient": "主要成分（英語）",\n'
     +'  "features": ["Feature1 (max 15 chars)","Feature2","Feature3","Feature4","Feature5"],\n'
+    +'  "spec_fields": "(カテゴリー別スペックは下記参照)",\n'
     +'  "parcel_w": "梱包幅（整数のみ 例:15）",\n'
     +'  "parcel_l": "梱包長さ（整数のみ）",\n'
     +'  "parcel_h": "梱包高さ（整数のみ）"\n'
-    +'}';
+    +'}\n\n'
+    +buildSpecFieldsPrompt(category);
+}
+
+function buildSpecFieldsPrompt(category){
+  const specs={
+    'Beauty':[
+      'spec_fields内: "formulation":"製品形態（例:Lotion/Cream/Serum/Gel/Oil/Foam/Powder）","skin_type":"肌タイプ（例:All Skin Types/Dry/Oily/Combination/Sensitive）","skin_care_benefits":"効果（例:Brightening/Moisturizing/Anti-aging/Acne Control）","ingredient_preference":"成分特徴（例:Hyaluronic Acid/Vitamin C/Retinol/Niacinamide）","specialty_type":"特徴（例:Vegan/Cruelty Free/Paraben Free/Natural）","volume_ml":"容量（ml数値のみ 例:150）"'
+    ],
+    'Health':[
+      'spec_fields内: "formulation":"剤形（例:Tablet/Capsule/Liquid/Powder/Gel）","quantity":"内容量（例:60 tablets）","ingredient":"主成分（英語）","specialty_type":"特徴（例:Sugar Free/Gluten Free/Vegan/Non-GMO）"'
+    ],
+    'Home & Living':[
+      'spec_fields内: "material_detail":"素材詳細（英語 例:Stainless Steel/Silicone/BPA-free Plastic）","color":"カラー（英語 例:White/Black/Clear）","size_detail":"サイズ情報（例:20x15x10cm）","specialty_type":"特徴（例:Eco-friendly/Dishwasher Safe/Microwave Safe）"'
+    ],
+    'Food & Beverages':[
+      'spec_fields内: "formulation":"形態（例:Liquid/Powder/Solid/Freeze-dried）","quantity":"内容量（例:500g/1L）","ingredient":"原材料（英語）","shelf_life":"賞味期限目安（例:12 months）","specialty_type":"特徴（例:Organic/Sugar Free/Gluten Free/Vegan）"'
+    ],
+    'Sports & Outdoors':[
+      'spec_fields内: "material_detail":"素材（英語）","color":"カラー（英語）","size_detail":"サイズ（英語 例:One Size/S/M/L）","specialty_type":"特徴（例:Waterproof/UV Protection/Breathable/Lightweight）"'
+    ],
+    'Mom & Baby':[
+      'spec_fields内: "material_detail":"素材（英語 例:BPA-free/Food-grade Silicone）","age_range":"対象年齢（英語 例:0-6 months/6-12 months）","quantity":"内容量・個数（例:50 sheets）","specialty_type":"特徴（例:Hypoallergenic/Fragrance Free/Dermatologist Tested）"'
+    ],
+    'Hobbies & Collections':[
+      'spec_fields内: "material_detail":"素材（英語）","color":"カラー（英語）","size_detail":"サイズ（英語）","specialty_type":"特徴（英語）"'
+    ],
+  };
+  const s=specs[category]||specs['Home & Living'];
+  return 'カテゴリー'+category+'のspec_fieldsは以下の形式で：\n'+s[0]+'\n以上を正確なJSONとして出力してください。';
 }
 
 // DeepLなし用プロンプト（従来通り全言語Geminiで生成）
