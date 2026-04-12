@@ -1140,7 +1140,7 @@ function formatDesc(parsed,lang,productName){
   var SEP='━━━━━━━━━━━━━━━━━━━';
   var configs={
     ja:{flag:'🇯🇵【日本直送】',whyTitle:'【選ばれる理由】',featureIcon:'✨ ',howTitle:'🎯 使い方',qualityTitle:'⭐ 日本製品質保証',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出荷情報',shipLines:['✅ 日本から直送'],closing:'今すぐ注文して、日本品質を体験しよう！✨'},
-    zh:{flag:'🇯🇵【日本直送】',whyTitle:'【為什麼選擇這個商品？】',featureIcon:'✨ ',howTitle:'🎯 使用方法（超簡單！）',qualityTitle:'⭐ 日本製品質保證',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出貨資訊',shipLines:['✅ 台灣直送','✅ 現貨供應','✅ 快速出貨（1-2個工作天）','✅ 完整包裝，確保品質'],closing:'立即下單，體驗日本品質的魅力！✨'},
+    zh:{flag:'🇯🇵【日本直送】',whyTitle:'【為什麼選擇這個商品？】',featureIcon:'✨ ',howTitle:'🎯 使用方法（超簡單！）',qualityTitle:'⭐ 日本製品質保證',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出貨資訊',shipLines:['✅ 日本直送'],closing:'立即下單，體驗日本品質的魅力！✨'},
     en:{flag:'🇯🇵【Direct from Japan】',whyTitle:'【Why choose this?】',featureIcon:'✨ ',howTitle:'🎯 How to Use',qualityTitle:'⭐ Japanese Quality Guaranteed',useIcon:'✅ ',warnTitle:'⚠️ Precautions',warnIcon:'• ',shipTitle:'🚚 Shipping Info',shipLines:['✅ Ships directly from Japan'],closing:'Order now and experience Japanese quality! ✨'},
     th:{flag:'🇯🇵【ส่งตรงจากญี่ปุ่น】',whyTitle:'【ทำไมต้องเลือกสินค้านี้？】',featureIcon:'✨ ',howTitle:'🎯 วิธีใช้งาน',qualityTitle:'⭐ รับประกันคุณภาพจากญี่ปุ่น',useIcon:'✅ ',warnTitle:'⚠️ ข้อควรระวัง',warnIcon:'• ',shipTitle:'🚚 ข้อมูลการจัดส่ง',shipLines:['✅ จัดส่งตรงจากญี่ปุ่น'],closing:'สั่งซื้อเลยวันนี้! ✨'},
     vn:{flag:'🇯🇵【Giao thẳng từ Nhật】',whyTitle:'【Tại sao chọn sản phẩm này？】',featureIcon:'✨ ',howTitle:'🎯 Cách sử dụng',qualityTitle:'⭐ Chất lượng Nhật Bản đảm bảo',useIcon:'✅ ',warnTitle:'⚠️ Lưu ý',warnIcon:'• ',shipTitle:'🚚 Thông tin vận chuyển',shipLines:['✅ Giao hàng trực tiếp từ Nhật Bản'],closing:'Đặt hàng ngay hôm nay! ✨'},
@@ -1282,13 +1282,11 @@ async function openModal(id){
 
         const prefixes={en:'【Direct from Japan】',zh:'【日本直送】',th:'【ส่งตรงจากญี่ปุ่น】',vn:'【Giao thẳng từ Nhật】'};
 
-        // タイトル翻訳
+        // タイトル翻訳（商品名からプレフィックスを除去してから翻訳）
         try{
-          const t=await deeplTranslate(p.name,targetCode);
-          if(t){
-            const cleaned=t.split('】').pop().trim();
-            parsed['title_'+lang]=(prefixes[lang]||'')+' '+cleaned;
-          }
+          var rawName=p.name.replace(/[【［][^】］]*[】］]\s*/g,'').trim();
+          const t=await deeplTranslate(rawName,targetCode);
+          if(t)parsed['title_'+lang]=(prefixes[lang]||'')+' '+t;
         }catch(e){}
 
         // キャッチコピー翻訳
