@@ -955,7 +955,7 @@ function addProduct(){
 
 function renderList(){
   var el=document.getElementById('product-list');
-  if(products.length===0){el.innerHTML='<div class="empty-state"><div class="icon">\u{1F4E6}</div>まだ商品がありません<br>「追加」タブから追加してください</div>';return;}
+  if(products.length===0){el.innerHTML='<div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>';return;}
   el.innerHTML=products.map(function(p){
     var marketKeys=Object.keys(p.markets||{});
     var allProfits=marketKeys.map(function(m){return calcProfit(p.markets[m].price,p.cost,p.weight,m,p.markets[m].isNew);});
@@ -971,13 +971,13 @@ function renderList(){
       var localStr=unitMap[m]+Math.round(c.localPrice).toLocaleString();
       var margin=Math.round(c.margin*10)/10;
       var chipClass=margin>=15?'good':margin>=5?'ok':'bad';
-      return'<span style="display:inline-flex;align-items:center;gap:3px;background:var(--light);border-radius:6px;padding:3px 7px;font-size:11px;font-family:\'DM Mono\',monospace;">'
+      return '<span style="display:inline-flex;align-items:center;gap:3px;background:var(--light);border-radius:6px;padding:3px 7px;font-size:11px;">'
         +marketFlags[m]+' <span style="font-weight:700;">'+localStr+'</span>'
         +' <span class="margin-chip '+chipClass+'" style="font-size:9px;padding:1px 5px;">'+margin+'%</span>'
         +'</span>';
     }).join('');
 
-    // 国別利益詳細
+    // 国別利益HTML
     var marketsHtml=marketKeys.map(function(m){
       var md=p.markets[m];
       var c=calcProfit(md.price,p.cost,p.weight,m,md.isNew);
@@ -986,24 +986,32 @@ function renderList(){
       var chipClass=margin>=15?'good':margin>=5?'ok':'bad';
       var localStr=unitMap[m]+Math.round(c.localPrice).toLocaleString();
       var warningHtml=belowTarget?'<div style="font-size:10px;color:var(--red);margin-top:4px;">⚠️ 目標利益率（'+targetMargin+'%）を下回っています</div>':'';
-      return'<div class="market-row">'
-        +'<div class="market-row-header"><span class="market-row-name">'+marketFlags[m]+' '+marketNames[m]+'</span>'
-        +'<div class="market-row-badges"><button class="new-toggle '+(md.isNew?'active':'')+'" onclick="toggleNew('+p.id+',\''+m+'\')">'+( md.isNew?'✅ 90日以内':'90日以内')+'</button></div></div>'
+      return '<div class="market-row">'
+        +'<div class="market-row-header">'
+          +'<span class="market-row-name">'+marketFlags[m]+' '+marketNames[m]+'</span>'
+          +'<div class="market-row-badges">'
+            +'<button class="new-toggle '+(md.isNew?'active':'')+'" onclick="toggleNew('+p.id+',\''+m+'\')">'+(md.isNew?'✅ 90日以内':'90日以内')+'</button>'
+            +'<button onclick="removeMarket('+p.id+',\''+m+'\')" style="margin-left:4px;width:22px;height:22px;border:none;background:none;color:var(--red);font-size:13px;cursor:pointer;padding:0;" title="削除">✕</button>'
+          +'</div>'
+        +'</div>'
         +'<div class="market-nums">'
-        +'<div class="num-box"><div class="num-box-label">販売価格（円）</div><div class="num-box-val">'+fmt(md.price)+'</div></div>'
-        +'<div class="num-box" style="border:1px solid var(--orange);background:var(--orange-pale);"><div class="num-box-label" style="color:var(--orange);font-weight:700;">現地価格</div><div class="num-box-val" style="color:var(--orange);font-size:11px;">'+localStr+'</div></div>'
-        +'<div class="num-box"><div class="num-box-label">利益</div><div class="num-box-val" style="font-size:11px;color:'+(c.profit>=0?'var(--green)':'var(--red)')+'">'+(c.profit<0?'−':'')+fmt(c.profit)+'</div></div>'
+          +'<div class="num-box"><div class="num-box-label">販売価格（円）</div><div class="num-box-val">'+fmt(md.price)+'</div></div>'
+          +'<div class="num-box" style="border:1px solid var(--orange);background:var(--orange-pale);"><div class="num-box-label" style="color:var(--orange);font-weight:700;">現地価格</div><div class="num-box-val" style="color:var(--orange);font-size:11px;">'+localStr+'</div></div>'
+          +'<div class="num-box"><div class="num-box-label">利益</div><div class="num-box-val" style="font-size:11px;color:'+(c.profit>=0?'var(--green)':'var(--red)')+'">'+(c.profit<0?'−':'')+fmt(c.profit)+'</div></div>'
         +'</div>'
         +'<div style="display:flex;justify-content:space-between;align-items:center;">'
-        +'<span class="margin-chip '+chipClass+'">'+margin+'%</span>'
-        +warningHtml+'</div>'
+          +'<span class="margin-chip '+chipClass+'">'+margin+'%</span>'
+          +warningHtml
+        +'</div>'
         +'<div style="margin-top:6px;">'
-        +'<div class="price-edit-row" style="margin-bottom:4px;"><span class="price-label">円：</span>'
-        +'<input type="number" class="price-edit-input" id="price-input-'+p.id+'-'+m+'" value="'+md.price+'" inputmode="numeric" oninput="syncLocalPrice('+p.id+',\''+m+'\')">' 
-        +'<button class="price-save-btn" onclick="savePrice('+p.id+',\''+m+'\')" >更新</button></div>'
-        +'<div class="price-edit-row"><span class="price-label">'+unitMap[m]+'：</span>'
-        +'<input type="number" class="price-edit-input" id="price-input-local-'+p.id+'-'+m+'" value="'+Math.round(c.localPrice)+'" inputmode="numeric" oninput="syncJpyPrice('+p.id+',\''+m+'\')">' 
-        +'<button class="price-save-btn" onclick="savePriceFromLocal('+p.id+',\''+m+'\')" >更新</button></div>'
+          +'<div class="price-edit-row" style="margin-bottom:4px;"><span class="price-label">円：</span>'
+            +'<input type="number" class="price-edit-input" id="price-input-'+p.id+'-'+m+'" value="'+md.price+'" inputmode="numeric" oninput="syncLocalPrice('+p.id+',\''+m+'\')">'
+            +'<button class="price-save-btn" onclick="savePrice('+p.id+',\''+m+'\')">更新</button>'
+          +'</div>'
+          +'<div class="price-edit-row"><span class="price-label">'+unitMap[m]+'：</span>'
+            +'<input type="number" class="price-edit-input" id="price-input-local-'+p.id+'-'+m+'" value="'+Math.round(c.localPrice)+'" inputmode="numeric" oninput="syncJpyPrice('+p.id+',\''+m+'\')">'
+            +'<button class="price-save-btn" onclick="savePriceFromLocal('+p.id+',\''+m+'\')">更新</button>'
+          +'</div>'
         +'</div>'
         +'</div>';
     }).join('');
@@ -1020,7 +1028,8 @@ function renderList(){
     var statusIcons={fresh:'✅',old:'⚠️',never:'❌'};
     var statusBadge='<span style="font-size:10px;color:'+statusColors[status]+';font-weight:700;">'+statusIcons[status]+'仕入れ先</span>';
 
-    return'<div class="product-item" style="padding:0;overflow:hidden;">'
+    return '<div class="product-item" style="padding:0;overflow:hidden;">'
+      // コンパクトヘッダー
       +'<div style="padding:12px 14px;cursor:pointer;user-select:none;" onclick="toggleProductDetail(this)">'
         +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">'
           +'<div style="font-size:13px;font-weight:700;color:var(--dark);flex:1;padding-right:8px;line-height:1.4;">'+p.name+'</div>'
@@ -1037,37 +1046,104 @@ function renderList(){
         +'</div>'
         +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">'+localPriceBadges+'</div>'
       +'</div>'
-      +'<div class="product-detail" style="display:none;border-top:1px solid var(--border);padding:12px 14px;">'
-        +'<div style="font-size:11px;color:var(--mid);margin-bottom:10px;">重量：'+['〜100g','〜250g','〜500g','〜1kg','〜2kg'][p.weight]+'　カテゴリ：'+p.category+'</div>'
-        +'<div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:6px;">📊 国別利益</div>'
-        +marketsHtml
-        +'<div style="margin-top:10px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">'
-          +'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;" onclick="toggleCheckArea(this)">'
-            +'<div style="font-size:12px;font-weight:700;color:var(--dark);">📦 仕入れ先チェック</div>'
-            +'<span style="font-size:11px;color:var(--mid);" class="check-toggle-icon">▼</span>'
-          +'</div>'
-          +'<div class="supplier-check-body">'+supplierBody+'</div>'
-        +'</div>'
-        +'<div style="margin-top:8px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">'
-          +'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;" onclick="toggleCompetitor(this)">'
-            +'<span style="font-size:12px;font-weight:700;color:var(--dark);">💹 競合価格メモ'+(p.competitor_notes?' <span style=\'font-size:10px;font-weight:400;color:#666;\'>記録あり</span>':'')+'</span>'
-            +'<span style="font-size:11px;color:var(--mid);" class="competitor-toggle-icon">▼</span>'
-          +'</div>'
-          +'<div class="competitor-body" style="display:none;padding:10px 12px;">'
-            +'<textarea id="competitor-note-'+p.id+'" rows="3" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:\'Noto Sans JP\',sans-serif;color:var(--dark);resize:vertical;line-height:1.7;">'+(p.competitor_notes||'')+'</textarea>'
-            +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+buildShopeeButtons(p)+'</div>'
-            +'<button onclick="saveCompetitorNote('+p.id+')" style="width:100%;margin-top:8px;padding:9px;background:var(--dark);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">💾 メモを保存</button>'
-          +'</div>'
-        +'</div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">'
-          +'<button class="action-btn '+(hasSavedDesc?'ai':'')+'" onclick="'+(hasSavedDesc?'showDesc('+p.id+')':'')+';" style="'+(hasSavedDesc?'':'opacity:.35;cursor:default;')+'padding:8px;">📄 説明文を表示</button>'
-          +'<button class="action-btn ai" onclick="openModal('+p.id+')" style="padding:8px;">🤖 説明文生成</button>'
-          +'<button class="action-btn" onclick="editProduct('+p.id+')" style="border-color:#93c5fd;color:#3b82f6;background:#eff6ff;padding:8px;">✏️ 編集</button>'
-          +'<button class="action-btn del" onclick="deleteProduct('+p.id+')" style="padding:8px;">🗑 削除</button>'
-        +'</div>'
-      +'</div>'
+      // 詳細エリア
+      +buildDetailHTML(p,marketsHtml,supplierBody,hasSavedDesc)
     +'</div>';
   }).join('');
+}
+
+function buildDetailHTML(p,marketsHtml,supplierBody,hasSavedDesc){
+  var id=p.id;
+  var weights=['〜100g','〜250g','〜500g','〜1kg','〜2kg'];
+  var descBtn=hasSavedDesc
+    ?'<button class="action-btn ai" onclick="showDesc('+id+')" style="padding:8px;">📄 説明文を表示</button>'
+    :'<button class="action-btn" style="opacity:.35;cursor:default;padding:8px;">📄 説明文を表示</button>';
+  var competitorHtml='<div style="margin-top:8px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;" onclick="toggleCompetitor(this)">'
+      +'<span style="font-size:12px;font-weight:700;color:var(--dark);">💹 競合価格メモ'+(p.competitor_notes?' <span style="font-size:10px;font-weight:400;color:#666;">記録あり</span>':'')+'</span>'
+      +'<span style="font-size:11px;color:var(--mid);" class="competitor-toggle-icon">▼</span>'
+    +'</div>'
+    +'<div class="competitor-body" style="display:none;padding:10px 12px;">'
+      +'<textarea id="competitor-note-'+id+'" rows="3" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:\'Noto Sans JP\',sans-serif;color:var(--dark);resize:vertical;line-height:1.7;">'+(p.competitor_notes||'')+'</textarea>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+buildShopeeButtons(p)+'</div>'
+      +'<button onclick="saveCompetitorNote('+id+')" style="width:100%;margin-top:8px;padding:9px;background:var(--dark);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">💾 メモを保存</button>'
+    +'</div>'
+  +'</div>';
+
+  return '<div class="product-detail" style="display:none;border-top:1px solid var(--border);padding:12px 14px;">'
+    // ① ボタン群（最上部）
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;">'
+      +descBtn
+      +'<button class="action-btn ai" onclick="openModal('+id+')" style="padding:8px;">🤖 説明文生成</button>'
+      +'<button class="action-btn" onclick="editProduct('+id+')" style="border-color:#93c5fd;color:#3b82f6;background:#eff6ff;padding:8px;">✏️ 編集</button>'
+      +'<button class="action-btn del" onclick="deleteProduct('+id+')" style="padding:8px;">🗑 削除</button>'
+    +'</div>'
+    // 重量・カテゴリ
+    +'<div style="font-size:11px;color:var(--mid);margin-bottom:10px);">重量：'+weights[p.weight]+'　カテゴリ：'+p.category+'</div>'
+    // ② 国別利益 + マーケット追加ボタン
+    +'<div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:6px;">📊 国別利益'
+      +'<button onclick="showAddMarketModal('+id+')" style="margin-left:8px;font-size:10px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;color:var(--orange);background:var(--orange-pale);border:1px solid var(--orange);border-radius:6px;padding:2px 8px;cursor:pointer;">＋ 国を追加</button>'
+    +'</div>'
+    +marketsHtml
+    // 仕入れ先チェック
+    +'<div style="margin-top:10px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;" onclick="toggleCheckArea(this)">'
+        +'<div style="font-size:12px;font-weight:700;color:var(--dark);">📦 仕入れ先チェック</div>'
+        +'<span style="font-size:11px;color:var(--mid);" class="check-toggle-icon">▼</span>'
+      +'</div>'
+      +'<div class="supplier-check-body">'+supplierBody+'</div>'
+    +'</div>'
+    +competitorHtml
+  +'</div>';
+}
+
+
+function showAddMarketModal(id){
+  var p=products.find(function(x){return x.id===id;});
+  if(!p)return;
+  var existing=Object.keys(p.markets||{});
+  var allMarkets=['tw','th','ph','my','vn','sg'];
+  var available=allMarkets.filter(function(m){return!existing.includes(m);});
+  if(available.length===0){alert('すべての国に出品済みです');return;}
+  var flags={tw:'🇹🇼台湾',th:'🇹🇭タイ',ph:'🇵🇭フィリピン',my:'🇲🇾マレーシア',vn:'🇻🇳ベトナム',sg:'🇸🇬シンガポール'};
+  var btns=available.map(function(m){
+    return'<button onclick="addMarketToProduct('+id+',\''+m+'\',this)" style="padding:10px;background:var(--light);border:1.5px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;width:100%;text-align:left;">'+flags[m]+'</button>';
+  }).join('');
+  var overlay=document.createElement('div');
+  overlay.id='add-market-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;display:flex;align-items:flex-end;justify-content:center;';
+  overlay.innerHTML='<div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 40px;width:100%;max-width:500px;">'
+    +'<div style="width:36px;height:4px;background:#E8E8E8;border-radius:4px;margin:0 auto 16px;"></div>'
+    +'<div style="font-size:15px;font-weight:900;margin-bottom:4px;">出品国を追加</div>'
+    +'<div style="font-size:12px;color:#666;margin-bottom:16px;">追加する国を選んでください</div>'
+    +'<div style="display:flex;flex-direction:column;gap:8px;">'+btns+'</div>'
+    +'<button onclick="document.getElementById(\'add-market-overlay\').remove()" style="width:100%;padding:12px;background:#F5F5F5;color:#666;border:none;border-radius:11px;font-size:14px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;margin-top:12px;">キャンセル</button>'
+  +'</div>';
+  overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};
+  document.body.appendChild(overlay);
+}
+
+function addMarketToProduct(id,market,btn){
+  var p=products.find(function(x){return x.id===id;});
+  if(!p)return;
+  var price=calcAutoPrice(p.cost,p.weight,market,false)||0;
+  p.markets[market]={price:price,isNew:false};
+  save();
+  var overlay=document.getElementById('add-market-overlay');
+  if(overlay)overlay.remove();
+  renderList();
+}
+
+
+function removeMarket(id,market){
+  var p=products.find(function(x){return x.id===id;});
+  if(!p)return;
+  if(Object.keys(p.markets||{}).length<=1){alert('最低1つの国が必要です');return;}
+  var name=marketFlags[market]+' '+marketNames[market];
+  if(!confirm(name+'を削除しますか？\n\n※ この国の価格データが削除されます。説明文は残ります。')){return;}
+  delete p.markets[market];
+  save();
+  renderList();
 }
 
 function toggleProductDetail(header){
