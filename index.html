@@ -43,6 +43,11 @@
   .market-check-item label{display:flex;align-items:center;justify-content:center;padding:8px 4px;border:1.5px solid var(--border);border-radius:9px;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:var(--mid);cursor:pointer;transition:all .15s;text-align:center;}
   .market-check-item input[type=checkbox]:checked + label{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
 
+  .ng-warning-banner{border-radius:10px;padding:10px 12px;margin-bottom:10px;background:rgba(239,68,68,.08);border:1.5px solid var(--red);}
+  .ng-warning-banner-title{font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;}
+  .ng-warning-row{font-size:11px;color:var(--red);margin-bottom:3px;line-height:1.6;}
+  .ng-warning-apply{font-size:10px;background:#ffe4e6;color:var(--red);border:none;border-radius:6px;padding:3px 8px;cursor:pointer;margin-left:6px;font-family:'Noto Sans JP',sans-serif;font-weight:700;}
+
   .supplier-url-list{margin-bottom:8px;}
   .supplier-url-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
   .supplier-url-row input{flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;font-size:13px;font-family:'DM Mono',monospace;color:var(--dark);background:var(--white);transition:border-color .2s;}
@@ -145,6 +150,20 @@
   .summary-box-val.green{color:var(--green);}
   .csv-btn{width:100%;padding:13px;background:var(--white);border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--dark);}
   .tip{font-size:11px;color:var(--mid);text-align:center;line-height:1.7;margin-top:8px;}
+
+  /* DeepL バッジ */
+  .deepl-badge{display:inline-flex;align-items:center;gap:4px;background:#0F2B46;color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;letter-spacing:.04em;}
+
+  .restriction-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+  .restriction-table th{background:var(--light);padding:6px 8px;text-align:left;font-weight:700;color:var(--mid);border-bottom:1.5px solid var(--border);}
+  .restriction-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.6;}
+  .restriction-table tr:last-child td{border-bottom:none;}
+  .restriction-level-ng{display:inline-block;background:rgba(239,68,68,.12);color:var(--red);font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;white-space:nowrap;}
+  .restriction-level-req{display:inline-block;background:rgba(245,158,11,.12);color:var(--yellow);font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;white-space:nowrap;}
+  .restriction-level-ok{display:inline-block;background:rgba(34,197,94,.12);color:var(--green);font-size:10px;font-weight:700;padding:1px 7px;border-radius:5px;white-space:nowrap;}
+  .market-filter-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+  .market-filter-tab{padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--white);color:var(--mid);}
+  .market-filter-tab.active{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
 </style>
 </head>
 <body>
@@ -187,7 +206,7 @@
       </div>
       <div class="field">
         <label>カテゴリー</label>
-        <select id="f-category">
+        <select id="f-category" onchange="previewPrices(); checkNgWarning()">
           <option value="Home & Living">Home &amp; Living</option>
           <option value="Health">Health</option>
           <option value="Beauty">Beauty</option>
@@ -202,14 +221,16 @@
     <div style="margin-bottom:12px;">
       <label style="display:block;font-size:11px;font-weight:500;color:var(--mid);margin-bottom:8px;">出品マーケット（複数選択可）</label>
       <div class="market-checks">
-        <div class="market-check-item"><input type="checkbox" id="mc-tw" value="tw" onchange="previewPrices()"><label for="mc-tw">🇹🇼 台湾</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-th" value="th" onchange="previewPrices()"><label for="mc-th">🇹🇭 タイ</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-ph" value="ph" onchange="previewPrices()"><label for="mc-ph">🇵🇭 フィリピン</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-my" value="my" onchange="previewPrices()"><label for="mc-my">🇲🇾 マレーシア</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-vn" value="vn" onchange="previewPrices()"><label for="mc-vn">🇻🇳 ベトナム</label></div>
-        <div class="market-check-item"><input type="checkbox" id="mc-sg" value="sg" onchange="previewPrices()"><label for="mc-sg">🇸🇬 SG</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-tw" value="tw" onchange="previewPrices(); checkNgWarning()"><label for="mc-tw">🇹🇼 台湾</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-th" value="th" onchange="previewPrices(); checkNgWarning()"><label for="mc-th">🇹🇭 タイ</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-ph" value="ph" onchange="previewPrices(); checkNgWarning()"><label for="mc-ph">🇵🇭 フィリピン</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-my" value="my" onchange="previewPrices(); checkNgWarning()"><label for="mc-my">🇲🇾 マレーシア</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-vn" value="vn" onchange="previewPrices(); checkNgWarning()"><label for="mc-vn">🇻🇳 ベトナム</label></div>
+        <div class="market-check-item"><input type="checkbox" id="mc-sg" value="sg" onchange="previewPrices(); checkNgWarning()"><label for="mc-sg">🇸🇬 SG</label></div>
       </div>
     </div>
+
+    <div id="ng-warning-area" style="display:none;margin-bottom:12px;"></div>
 
     <div id="price-preview" style="display:none;margin-bottom:12px;">
       <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">
@@ -253,7 +274,9 @@
 <div class="panel" id="panel-research">
   <div class="card">
     <div class="card-title">🔎 Shopee価格リサーチ</div>
-    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;">日本語で入力するとAIが自動翻訳して各国Shopeeで検索できます</div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:6px;">日本語で入力すると自動翻訳して各国Shopeeで検索できます</div>
+    <!-- DeepL使用状況バッジ -->
+    <div id="research-translate-badge" style="margin-bottom:12px;"></div>
     <div class="field form-full" style="margin-bottom:8px;">
       <label>商品名（日本語）</label>
       <input type="text" id="search-keyword" placeholder="例：ルック 防カビくん煙剤">
@@ -480,966 +503,967 @@
     <button class="add-btn" onclick="saveFeeSettings()">手数料を保存する</button>
     <div id="fee-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
   </div>
+
+  <!-- ── 禁止カテゴリ一覧 ── -->
+  <div class="card">
+    <div class="card-title">🚫 各国の禁止・要申請カテゴリ</div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.7;">
+      出品前に必ず確認してください。<span style="color:var(--red);font-weight:700;">🚫 禁止</span>＝出品不可、<span style="color:var(--yellow);font-weight:700;">⚠️ 要申請</span>＝事前申請で出品可能
+    </div>
+    <div class="market-filter-tabs" id="restriction-filter-tabs">
+      <button class="market-filter-tab active" onclick="filterRestrictions('all',this)">全マーケット</button>
+      <button class="market-filter-tab" onclick="filterRestrictions('tw',this)">🇹🇼 台湾</button>
+      <button class="market-filter-tab" onclick="filterRestrictions('th',this)">🇹🇭 タイ</button>
+      <button class="market-filter-tab" onclick="filterRestrictions('ph',this)">🇵🇭 フィリピン</button>
+      <button class="market-filter-tab" onclick="filterRestrictions('my',this)">🇲🇾 マレーシア</button>
+      <button class="market-filter-tab" onclick="filterRestrictions('vn',this)">🇻🇳 ベトナム</button>
+      <button class="market-filter-tab" onclick="filterRestrictions('sg',this)">🇸🇬 SG</button>
+    </div>
+    <div id="restriction-table-area"></div>
+  </div>
+
+  <!-- ── AI設定（Gemini API） ── -->
   <div class="card">
     <div class="card-title">AI設定（Gemini API）</div>
     <div class="field" style="margin-bottom:12px;">
       <label>Gemini APIキー</label>
       <div style="position:relative;">
         <input type="password" id="gemini-key-input" placeholder="AIza..." style="padding-right:70px;">
-        <button onclick="toggleKeyVisibility()" id="toggle-vis-btn" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+        <button onclick="toggleKeyVisibility('gemini-key-input','toggle-vis-btn-gemini')" id="toggle-vis-btn-gemini" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
       </div>
     </div>
     <button class="add-btn" onclick="saveApiKey()">APIキーを保存する</button>
     <div id="key-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
   </div>
+
+  <!-- ── DeepL API設定（NEW） ── -->
+  <div class="card">
+    <div class="card-title" style="display:flex;align-items:center;gap:8px;">
+      🌐 翻訳設定（DeepL API）
+      <span class="deepl-badge">DeepL</span>
+    </div>
+    <div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.8;">
+      DeepL APIキーを設定すると、翻訳精度が向上します。<br>
+      未設定の場合はGeminiが翻訳を担当します。<br>
+      <span style="color:var(--green);font-weight:700;">✅ 無料枠：月50万文字（クレジットカード登録必要）</span>
+    </div>
+    <div style="background:var(--light);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:11px;line-height:1.8;color:var(--dark);">
+      <div style="font-weight:700;margin-bottom:4px;">DeepLが対応する言語</div>
+      <div>✅ 英語 / 繁体字中国語 / タイ語 / ベトナム語</div>
+      <div style="color:var(--mid);">⚠️ フィリピン語・マレー語はGeminiが担当（DeepL非対応）</div>
+    </div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>DeepL APIキー（無料版）</label>
+      <div style="position:relative;">
+        <input type="password" id="deepl-key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx" style="padding-right:70px;">
+        <button onclick="toggleKeyVisibility('deepl-key-input','toggle-vis-btn-deepl')" id="toggle-vis-btn-deepl" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+      </div>
+      <div style="font-size:10px;color:var(--mid);margin-top:4px;">※ 無料版のキーは末尾に「:fx」が付きます</div>
+    </div>
+    <button class="add-btn" onclick="saveDeeplKey()">DeepL APIキーを保存する</button>
+    <div id="deepl-key-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;font-size:12px;color:var(--mid);line-height:1.9;">
+      1. <a href="https://www.deepl.com/ja/pro-api" target="_blank" style="color:var(--orange);">DeepL APIページ</a> でアカウント作成<br>
+      2. 「DeepL API 無料」プランを選択<br>
+      3. クレジットカード登録（無料枠超過時のみ課金）<br>
+      4. APIキーをコピーして上の欄に貼り付け
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">使い方</div>
     <div style="font-size:12px;color:var(--mid);line-height:1.9;">
-      1. Google AI Studio でAPIキーを取得<br>
-      2. 上の入力欄に貼り付けて「保存」をタップ<br>
-      3. 商品一覧の「🤖 説明文生成」ボタンが使えます<br><br>
-      <span style="color:var(--green);font-weight:700;">✅ 無料枠あり・キーはこの端末のみに保存</span>
+      1. Google AI Studio でGemini APIキーを取得<br>
+      2. DeepL APIページでDeepL APIキーを取得（任意）<br>
+      3. それぞれ上の入力欄に貼り付けて「保存」をタップ<br>
+      4. 商品一覧の「🤖 説明文生成」ボタンが使えます<br><br>
+      <span style="color:var(--green);font-weight:700;">✅ DeepL設定済みの場合：英語・中国語・タイ語・ベトナム語をDeepLで高精度翻訳</span><br>
+      <span style="color:var(--mid);">DeepL未設定の場合：全言語をGeminiで生成（従来通り）</span>
     </div>
   </div>
 </div>
 
 <script>
-// ── CONSTANTS ──
-const DEFAULT_SLS = 1.75, DEFAULT_PAYONEER = 2.0;
-const DEFAULT_SALE_FEE = {tw:6,th:6,ph:6,my:6,vn:6,sg:7};
-const marketNames = {tw:'台湾',th:'タイ',ph:'フィリピン',my:'マレーシア',vn:'ベトナム',sg:'シンガポール'};
-const unitMap = {sg:'S$',tw:'NT$',th:'฿',my:'RM',ph:'₱',vn:'₫'};
-const shippingByMarket = {
-  tw:[250,320,450,700,1100],th:[300,380,520,800,1300],
-  ph:[350,430,600,900,1400],my:[300,380,520,800,1300],
-  vn:[280,360,490,760,1200],sg:[250,310,430,680,1050],
+// ────────────────────────────────────────────
+// DeepL API ヘルパー
+// ────────────────────────────────────────────
+
+// DeepLが対応する言語コード（言語→DeepLターゲットコード）
+const DEEPL_LANG_MAP = {
+  en: 'EN',
+  zh: 'ZH-HANT',  // 繁体字
+  th: 'TH',
+  vn: 'VI',
 };
-const ALL_MARKETS = ['tw','th','ph','my','vn','sg'];
+// フィリピン語・マレー語はDeepL非対応 → Geminiに任せる
 
-function loadFees() {
-  const s = JSON.parse(localStorage.getItem('fee_settings')||'{}');
-  return {
-    sls:parseFloat(s.sls)||DEFAULT_SLS, payoneer:parseFloat(s.payoneer)||DEFAULT_PAYONEER,
-    tw:parseFloat(s.tw)||DEFAULT_SALE_FEE.tw, th:parseFloat(s.th)||DEFAULT_SALE_FEE.th,
-    ph:parseFloat(s.ph)||DEFAULT_SALE_FEE.ph, my:parseFloat(s.my)||DEFAULT_SALE_FEE.my,
-    vn:parseFloat(s.vn)||DEFAULT_SALE_FEE.vn, sg:parseFloat(s.sg)||DEFAULT_SALE_FEE.sg,
-  };
-}
-let fees = loadFees();
-let exchangeRates = {sg:0.011,tw:0.22,th:0.24,my:0.031,ph:0.38,vn:165.0};
-
-function calcAutoPrice(cost, weight, market, isNew) {
-  const shipping = shippingByMarket[market][weight];
-  const saleFeeRate = isNew ? 0 : fees[market];
-  const totalFeeRate = (saleFeeRate + fees.sls + fees.payoneer) / 100;
-  const margin = targetMargin / 100;
-  const denom = 1 - totalFeeRate - margin;
-  if (denom <= 0) return null;
-  return Math.ceil((cost + shipping) / denom);
+function getDeeplKey() {
+  return localStorage.getItem('deepl_api_key') || '';
 }
 
-function calcProfit(price, cost, weight, market, isNew) {
-  const shipping = shippingByMarket[market][weight];
-  const saleFeeRate = isNew ? 0 : fees[market];
-  const saleFee = price * saleFeeRate / 100;
-  const slsFee = price * fees.sls / 100;
-  const payoneer = price * fees.payoneer / 100;
-  const profit = price - cost - shipping - saleFee - slsFee - payoneer;
-  const margin = (profit / price) * 100;
-  const localPrice = price * exchangeRates[market];
-  return {profit, margin, shipping, localPrice};
+function saveDeeplKey() {
+  const key = document.getElementById('deepl-key-input').value.trim();
+  if (!key) { alert('DeepL APIキーを入力してください'); return; }
+  try { localStorage.setItem('deepl_api_key', key); } catch(e) {}
+  const st = document.getElementById('deepl-key-status');
+  st.innerHTML = '✅ 保存しました！';
+  st.style.color = 'var(--green)';
+  setTimeout(function(){ st.textContent = ''; }, 2000);
+  updateResearchTranslateBadge();
 }
 
-function fmt(n) { return '¥' + Math.abs(Math.round(n)).toLocaleString(); }
-function fmtPct(n) { return Math.round(n*10)/10 + '%'; }
-
-function migrateProduct(p) {
-  if (!p.markets) {
-    p.markets = {};
-    if (p.market && p.price) {
-      p.markets[p.market] = { price: p.price, isNew: p.isNew || false };
-    }
-    delete p.market; delete p.price; delete p.isNew;
+function loadDeeplKeyToInput() {
+  const key = getDeeplKey();
+  document.getElementById('deepl-key-input').value = key;
+  if (key) {
+    const st = document.getElementById('deepl-key-status');
+    st.innerHTML = '✅ DeepL APIキーが設定されています';
+    st.style.color = 'var(--green)';
   }
-  if (!p.supplier_urls) {
-    p.supplier_urls = [];
-    if (p.url) { p.supplier_urls.push({label:'リンク', url:p.url}); delete p.url; }
+}
+
+// DeepL APIを使って1テキストを翻訳する
+async function deeplTranslate(text, targetLangCode) {
+  const key = getDeeplKey();
+  if (!key || !text) return null;
+  try {
+    const resp = await fetch('https://api-free.deepl.com/v2/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        auth_key: key,
+        text: text,
+        target_lang: targetLangCode,
+        source_lang: 'JA',
+      }),
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data.translations?.[0]?.text || null;
+  } catch(e) {
+    return null;
   }
-  if (!p.last_checked) p.last_checked = null;
-  if (!p.competitor_notes) p.competitor_notes = '';
+}
+
+// 複数言語を一括翻訳（DeepL対応言語のみ）
+// inputText: 日本語テキスト
+// langs: ['en','zh','th','vn'] など
+// 戻り値: { en: '...', zh: '...', th: '...', vn: '...' }
+async function deeplTranslateMulti(inputText, langs) {
+  const key = getDeeplKey();
+  const result = {};
+  if (!key || !inputText) return result;
+  const promises = langs.map(async function(lang) {
+    const targetCode = DEEPL_LANG_MAP[lang];
+    if (!targetCode) return;
+    const translated = await deeplTranslate(inputText, targetCode);
+    if (translated) result[lang] = translated;
+  });
+  await Promise.all(promises);
+  return result;
+}
+
+// 調査タブのバッジ更新
+function updateResearchTranslateBadge() {
+  const el = document.getElementById('research-translate-badge');
+  if (!el) return;
+  const key = getDeeplKey();
+  if (key) {
+    el.innerHTML = '<span class="deepl-badge">DeepL</span> <span style="font-size:11px;color:var(--green);font-weight:700;">高精度翻訳モード</span>';
+  } else {
+    el.innerHTML = '<span style="font-size:11px;color:var(--mid);">翻訳：Gemini（DeepLキー未設定）</span>';
+  }
+}
+
+// ────────────────────────────────────────────
+// 各国禁止・要申請カテゴリ定義
+// ────────────────────────────────────────────
+const MARKET_RESTRICTIONS = [
+  {category:'電子タバコ・VAPE（本体・液体・アクセサリ含む）',markets:{tw:{level:'ng',note:'全国販売禁止'},th:{level:'ng',note:'タイ国内法で禁止'},ph:{level:'ng',note:'販売禁止'},my:{level:'ng',note:'販売禁止'},vn:{level:'ng',note:'販売禁止'},sg:{level:'ng',note:'販売禁止・輸入禁止'}}},
+  {category:'香水・フレグランス（Perfumes & Fragrances）',markets:{tw:{level:'ng',note:'航空便で発送不可（可燃性液体）'},th:{level:'ng',note:'航空便で発送不可'},ph:{level:'ng',note:'航空便で発送不可'},my:{level:'ng',note:'航空便で発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'航空便で発送不可'}}},
+  {category:'バッテリー・リチウム電池単体（モバイルバッテリー含む）',markets:{tw:{level:'ng',note:'航空便で発送不可'},th:{level:'ng',note:'航空便で発送不可'},ph:{level:'ng',note:'航空便で発送不可'},my:{level:'ng',note:'航空便で発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'航空便で発送不可'}}},
+  {category:'医薬品・処方薬・市販薬（OTC含む）',markets:{tw:{level:'ng',note:'台湾では医薬品の並行輸入禁止'},th:{level:'ng',note:'医薬品は原則禁止'},ph:{level:'ng',note:'FDA未登録は禁止'},my:{level:'ng',note:'医薬品の個人輸入禁止'},vn:{level:'ng',note:'禁止'},sg:{level:'ng',note:'処方薬・指定医薬品は禁止'}}},
+  {category:'エッセンシャルオイル（精油）・ディフューザー・アロマ加湿器',markets:{tw:{level:'ng',note:'カテゴリリスト上NO（発送不可）'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+  {category:'ライター・マッチ・着火剤',markets:{tw:{level:'ng',note:'航空便で発送不可（可燃物）'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+  {category:'洗剤（Detergents）',markets:{tw:{level:'ng',note:'カテゴリリスト上NO'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+  {category:'ネイルポリッシュ・ネイルリムーバー（マニキュア）',markets:{tw:{level:'ng',note:'可燃性液体として発送不可'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+  {category:'生鮮・冷凍食品（肉・魚・野菜・果物・乳製品）',markets:{tw:{level:'ng',note:'台湾への食品輸入規制あり・要検疫'},th:{level:'ok',note:'乾燥・加工品はOK'},ph:{level:'ok',note:'加工品はOK'},my:{level:'ok',note:'加工品はOK'},vn:{level:'ok',note:'加工品はOK'},sg:{level:'ok',note:'加工品はOK'}}},
+  {category:'アルコール飲料（ビール・ワイン・日本酒・焼酎など）',markets:{tw:{level:'req',note:'現地ライセンス必要。Shopeeに申請'},th:{level:'ng',note:'オンライン販売禁止'},ph:{level:'ng',note:'オンライン販売禁止'},my:{level:'ng',note:'SG/PHは禁止。MYは要確認'},vn:{level:'ng',note:'オンライン販売禁止'},sg:{level:'ng',note:'SG/PHは販売禁止'}}},
+  {category:'包丁・ナイフ・キッチンはさみ（Knives & Kitchen Scissors）',markets:{tw:{level:'req',note:'現地ライセンス必要（公式資料）。Shopee申請が必要'},th:{level:'ng',note:'タイのオンライン販売禁止リストに「包丁」が含まれる'},ph:{level:'ok',note:'キッチン用途はOK。ただし刃渡り要確認'},my:{level:'req',note:'要確認。Shopeeに事前申請推奨'},vn:{level:'ok',note:'キッチン用途はOK'},sg:{level:'req',note:'要申請（Shopeeカテゴリリスト上「Shopeeと要確認」）'}}},
+  {category:'Beauty・スキンケア全般（化粧水・クリーム・美容液など）',markets:{tw:{level:'ok',note:'基本OK。医薬部外品表記は除く'},th:{level:'ok',note:'基本OK。SPF・薬用表記は要申請'},ph:{level:'ok',note:'基本OK。薬用表記は要申請'},my:{level:'ok',note:'基本OK'},vn:{level:'ok',note:'基本OK'},sg:{level:'ok',note:'基本OK。薬用・SPF表記は要申請'}}},
+  {category:'医薬部外品・薬用スキンケア（「薬用」「有効成分」表記あり）',markets:{tw:{level:'ng',note:'台湾では医薬品扱い。販売禁止リストに該当'},th:{level:'req',note:'タイFDA承認が必要。要申請'},ph:{level:'req',note:'フィリピンFDA登録が必要'},my:{level:'req',note:'医薬品扱いになる場合あり。要確認'},vn:{level:'req',note:'保健省認可が必要な場合あり'},sg:{level:'req',note:'HSA規制あり。要申請'}}},
+  {category:'日焼け止め・サンスクリーン（Face/Body Sunscreen）',markets:{tw:{level:'req',note:'Shopeeカテゴリリスト上「Shopeeと要確認」'},th:{level:'req',note:'Shopeeと要確認'},ph:{level:'req',note:'Shopeeと要確認'},my:{level:'req',note:'Shopeeと要確認'},vn:{level:'req',note:'要確認'},sg:{level:'req',note:'Shopeeと要確認'}}},
+  {category:'ヘアカラー・白髪染め（Hair Colour）',markets:{tw:{level:'req',note:'Shopeeと要確認。数量制限10個'},th:{level:'req',note:'Shopeeと要確認'},ph:{level:'req',note:'Shopeeと要確認'},my:{level:'req',note:'Shopeeと要確認'},vn:{level:'req',note:'要確認'},sg:{level:'req',note:'Shopeeと要確認'}}},
+  {category:'Food & Beverages・加工食品・スナック（乾燥・常温品）',markets:{tw:{level:'ng',note:'台湾向け食品は発送不可（カテゴリリスト上NO）'},th:{level:'ok',note:'基本OK'},ph:{level:'ok',note:'基本OK'},my:{level:'ok',note:'基本OK'},vn:{level:'ok',note:'基本OK'},sg:{level:'ok',note:'基本OK（5kg以下）'}}},
+  {category:'サプリメント・健康食品（Food Supplement）',markets:{tw:{level:'ok',note:'基本OK'},th:{level:'ok',note:'基本OK'},ph:{level:'ok',note:'基本OK'},my:{level:'ok',note:'基本OK'},vn:{level:'ok',note:'基本OK'},sg:{level:'req',note:'体重管理系はShopeeと要確認'}}},
+  {category:'手指消毒剤・ハンドサニタイザー',markets:{tw:{level:'ng',note:'全マーケット発送不可（カテゴリリスト上NO）'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+  {category:'コンタクトレンズ液・目薬（Lens Solutions & Eyedrops）',markets:{tw:{level:'req',note:'Shopeeと要確認'},th:{level:'req',note:'Shopeeと要確認'},ph:{level:'req',note:'Shopeeと要確認'},my:{level:'req',note:'Shopeeと要確認'},vn:{level:'req',note:'要確認'},sg:{level:'req',note:'Shopeeと要確認'}}},
+  {category:'ベビーオイル（Baby Skincare Oils）',markets:{tw:{level:'ng',note:'全マーケット発送不可（カテゴリリスト上NO）'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+  {category:'粉ミルク・液体ミルク（Maternity Milk / Milk Formula）',markets:{tw:{level:'ng',note:'全マーケット発送不可'},th:{level:'ng',note:'発送不可'},ph:{level:'ng',note:'発送不可'},my:{level:'ng',note:'発送不可'},vn:{level:'ng',note:'発送不可'},sg:{level:'ng',note:'発送不可'}}},
+];
+
+const CATEGORY_RESTRICTION_MAP = {
+  'Beauty':['Beauty・スキンケア全般（化粧水・クリーム・美容液など）','医薬部外品・薬用スキンケア（「薬用」「有効成分」表記あり）','日焼け止め・サンスクリーン（Face/Body Sunscreen）','ヘアカラー・白髪染め（Hair Colour）','香水・フレグランス（Perfumes & Fragrances）','ネイルポリッシュ・ネイルリムーバー（マニキュア）'],
+  'Health':['サプリメント・健康食品（Food Supplement）','医薬品・処方薬・市販薬（OTC含む）','手指消毒剤・ハンドサニタイザー','コンタクトレンズ液・目薬（Lens Solutions & Eyedrops）'],
+  'Food & Beverages':['Food & Beverages・加工食品・スナック（乾燥・常温品）','アルコール飲料（ビール・ワイン・日本酒・焼酎など）'],
+  'Home & Living':['包丁・ナイフ・キッチンはさみ（Knives & Kitchen Scissors）','エッセンシャルオイル（精油）・ディフューザー・アロマ加湿器','ライター・マッチ・着火剤'],
+  'Mom & Baby':['ベビーオイル（Baby Skincare Oils）','粉ミルク・液体ミルク（Maternity Milk / Milk Formula）'],
+};
+
+const marketNames={tw:'台湾',th:'タイ',ph:'フィリピン',my:'マレーシア',vn:'ベトナム',sg:'シンガポール'};
+const marketFlags={tw:'🇹🇼',th:'🇹🇭',ph:'🇵🇭',my:'🇲🇾',vn:'🇻🇳',sg:'🇸🇬'};
+
+function checkNgWarning(){
+  const category=document.getElementById('f-category').value;
+  const selectedMarkets=['tw','th','ph','my','vn','sg'].filter(function(m){return document.getElementById('mc-'+m)?.checked;});
+  const warningArea=document.getElementById('ng-warning-area');
+  if(selectedMarkets.length===0){warningArea.style.display='none';return;}
+  const relatedCategories=CATEGORY_RESTRICTION_MAP[category]||[];
+  if(relatedCategories.length===0){warningArea.style.display='none';return;}
+  const warnings=[];
+  MARKET_RESTRICTIONS.forEach(function(r){
+    if(!relatedCategories.includes(r.category))return;
+    selectedMarkets.forEach(function(m){
+      const restriction=r.markets[m];
+      if(!restriction||restriction.level==='ok')return;
+      warnings.push({market:m,category:r.category,level:restriction.level,note:restriction.note});
+    });
+  });
+  if(warnings.length===0){warningArea.style.display='none';return;}
+  const byMarket={};
+  warnings.forEach(function(w){if(!byMarket[w.market])byMarket[w.market]=[];byMarket[w.market].push(w);});
+  const ngMarkets=Object.keys(byMarket).filter(function(m){return byMarket[m].some(function(w){return w.level==='ng';});});
+  const reqMarkets=Object.keys(byMarket).filter(function(m){return !ngMarkets.includes(m)&&byMarket[m].some(function(w){return w.level==='req';});});
+  let html='<div class="ng-warning-banner"><div class="ng-warning-banner-title">⚠️ 出品制限の確認が必要です</div>';
+  if(ngMarkets.length>0){ngMarkets.forEach(function(m){byMarket[m].filter(function(w){return w.level==='ng';}).forEach(function(w){html+='<div class="ng-warning-row">🚫 <strong>'+marketFlags[m]+' '+marketNames[m]+'</strong>：'+w.category+'は出品不可（'+w.note+'）<button class="ng-warning-apply" onclick="uncheckMarket(\''+m+'\')">チェックを外す</button></div>';});});}
+  if(reqMarkets.length>0){reqMarkets.forEach(function(m){byMarket[m].filter(function(w){return w.level==='req';}).forEach(function(w){html+='<div class="ng-warning-row" style="color:var(--yellow);">⚠️ <strong>'+marketFlags[m]+' '+marketNames[m]+'</strong>：'+w.category+'は要申請（'+w.note+'）</div>';});});}
+  html+='<div style="font-size:10px;margin-top:8px;color:var(--mid);">設定タブの「各国禁止カテゴリ」で詳細を確認できます</div></div>';
+  warningArea.innerHTML=html;warningArea.style.display='block';
+}
+function uncheckMarket(market){const el=document.getElementById('mc-'+market);if(el){el.checked=false;previewPrices();checkNgWarning();}}
+
+function renderRestrictionTable(filterMarket){
+  const area=document.getElementById('restriction-table-area');if(!area)return;
+  const markets=filterMarket==='all'?['tw','th','ph','my','vn','sg']:[filterMarket];
+  let html='<table class="restriction-table"><thead><tr><th>カテゴリ</th>';
+  markets.forEach(function(m){html+='<th>'+marketFlags[m]+'<br>'+marketNames[m]+'</th>';});
+  html+='</tr></thead><tbody>';
+  MARKET_RESTRICTIONS.forEach(function(r){
+    html+='<tr><td style="font-weight:700;font-size:11px;">'+r.category+'</td>';
+    markets.forEach(function(m){
+      const res=r.markets[m];
+      if(!res){html+='<td>-</td>';return;}
+      let badge='';
+      if(res.level==='ng')badge='<span class="restriction-level-ng">🚫 禁止</span>';
+      else if(res.level==='req')badge='<span class="restriction-level-req">⚠️ 要申請</span>';
+      else badge='<span class="restriction-level-ok">✅ OK</span>';
+      html+='<td>'+badge+'<div style="font-size:10px;color:var(--mid);margin-top:3px;">'+res.note+'</div></td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  area.innerHTML=html;
+}
+function filterRestrictions(market,btn){
+  document.querySelectorAll('.market-filter-tab').forEach(function(t){t.classList.remove('active');});
+  btn.classList.add('active');renderRestrictionTable(market);
+}
+
+// ── CONSTANTS ──
+const DEFAULT_SLS=1.75,DEFAULT_PAYONEER=2.0;
+const DEFAULT_SALE_FEE={tw:6,th:6,ph:6,my:6,vn:6,sg:7};
+const unitMap={sg:'S$',tw:'NT$',th:'฿',my:'RM',ph:'₱',vn:'₫'};
+const shippingByMarket={tw:[250,320,450,700,1100],th:[300,380,520,800,1300],ph:[350,430,600,900,1400],my:[300,380,520,800,1300],vn:[280,360,490,760,1200],sg:[250,310,430,680,1050]};
+const ALL_MARKETS=['tw','th','ph','my','vn','sg'];
+
+function loadFees(){
+  const s=JSON.parse(localStorage.getItem('fee_settings')||'{}');
+  return{sls:parseFloat(s.sls)||DEFAULT_SLS,payoneer:parseFloat(s.payoneer)||DEFAULT_PAYONEER,tw:parseFloat(s.tw)||DEFAULT_SALE_FEE.tw,th:parseFloat(s.th)||DEFAULT_SALE_FEE.th,ph:parseFloat(s.ph)||DEFAULT_SALE_FEE.ph,my:parseFloat(s.my)||DEFAULT_SALE_FEE.my,vn:parseFloat(s.vn)||DEFAULT_SALE_FEE.vn,sg:parseFloat(s.sg)||DEFAULT_SALE_FEE.sg};
+}
+let fees=loadFees();
+let exchangeRates={sg:0.011,tw:0.22,th:0.24,my:0.031,ph:0.38,vn:165.0};
+
+function calcAutoPrice(cost,weight,market,isNew){
+  const shipping=shippingByMarket[market][weight];
+  const saleFeeRate=isNew?0:fees[market];
+  const totalFeeRate=(saleFeeRate+fees.sls+fees.payoneer)/100;
+  const margin=targetMargin/100;
+  const denom=1-totalFeeRate-margin;
+  if(denom<=0)return null;
+  return Math.ceil((cost+shipping)/denom);
+}
+function calcProfit(price,cost,weight,market,isNew){
+  const shipping=shippingByMarket[market][weight];
+  const saleFeeRate=isNew?0:fees[market];
+  const saleFee=price*saleFeeRate/100;
+  const slsFee=price*fees.sls/100;
+  const payoneer=price*fees.payoneer/100;
+  const profit=price-cost-shipping-saleFee-slsFee-payoneer;
+  const margin=(profit/price)*100;
+  const localPrice=price*exchangeRates[market];
+  return{profit,margin,shipping,localPrice};
+}
+function fmt(n){return'¥'+Math.abs(Math.round(n)).toLocaleString();}
+function fmtPct(n){return Math.round(n*10)/10+'%';}
+
+function migrateProduct(p){
+  if(!p.markets){p.markets={};if(p.market&&p.price){p.markets[p.market]={price:p.price,isNew:p.isNew||false};}delete p.market;delete p.price;delete p.isNew;}
+  if(!p.supplier_urls){p.supplier_urls=[];if(p.url){p.supplier_urls.push({label:'リンク',url:p.url});delete p.url;}}
+  if(!p.last_checked)p.last_checked=null;
+  if(!p.competitor_notes)p.competitor_notes='';
   return p;
 }
 
-let products = JSON.parse(localStorage.getItem('shopee_products')||'[]').map(migrateProduct);
-let targetMargin = parseFloat(localStorage.getItem('target_margin')||'20');
-let currentDesc = {};
-let currentLang = 'ja';
-let currentProduct = null;
+let products=JSON.parse(localStorage.getItem('shopee_products')||'[]').map(migrateProduct);
+let targetMargin=parseFloat(localStorage.getItem('target_margin')||'20');
+let currentDesc={};
+let currentLang='ja';
+let currentProduct=null;
 
-function save() {
-  try { localStorage.setItem('shopee_products', JSON.stringify(products)); } catch(e) {}
-}
+function save(){try{localStorage.setItem('shopee_products',JSON.stringify(products));}catch(e){}}
 
-// ── EXCHANGE RATES ──
-async function updateExchangeRates() {
-  try {
-    const resp = await fetch('https://open.er-api.com/v6/latest/JPY');
-    const data = await resp.json();
-    if (data && data.rates) {
-      exchangeRates.sg=data.rates.SGD; exchangeRates.tw=data.rates.TWD;
-      exchangeRates.th=data.rates.THB; exchangeRates.my=data.rates.MYR;
-      exchangeRates.ph=data.rates.PHP; exchangeRates.vn=data.rates.VND;
-      renderList(); renderRates();
-      const now = new Date();
-      const el = document.getElementById('rate-updated');
-      if (el) el.textContent = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 更新';
+async function updateExchangeRates(){
+  try{
+    const resp=await fetch('https://open.er-api.com/v6/latest/JPY');
+    const data=await resp.json();
+    if(data&&data.rates){
+      exchangeRates.sg=data.rates.SGD;exchangeRates.tw=data.rates.TWD;exchangeRates.th=data.rates.THB;exchangeRates.my=data.rates.MYR;exchangeRates.ph=data.rates.PHP;exchangeRates.vn=data.rates.VND;
+      renderList();renderRates();
+      const now=new Date();const el=document.getElementById('rate-updated');
+      if(el)el.textContent=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+' 更新';
     }
-  } catch(e) {
-    renderRates();
-    const el = document.getElementById('rate-updated');
-    if (el) el.textContent = '固定レート使用中';
-  }
+  }catch(e){renderRates();const el=document.getElementById('rate-updated');if(el)el.textContent='固定レート使用中';}
+}
+function renderRates(){
+  const fmt4=n=>(!n||isNaN(n))?'-':n<1?n.toFixed(4):n.toFixed(2);
+  ['tw','sg','th','my','ph','vn'].forEach(k=>{const el=document.getElementById('rate-'+k);if(el)el.textContent=fmt4(exchangeRates[k]);});
 }
 
-function renderRates() {
-  const fmt4 = n => (!n||isNaN(n)) ? '-' : n<1 ? n.toFixed(4) : n.toFixed(2);
-  ['tw','sg','th','my','ph','vn'].forEach(k => {
-    const el = document.getElementById('rate-'+k);
-    if (el) el.textContent = fmt4(exchangeRates[k]);
-  });
-}
-
-// ── TABS ──
-function switchTab(tab) {
-  const tabIds = ['add','list','research','summary','settings'];
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabIds[i]===tab));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+function switchTab(tab){
+  const tabIds=['add','list','research','summary','settings'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabIds[i]===tab));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
-  if (tab==='list') renderList();
-  if (tab==='summary') { renderSummary(); renderRates(); }
-  if (tab==='settings') { loadKeyToInput(); loadTargetMargin(); loadFeeToInput(); }
-  if (tab==='research') { renderCalendar(); renderMonthlyRecommend(); }
+  if(tab==='list')renderList();
+  if(tab==='summary'){renderSummary();renderRates();}
+  if(tab==='settings'){loadKeyToInput();loadTargetMargin();loadFeeToInput();loadDeeplKeyToInput();renderRestrictionTable('all');}
+  if(tab==='research'){renderCalendar();renderMonthlyRecommend();updateResearchTranslateBadge();}
 }
 
-// ── PRICE PREVIEW ──
-function previewPrices() {
-  const cost = parseFloat(document.getElementById('f-cost').value);
-  const weight = parseInt(document.getElementById('f-weight').value);
-  const selected = ALL_MARKETS.filter(m => document.getElementById('mc-'+m)?.checked);
-  const previewEl = document.getElementById('price-preview');
-  const listEl = document.getElementById('price-preview-list');
-  document.getElementById('preview-target-margin').textContent = targetMargin;
-
-  if (!cost || selected.length === 0) { previewEl.style.display='none'; return; }
-  previewEl.style.display = 'block';
-
-  listEl.innerHTML = selected.map(m => {
-    const price = calcAutoPrice(cost, weight, m, false);
-    if (!price) return '<div style="font-size:12px;color:var(--red);padding:4px 0;">'+marketNames[m]+'：計算不可（手数料設定を確認）</div>';
-    const c = calcProfit(price, cost, weight, m, false);
-    const local = Math.round(c.localPrice).toLocaleString();
-    const unit = unitMap[m];
-    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--light);border-radius:8px;margin-bottom:4px;">'
-      + '<span style="font-size:12px;font-weight:700;color:var(--dark);">'+marketNames[m]+'</span>'
-      + '<span style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--dark);">'+fmt(price)+'</span>'
-      + '<span style="font-size:11px;color:var(--mid);">→ '+unit+local+'</span>'
-      + '<span style="font-size:11px;font-weight:700;color:var(--green);">'+Math.round(c.margin*10)/10+'%</span>'
-      + '</div>';
+function previewPrices(){
+  const cost=parseFloat(document.getElementById('f-cost').value);
+  const weight=parseInt(document.getElementById('f-weight').value);
+  const selected=ALL_MARKETS.filter(m=>document.getElementById('mc-'+m)?.checked);
+  const previewEl=document.getElementById('price-preview');
+  const listEl=document.getElementById('price-preview-list');
+  document.getElementById('preview-target-margin').textContent=targetMargin;
+  if(!cost||selected.length===0){previewEl.style.display='none';return;}
+  previewEl.style.display='block';
+  listEl.innerHTML=selected.map(m=>{
+    const price=calcAutoPrice(cost,weight,m,false);
+    if(!price)return'<div style="font-size:12px;color:var(--red);padding:4px 0;">'+marketNames[m]+'：計算不可（手数料設定を確認）</div>';
+    const c=calcProfit(price,cost,weight,m,false);
+    const local=Math.round(c.localPrice).toLocaleString();
+    const unit=unitMap[m];
+    return'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--light);border-radius:8px;margin-bottom:4px;">'
+      +'<span style="font-size:12px;font-weight:700;color:var(--dark);">'+marketNames[m]+'</span>'
+      +'<span style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--dark);">'+fmt(price)+'</span>'
+      +'<span style="font-size:11px;color:var(--mid);">→ '+unit+local+'</span>'
+      +'<span style="font-size:11px;font-weight:700;color:var(--green);">'+Math.round(c.margin*10)/10+'%</span>'
+      +'</div>';
   }).join('');
 }
 
-// ── URL ROW HELPERS ──
-function addUrlRow(label, url) {
-  const list = document.getElementById('supplier-url-list');
-  const row = document.createElement('div');
-  row.className = 'supplier-url-row';
-  row.innerHTML = '<input type="text" class="url-label-input" placeholder="名前" value="'+(label||'')+'">'
-    + '<input type="url" class="url-input" placeholder="https://..." value="'+(url||'')+'">'
-    + '<button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>';
+function addUrlRow(label,url){
+  const list=document.getElementById('supplier-url-list');
+  const row=document.createElement('div');row.className='supplier-url-row';
+  row.innerHTML='<input type="text" class="url-label-input" placeholder="名前" value="'+(label||'')+'">'
+    +'<input type="url" class="url-input" placeholder="https://..." value="'+(url||'')+'">'
+    +'<button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button>';
   list.appendChild(row);
 }
-function removeUrlRow(btn) {
-  if (document.getElementById('supplier-url-list').children.length <= 1) return;
-  btn.parentElement.remove();
-}
-function getSupplierUrls() {
-  const result = [];
-  document.querySelectorAll('#supplier-url-list .supplier-url-row').forEach(row => {
-    const label = row.querySelector('.url-label-input').value.trim();
-    const url   = row.querySelector('.url-input').value.trim();
-    if (url) result.push({label: label||'リンク', url});
+function removeUrlRow(btn){if(document.getElementById('supplier-url-list').children.length<=1)return;btn.parentElement.remove();}
+function getSupplierUrls(){
+  const result=[];
+  document.querySelectorAll('#supplier-url-list .supplier-url-row').forEach(row=>{
+    const label=row.querySelector('.url-label-input').value.trim();
+    const url=row.querySelector('.url-input').value.trim();
+    if(url)result.push({label:label||'リンク',url});
   });
   return result;
 }
-function clearUrlRows() {
-  document.getElementById('supplier-url-list').innerHTML =
+function clearUrlRows(){
+  document.getElementById('supplier-url-list').innerHTML=
     '<div class="supplier-url-row"><input type="text" class="url-label-input" placeholder="Amazon" value="Amazon"><input type="url" class="url-input" placeholder="https://www.amazon.co.jp/..."><button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button></div>'
-    + '<div class="supplier-url-row"><input type="text" class="url-label-input" placeholder="楽天" value="楽天"><input type="url" class="url-input" placeholder="https://item.rakuten.co.jp/..."><button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button></div>';
+    +'<div class="supplier-url-row"><input type="text" class="url-label-input" placeholder="楽天" value="楽天"><input type="url" class="url-input" placeholder="https://item.rakuten.co.jp/..."><button type="button" class="remove-url-btn" onclick="removeUrlRow(this)">×</button></div>';
 }
 
-// ── ADD ──
-function addProduct() {
-  const name = document.getElementById('f-name').value.trim();
-  const cost = parseFloat(document.getElementById('f-cost').value);
-  const weight = parseInt(document.getElementById('f-weight').value);
-  const selected = ALL_MARKETS.filter(m => document.getElementById('mc-'+m)?.checked);
-  if (!name) { alert('商品名を入力してください'); return; }
-  if (!cost) { alert('仕入れ値を入力してください'); return; }
-  if (selected.length === 0) { alert('マーケットを1つ以上選択してください'); return; }
-
-  const markets = {};
-  selected.forEach(m => {
-    const price = calcAutoPrice(cost, weight, m, false);
-    markets[m] = { price: price || 0, isNew: false };
-  });
-
-  products.push({
-    id: Date.now(), name, cost, weight,
-    category: document.getElementById('f-category').value,
-    markets,
-    supplier_urls: getSupplierUrls(),
-    last_checked: null,
-  });
+function addProduct(){
+  const name=document.getElementById('f-name').value.trim();
+  const cost=parseFloat(document.getElementById('f-cost').value);
+  const weight=parseInt(document.getElementById('f-weight').value);
+  const selected=ALL_MARKETS.filter(m=>document.getElementById('mc-'+m)?.checked);
+  if(!name){alert('商品名を入力してください');return;}
+  if(!cost){alert('仕入れ値を入力してください');return;}
+  if(selected.length===0){alert('マーケットを1つ以上選択してください');return;}
+  const markets={};
+  selected.forEach(m=>{const price=calcAutoPrice(cost,weight,m,false);markets[m]={price:price||0,isNew:false};});
+  products.push({id:Date.now(),name,cost,weight,category:document.getElementById('f-category').value,markets,supplier_urls:getSupplierUrls(),last_checked:null});
   save();
-
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-cost').value = '';
-  ALL_MARKETS.forEach(m => { const el = document.getElementById('mc-'+m); if(el) el.checked=false; });
-  document.getElementById('price-preview').style.display = 'none';
+  document.getElementById('f-name').value='';document.getElementById('f-cost').value='';
+  ALL_MARKETS.forEach(m=>{const el=document.getElementById('mc-'+m);if(el)el.checked=false;});
+  document.getElementById('price-preview').style.display='none';
+  document.getElementById('ng-warning-area').style.display='none';
   clearUrlRows();
-
-  const btn = document.querySelector('#panel-add .add-btn');
-  btn.textContent = '✅ 追加しました！';
-  setTimeout(() => { btn.textContent = '商品を追加する'; }, 1500);
+  const btn=document.querySelector('#panel-add .add-btn');
+  btn.textContent='✅ 追加しました！';setTimeout(()=>{btn.textContent='商品を追加する';},1500);
 }
 
-// ── LIST ──
-function renderList() {
-  const el = document.getElementById('product-list');
-  if (products.length === 0) {
-    el.innerHTML = '<div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>';
-    return;
-  }
-  el.innerHTML = products.map(function(p) {
-    const marketKeys = Object.keys(p.markets||{});
-    const allProfits = marketKeys.map(function(m){ return calcProfit(p.markets[m].price, p.cost, p.weight, m, p.markets[m].isNew); });
-    const avgMargin = allProfits.length ? allProfits.reduce(function(a,c){return a+c.margin;},0)/allProfits.length : 0;
-    const status = getCheckStatus(p.last_checked);
-    const statusLabel = {fresh:'確認済み',old:'要再確認',never:'未確認'}[status];
-    const checkLabel = getCheckLabel(p.last_checked);
-
-    const marketsHtml = marketKeys.map(function(m) {
-      const md = p.markets[m];
-      const c = calcProfit(md.price, p.cost, p.weight, m, md.isNew);
-      const margin = Math.round(c.margin*10)/10;
-      const belowTarget = margin < targetMargin;
-      const chipClass = margin>=15?'good':margin>=5?'ok':'bad';
-      const localStr = unitMap[m] + Math.round(c.localPrice).toLocaleString();
-      const warningHtml = belowTarget ? '<div style="font-size:10px;color:var(--red);margin-top:4px;">⚠️ 目標利益率（'+targetMargin+'%）を下回っています</div>' : '';
-      return '<div class="market-row">'
-        + '<div class="market-row-header"><span class="market-row-name">'+marketNames[m]+'</span>'
-        + '<div class="market-row-badges"><button class="new-toggle '+(md.isNew?'active':'')+'" onclick="toggleNew('+p.id+',\''+m+'\')">'+( md.isNew?'✅ 90日以内':'90日以内')+'</button></div></div>'
-        + '<div class="market-nums">'
-        + '<div class="num-box"><div class="num-box-label">販売価格（円）</div><div class="num-box-val">'+fmt(md.price)+'</div></div>'
-        + '<div class="num-box" style="border:1px solid var(--orange);background:var(--orange-pale);"><div class="num-box-label" style="color:var(--orange);font-weight:700;">現地価格</div><div class="num-box-val" style="color:var(--orange);font-size:11px;">'+localStr+'</div></div>'
-        + '<div class="num-box"><div class="num-box-label">送料</div><div class="num-box-val">'+fmt(c.shipping)+'</div></div>'
-        + '</div>'
-        + '<div class="market-profit-row"><div><span class="profit-badge '+(c.profit>=0?'pos':'neg')+'">'+(c.profit<0?'−':'')+fmt(c.profit)+'</span><span style="font-size:11px;color:var(--mid);margin-left:4px;">利益</span></div>'
-        + '<span class="margin-chip '+chipClass+'">'+margin+'%</span></div>'
-        + warningHtml
-        + '<div class="price-edit-row"><span class="price-label">価格修正：</span>'
-        + '<input type="number" class="price-edit-input" id="price-input-'+p.id+'-'+m+'" value="'+md.price+'" inputmode="numeric">'
-        + '<button class="price-save-btn" onclick="savePrice('+p.id+',\''+m+'\')">更新</button></div>'
-        + '</div>';
-    }).join('');
-
-    let supplierBody = '';
-    if (p.supplier_urls && p.supplier_urls.length > 0) {
-      supplierBody = p.supplier_urls.map(function(s){
-        return '<div class="supplier-url-item"><span class="supplier-url-name">'+s.label+'</span><a href="'+s.url+'" target="_blank" class="supplier-url-link">🔗 在庫・価格を確認</a></div>';
-      }).join('');
-      supplierBody += '<button class="check-done-btn" onclick="markChecked('+p.id+')">✅ 確認しました（今日の日付で記録）</button>';
-    } else {
-      supplierBody = '<p class="no-url-hint">仕入れ先URLが登録されていません</p><button class="no-url-edit-btn" onclick="editProduct('+p.id+')">✏️ 編集して追加する</button>';
-    }
-
-    const overallChip = avgMargin>=15?'good':avgMargin>=5?'ok':'bad';
-    const hasSavedDesc = getSavedDesc(p.id);
-
-    return '<div class="product-item">'
-      + '<div class="product-header"><div class="product-name">'+p.name+'</div>'
-      + '<div class="product-meta"><span class="product-market-count">'+marketKeys.length+'マーケット</span>'
-      + '<span class="margin-chip '+overallChip+'" style="font-size:10px;">'+Math.round(avgMargin*10)/10+'%均</span></div></div>'
-      + '<div style="font-size:11px;color:var(--mid);margin-bottom:8px;">仕入れ：'+fmt(p.cost)+'　重量：'+['〜100g','〜250g','〜500g','〜1kg','〜2kg'][p.weight]+'</div>'
-      + '<div class="markets-area"><div class="markets-toggle" onclick="toggleMarkets(this)"><span class="markets-toggle-label">📊 国別利益を見る</span><span class="markets-toggle-icon">▼</span></div><div class="markets-body">'+marketsHtml+'</div></div>'
-      + '<div class="supplier-check-area"><div class="supplier-check-header" onclick="toggleCheckArea(this)"><div class="supplier-check-header-left">📦 仕入れ先チェック<span class="checked-badge '+status+'">'+statusLabel+'</span><span style="font-size:10px;color:var(--mid);font-weight:400;">'+checkLabel+'</span></div><span style="font-size:11px;color:var(--mid);" class="check-toggle-icon">▼</span></div><div class="supplier-check-body">'+supplierBody+'</div></div>'
-      + '<div style="margin-top:10px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;user-select:none;" onclick="toggleCompetitor(this)">'
-      + '<span style="font-size:12px;font-weight:700;color:var(--dark);">💹 競合価格メモ'+(p.competitor_notes?' <span style=\'font-size:10px;font-weight:400;color:#666;\'>記録あり</span>':'')+'</span>'
-      + '<span style="font-size:11px;color:var(--mid);" class="competitor-toggle-icon">▼</span></div>'
-      + '<div class="competitor-body" style="display:none;padding:10px 12px;">'
-      + '<div style="font-size:11px;color:var(--mid);margin-bottom:8px;line-height:1.7;">各国Shopeeで確認した競合価格や気になった点をメモしておけます</div>'
-      + '<textarea id="competitor-note-'+p.id+'" rows="3" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:\'Noto Sans JP\',sans-serif;color:var(--dark);resize:vertical;line-height:1.7;">'+(p.competitor_notes||'')+'</textarea>'
-      + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+buildShopeeButtons(p)+'</div>'
-      + '<button onclick="saveCompetitorNote('+p.id+')" style="width:100%;margin-top:8px;padding:9px;background:var(--dark);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">💾 メモを保存</button>'
-      + '</div></div>'
-      + '<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">'
-      + '<div style="display:flex;gap:6px;">'
-      + '<button class="action-btn '+(hasSavedDesc?'ai':'')+'" onclick="'+(hasSavedDesc?'showDesc('+p.id+')':'')+'" style="'+(hasSavedDesc?'':'opacity:.35;cursor:default;border-color:var(--border);color:var(--mid);background:var(--white);')+'flex:1;padding:8px;">📄 説明文を表示</button>'
-      + '<button class="action-btn ai" onclick="openModal('+p.id+')" style="flex:1;padding:8px;">🤖 説明文生成</button>'
-      + '</div>'
-      + '<div style="display:flex;gap:6px;">'
-      + '<button class="action-btn" onclick="editProduct('+p.id+')" style="flex:1;border-color:#93c5fd;color:#3b82f6;background:#eff6ff;">✏️ 編集</button>'
-      + '<button class="action-btn del" onclick="deleteProduct('+p.id+')" style="flex:0;padding:8px 20px;">🗑 削除</button>'
-      + '</div></div></div>';
-  }).join('');
-}
-
-function buildShopeeButtons(p) {
-  const shopeeUrls = {tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
-  const labels = {tw:'🇹🇼',sg:'🇸🇬',th:'🇹🇭',my:'🇲🇾',ph:'🇵🇭',vn:'🇻🇳'};
-  const kw = encodeURIComponent(p.name);
-  return Object.keys(p.markets||{}).map(function(m) {
-    if (!shopeeUrls[m]) return '';
-    return '<a href="'+shopeeUrls[m]+kw+'" target="_blank" style="display:inline-flex;align-items:center;padding:5px 9px;background:var(--orange-pale);color:var(--orange);border:1px solid var(--orange);border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">'+labels[m]+' Shopee</a>';
-  }).join('');
-}
-
-function buildMarketCheckboxes(i) {
-  var markets = ['tw','th','ph','my','vn','sg'];
-  var labels = {tw:'🇹🇼台湾',th:'🇹🇭タイ',ph:'🇵🇭フィリピン',my:'🇲🇾マレーシア',vn:'🇻🇳ベトナム',sg:'🇸🇬SG'};
-  return markets.map(function(m) {
-    var id = 'pi-mc-'+i+'-'+m;
-    return '<div style="position:relative;">'
-      + '<input type="checkbox" id="'+id+'" value="'+m+'" style="position:absolute;opacity:0;width:0;height:0;">'
-      + '<label for="'+id+'" style="display:flex;align-items:center;justify-content:center;padding:6px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;font-family:Noto Sans JP,sans-serif;color:var(--mid);cursor:pointer;" '
-      + 'onclick="var el=document.getElementById(\''+id+'\');this.style.borderColor=el.checked?\'var(--border)\':\'var(--orange)\';this.style.color=el.checked?\'var(--mid)\':\'var(--orange)\';this.style.background=el.checked?\'var(--white)\':\'var(--orange-pale)\';">'
-      + labels[m]+'</label></div>';
-  }).join('');
-}
-
-function buildShopeeButtonsByKeyword(keyword) {
-  const shopeeUrls = {tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
-  const labels = {tw:'🇹🇼台湾',sg:'🇸🇬SG',th:'🇹🇭タイ',my:'🇲🇾マレーシア',ph:'🇵🇭フィリピン',vn:'🇻🇳ベトナム'};
-  const kw = encodeURIComponent(keyword);
-  return ['tw','sg','th','my','ph','vn'].map(function(m) {
-    return '<a href="'+shopeeUrls[m]+kw+'" target="_blank" style="display:inline-flex;align-items:center;padding:5px 9px;background:var(--orange-pale);color:var(--orange);border:1px solid var(--orange);border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">'+labels[m]+'</a>';
-  }).join('');
-}
-
-function toggleCompetitor(header) {
-  const body = header.nextElementSibling;
-  const icon = header.querySelector('.competitor-toggle-icon');
-  const isOpen = body.style.display === 'block';
-  body.style.display = isOpen ? 'none' : 'block';
-  icon.textContent = isOpen ? '▼' : '▲';
-}
-function saveCompetitorNote(id) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p) return;
-  const note = document.getElementById('competitor-note-'+id)?.value || '';
-  p.competitor_notes = note;
-  save();
-  const btn = document.querySelector('[onclick="saveCompetitorNote('+id+')"]');
-  if (btn) { btn.textContent='✅ 保存しました'; setTimeout(function(){btn.textContent='💾 メモを保存';},1500); }
-}
-function toggleMarkets(header) {
-  const body = header.nextElementSibling;
-  const icon = header.querySelector('.markets-toggle-icon');
-  const isOpen = body.classList.toggle('open');
-  icon.textContent = isOpen ? '▲' : '▼';
-}
-function toggleCheckArea(header) {
-  const body = header.nextElementSibling;
-  const icon = header.querySelector('.check-toggle-icon');
-  const isOpen = body.classList.toggle('open');
-  icon.textContent = isOpen ? '▲' : '▼';
-}
-function savePrice(id, market) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p) return;
-  const val = parseFloat(document.getElementById('price-input-'+id+'-'+market).value);
-  if (!val || val <= 0) { alert('正しい価格を入力してください'); return; }
-  p.markets[market].price = val;
-  save(); renderList();
-}
-function toggleNew(id, market) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p || !p.markets[market]) return;
-  p.markets[market].isNew = !p.markets[market].isNew;
-  save(); renderList();
-}
-function markChecked(id) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p) return;
-  p.last_checked = new Date().toISOString();
-  save(); renderList(); renderSummary();
-}
-function deleteProduct(id) {
-  products = products.filter(function(p){return p.id!==id;});
-  save(); renderList(); renderSummary();
-}
-function getCheckStatus(lc) {
-  if (!lc) return 'never';
-  const days = (Date.now()-new Date(lc).getTime())/(1000*60*60*24);
-  if (days<=7) return 'fresh';
-  if (days<=30) return 'old';
-  return 'never';
-}
-function getCheckLabel(lc) {
-  if (!lc) return '未確認';
-  const days = Math.floor((Date.now()-new Date(lc).getTime())/(1000*60*60*24));
-  if (days===0) return '今日確認済み';
-  if (days<=7) return days+'日前に確認';
-  if (days<=30) return days+'日前（要再確認）';
-  return days+'日前（期限切れ）';
-}
-
-// ── EDIT ──
-function editProduct(id) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p) return;
-  document.getElementById('f-name').value = p.name;
-  document.getElementById('f-cost').value = p.cost;
-  document.getElementById('f-weight').value = p.weight;
-  document.getElementById('f-category').value = p.category;
-  ALL_MARKETS.forEach(function(m){ const el=document.getElementById('mc-'+m); if(el) el.checked=!!p.markets[m]; });
-  const list = document.getElementById('supplier-url-list');
-  list.innerHTML = '';
-  (p.supplier_urls||[]).forEach(function(s){addUrlRow(s.label,s.url);});
-  if (!p.supplier_urls||p.supplier_urls.length===0) clearUrlRows();
-  products = products.filter(function(x){return x.id!==id;});
-  save(); switchTab('add'); previewPrices();
-  const btn = document.querySelector('#panel-add .add-btn');
-  btn.textContent = '✏️ 更新する';
-  setTimeout(function(){btn.textContent='商品を追加する';},3000);
-}
-
-// ── SUMMARY ──
-function renderSummary() {
-  const count = products.length;
-  document.getElementById('s-count').textContent = count;
-  let listings=0, allMargins=[], totalProfit=0;
-  products.forEach(function(p){
-    Object.entries(p.markets||{}).forEach(function(e){
-      const m=e[0], md=e[1];
-      listings++;
+function renderList(){
+  const el=document.getElementById('product-list');
+  if(products.length===0){el.innerHTML='<div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>';return;}
+  el.innerHTML=products.map(function(p){
+    const marketKeys=Object.keys(p.markets||{});
+    const allProfits=marketKeys.map(function(m){return calcProfit(p.markets[m].price,p.cost,p.weight,m,p.markets[m].isNew);});
+    const avgMargin=allProfits.length?allProfits.reduce(function(a,c){return a+c.margin;},0)/allProfits.length:0;
+    const status=getCheckStatus(p.last_checked);
+    const statusLabel={fresh:'確認済み',old:'要再確認',never:'未確認'}[status];
+    const checkLabel=getCheckLabel(p.last_checked);
+    const marketsHtml=marketKeys.map(function(m){
+      const md=p.markets[m];
       const c=calcProfit(md.price,p.cost,p.weight,m,md.isNew);
-      allMargins.push(c.margin); totalProfit+=c.profit;
-    });
-  });
-  document.getElementById('s-listings').textContent = listings;
-  document.getElementById('s-margin').textContent = allMargins.length ? fmtPct(allMargins.reduce(function(a,b){return a+b;},0)/allMargins.length) : '-%';
-  document.getElementById('s-profit').textContent = (totalProfit<0?'−':'')+fmt(totalProfit);
-  document.getElementById('s-profit').className = 'summary-box-val '+(totalProfit>=0?'green':'');
-  let checked=0,stale=0,unchecked=0;
-  products.forEach(function(p){
-    const s=getCheckStatus(p.last_checked);
-    if(s==='fresh') checked++; else if(s==='old') stale++; else unchecked++;
-  });
-  document.getElementById('s-checked').textContent=checked;
-  document.getElementById('s-stale').textContent=stale;
-  document.getElementById('s-unchecked').textContent=unchecked;
-}
-
-// ── JSON エクスポート／インポート ──
-function exportJSON() {
-  const descData = {};
-  products.forEach(function(p) {
-    const d = getSavedDesc(p.id);
-    if (d) descData['desc_' + p.id] = d;
-    const s = getSavedShippingSpec(p.id);
-    if (s && Object.keys(s).length) descData['shipping_' + p.id] = s;
-  });
-  const payload = {
-    version: 1,
-    exported_at: new Date().toISOString(),
-    products: products,
-    descriptions: descData,
-    fee_settings: JSON.parse(localStorage.getItem('fee_settings') || '{}'),
-    target_margin: targetMargin,
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const date = new Date().toISOString().slice(0, 10);
-  a.href = url; a.download = 'shopee_data_' + date + '.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importJSON(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const st = document.getElementById('import-status');
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const payload = JSON.parse(e.target.result);
-      if (!payload.products || !Array.isArray(payload.products)) {
-        st.textContent = '❌ ファイルが正しくありません';
-        st.style.color = 'var(--red)'; return;
-      }
-      const ok = confirm(
-        'データをマージします。\n'
-        + 'インポート商品数: ' + payload.products.length + '件\n'
-        + 'エクスポート日時: ' + (payload.exported_at ? payload.exported_at.slice(0,16).replace('T',' ') : '不明') + '\n\n'
-        + '※ 同じIDの商品はインポート側で上書きされます。\n続けますか？'
-      );
-      if (!ok) { event.target.value = ''; return; }
-      const importedIds = new Set(payload.products.map(function(p){ return p.id; }));
-      const kept = products.filter(function(p){ return !importedIds.has(p.id); });
-      products = kept.concat(payload.products.map(migrateProduct));
-      localStorage.setItem('shopee_products', JSON.stringify(products));
-      if (payload.descriptions) {
-        Object.keys(payload.descriptions).forEach(function(key) {
-          try { localStorage.setItem(key, JSON.stringify(payload.descriptions[key])); } catch(err) {}
-        });
-      }
-      if (payload.fee_settings) {
-        try { localStorage.setItem('fee_settings', JSON.stringify(payload.fee_settings)); } catch(err) {}
-        fees = loadFees();
-      }
-      if (payload.target_margin) {
-        targetMargin = payload.target_margin;
-        try { localStorage.setItem('target_margin', targetMargin); } catch(err) {}
-      }
-      renderList(); renderSummary();
-      st.textContent = '✅ ' + products.length + '件のデータをインポートしました！';
-      st.style.color = 'var(--green)';
-      event.target.value = '';
-    } catch(err) {
-      st.textContent = '❌ 読み込みに失敗しました。正しいJSONファイルか確認してください。';
-      st.style.color = 'var(--red)';
+      const margin=Math.round(c.margin*10)/10;
+      const belowTarget=margin<targetMargin;
+      const chipClass=margin>=15?'good':margin>=5?'ok':'bad';
+      const localStr=unitMap[m]+Math.round(c.localPrice).toLocaleString();
+      const warningHtml=belowTarget?'<div style="font-size:10px;color:var(--red);margin-top:4px;">⚠️ 目標利益率（'+targetMargin+'%）を下回っています</div>':'';
+      return'<div class="market-row">'
+        +'<div class="market-row-header"><span class="market-row-name">'+marketNames[m]+'</span>'
+        +'<div class="market-row-badges"><button class="new-toggle '+(md.isNew?'active':'')+'" onclick="toggleNew('+p.id+',\''+m+'\')">'+( md.isNew?'✅ 90日以内':'90日以内')+'</button></div></div>'
+        +'<div class="market-nums">'
+        +'<div class="num-box"><div class="num-box-label">販売価格（円）</div><div class="num-box-val">'+fmt(md.price)+'</div></div>'
+        +'<div class="num-box" style="border:1px solid var(--orange);background:var(--orange-pale);"><div class="num-box-label" style="color:var(--orange);font-weight:700;">現地価格</div><div class="num-box-val" style="color:var(--orange);font-size:11px;">'+localStr+'</div></div>'
+        +'<div class="num-box"><div class="num-box-label">送料</div><div class="num-box-val">'+fmt(c.shipping)+'</div></div>'
+        +'</div>'
+        +'<div class="market-profit-row"><div><span class="profit-badge '+(c.profit>=0?'pos':'neg')+'">'+(c.profit<0?'−':'')+fmt(c.profit)+'</span><span style="font-size:11px;color:var(--mid);margin-left:4px;">利益</span></div>'
+        +'<span class="margin-chip '+chipClass+'">'+margin+'%</span></div>'
+        +warningHtml
+        +'<div class="price-edit-row"><span class="price-label">価格修正：</span>'
+        +'<input type="number" class="price-edit-input" id="price-input-'+p.id+'-'+m+'" value="'+md.price+'" inputmode="numeric">'
+        +'<button class="price-save-btn" onclick="savePrice('+p.id+',\''+m+'\')">更新</button></div>'
+        +'</div>';
+    }).join('');
+    let supplierBody='';
+    if(p.supplier_urls&&p.supplier_urls.length>0){
+      supplierBody=p.supplier_urls.map(function(s){return'<div class="supplier-url-item"><span class="supplier-url-name">'+s.label+'</span><a href="'+s.url+'" target="_blank" class="supplier-url-link">🔗 在庫・価格を確認</a></div>';}).join('');
+      supplierBody+='<button class="check-done-btn" onclick="markChecked('+p.id+')">✅ 確認しました（今日の日付で記録）</button>';
+    }else{
+      supplierBody='<p class="no-url-hint">仕入れ先URLが登録されていません</p><button class="no-url-edit-btn" onclick="editProduct('+p.id+')">✏️ 編集して追加する</button>';
     }
+    const overallChip=avgMargin>=15?'good':avgMargin>=5?'ok':'bad';
+    const hasSavedDesc=getSavedDesc(p.id);
+    return'<div class="product-item">'
+      +'<div class="product-header"><div class="product-name">'+p.name+'</div>'
+      +'<div class="product-meta"><span class="product-market-count">'+marketKeys.length+'マーケット</span>'
+      +'<span class="margin-chip '+overallChip+'" style="font-size:10px;">'+Math.round(avgMargin*10)/10+'%均</span></div></div>'
+      +'<div style="font-size:11px;color:var(--mid);margin-bottom:8px;">仕入れ：'+fmt(p.cost)+'　重量：'+['〜100g','〜250g','〜500g','〜1kg','〜2kg'][p.weight]+'</div>'
+      +'<div class="markets-area"><div class="markets-toggle" onclick="toggleMarkets(this)"><span class="markets-toggle-label">📊 国別利益を見る</span><span class="markets-toggle-icon">▼</span></div><div class="markets-body">'+marketsHtml+'</div></div>'
+      +'<div class="supplier-check-area"><div class="supplier-check-header" onclick="toggleCheckArea(this)"><div class="supplier-check-header-left">📦 仕入れ先チェック<span class="checked-badge '+status+'">'+statusLabel+'</span><span style="font-size:10px;color:var(--mid);font-weight:400;">'+checkLabel+'</span></div><span style="font-size:11px;color:var(--mid);" class="check-toggle-icon">▼</span></div><div class="supplier-check-body">'+supplierBody+'</div></div>'
+      +'<div style="margin-top:10px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--light);cursor:pointer;user-select:none;" onclick="toggleCompetitor(this)">'
+      +'<span style="font-size:12px;font-weight:700;color:var(--dark);">💹 競合価格メモ'+(p.competitor_notes?' <span style=\'font-size:10px;font-weight:400;color:#666;\'>記録あり</span>':'')+'</span>'
+      +'<span style="font-size:11px;color:var(--mid);" class="competitor-toggle-icon">▼</span></div>'
+      +'<div class="competitor-body" style="display:none;padding:10px 12px;">'
+      +'<div style="font-size:11px;color:var(--mid);margin-bottom:8px;line-height:1.7;">各国Shopeeで確認した競合価格や気になった点をメモしておけます</div>'
+      +'<textarea id="competitor-note-'+p.id+'" rows="3" style="width:100%;padding:9px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:\'Noto Sans JP\',sans-serif;color:var(--dark);resize:vertical;line-height:1.7;">'+(p.competitor_notes||'')+'</textarea>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">'+buildShopeeButtons(p)+'</div>'
+      +'<button onclick="saveCompetitorNote('+p.id+')" style="width:100%;margin-top:8px;padding:9px;background:var(--dark);color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">💾 メモを保存</button>'
+      +'</div></div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;">'
+      +'<div style="display:flex;gap:6px;">'
+      +'<button class="action-btn '+(hasSavedDesc?'ai':'')+'" onclick="'+(hasSavedDesc?'showDesc('+p.id+')':'')+'" style="'+(hasSavedDesc?'':'opacity:.35;cursor:default;border-color:var(--border);color:var(--mid);background:var(--white);')+'flex:1;padding:8px;">📄 説明文を表示</button>'
+      +'<button class="action-btn ai" onclick="openModal('+p.id+')" style="flex:1;padding:8px;">🤖 説明文生成</button>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px;">'
+      +'<button class="action-btn" onclick="editProduct('+p.id+')" style="flex:1;border-color:#93c5fd;color:#3b82f6;background:#eff6ff;">✏️ 編集</button>'
+      +'<button class="action-btn del" onclick="deleteProduct('+p.id+')" style="flex:0;padding:8px 20px;">🗑 削除</button>'
+      +'</div></div></div>';
+  }).join('');
+}
+
+function buildShopeeButtons(p){
+  const shopeeUrls={tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
+  const labels={tw:'🇹🇼',sg:'🇸🇬',th:'🇹🇭',my:'🇲🇾',ph:'🇵🇭',vn:'🇻🇳'};
+  const kw=encodeURIComponent(p.name);
+  return Object.keys(p.markets||{}).map(function(m){
+    if(!shopeeUrls[m])return'';
+    return'<a href="'+shopeeUrls[m]+kw+'" target="_blank" style="display:inline-flex;align-items:center;padding:5px 9px;background:var(--orange-pale);color:var(--orange);border:1px solid var(--orange);border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">'+labels[m]+' Shopee</a>';
+  }).join('');
+}
+
+function buildMarketCheckboxes(i){
+  var markets=['tw','th','ph','my','vn','sg'];
+  var labels={tw:'🇹🇼台湾',th:'🇹🇭タイ',ph:'🇵🇭フィリピン',my:'🇲🇾マレーシア',vn:'🇻🇳ベトナム',sg:'🇸🇬SG'};
+  return markets.map(function(m){
+    var id='pi-mc-'+i+'-'+m;
+    return'<div style="position:relative;">'
+      +'<input type="checkbox" id="'+id+'" value="'+m+'" style="position:absolute;opacity:0;width:0;height:0;">'
+      +'<label for="'+id+'" style="display:flex;align-items:center;justify-content:center;padding:6px 4px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;font-family:Noto Sans JP,sans-serif;color:var(--mid);cursor:pointer;" '
+      +'onclick="var el=document.getElementById(\''+id+'\');this.style.borderColor=el.checked?\'var(--border)\':\'var(--orange)\';this.style.color=el.checked?\'var(--mid)\':\'var(--orange)\';this.style.background=el.checked?\'var(--white)\':\'var(--orange-pale)\';">'
+      +labels[m]+'</label></div>';
+  }).join('');
+}
+
+function buildShopeeButtonsByKeyword(keyword){
+  const shopeeUrls={tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
+  const labels={tw:'🇹🇼台湾',sg:'🇸🇬SG',th:'🇹🇭タイ',my:'🇲🇾マレーシア',ph:'🇵🇭フィリピン',vn:'🇻🇳ベトナム'};
+  const kw=encodeURIComponent(keyword);
+  return['tw','sg','th','my','ph','vn'].map(function(m){
+    return'<a href="'+shopeeUrls[m]+kw+'" target="_blank" style="display:inline-flex;align-items:center;padding:5px 9px;background:var(--orange-pale);color:var(--orange);border:1px solid var(--orange);border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">'+labels[m]+'</a>';
+  }).join('');
+}
+
+function toggleCompetitor(header){const body=header.nextElementSibling;const icon=header.querySelector('.competitor-toggle-icon');const isOpen=body.style.display==='block';body.style.display=isOpen?'none':'block';icon.textContent=isOpen?'▼':'▲';}
+function saveCompetitorNote(id){const p=products.find(function(x){return x.id===id;});if(!p)return;const note=document.getElementById('competitor-note-'+id)?.value||'';p.competitor_notes=note;save();const btn=document.querySelector('[onclick="saveCompetitorNote('+id+')"]');if(btn){btn.textContent='✅ 保存しました';setTimeout(function(){btn.textContent='💾 メモを保存';},1500);}}
+function toggleMarkets(header){const body=header.nextElementSibling;const icon=header.querySelector('.markets-toggle-icon');const isOpen=body.classList.toggle('open');icon.textContent=isOpen?'▲':'▼';}
+function toggleCheckArea(header){const body=header.nextElementSibling;const icon=header.querySelector('.check-toggle-icon');const isOpen=body.classList.toggle('open');icon.textContent=isOpen?'▲':'▼';}
+function savePrice(id,market){const p=products.find(function(x){return x.id===id;});if(!p)return;const val=parseFloat(document.getElementById('price-input-'+id+'-'+market).value);if(!val||val<=0){alert('正しい価格を入力してください');return;}p.markets[market].price=val;save();renderList();}
+function toggleNew(id,market){const p=products.find(function(x){return x.id===id;});if(!p||!p.markets[market])return;p.markets[market].isNew=!p.markets[market].isNew;save();renderList();}
+function markChecked(id){const p=products.find(function(x){return x.id===id;});if(!p)return;p.last_checked=new Date().toISOString();save();renderList();renderSummary();}
+function deleteProduct(id){products=products.filter(function(p){return p.id!==id;});save();renderList();renderSummary();}
+function getCheckStatus(lc){if(!lc)return'never';const days=(Date.now()-new Date(lc).getTime())/(1000*60*60*24);if(days<=7)return'fresh';if(days<=30)return'old';return'never';}
+function getCheckLabel(lc){if(!lc)return'未確認';const days=Math.floor((Date.now()-new Date(lc).getTime())/(1000*60*60*24));if(days===0)return'今日確認済み';if(days<=7)return days+'日前に確認';if(days<=30)return days+'日前（要再確認）';return days+'日前（期限切れ）';}
+
+function editProduct(id){
+  const p=products.find(function(x){return x.id===id;});if(!p)return;
+  document.getElementById('f-name').value=p.name;document.getElementById('f-cost').value=p.cost;document.getElementById('f-weight').value=p.weight;document.getElementById('f-category').value=p.category;
+  ALL_MARKETS.forEach(function(m){const el=document.getElementById('mc-'+m);if(el)el.checked=!!p.markets[m];});
+  const list=document.getElementById('supplier-url-list');list.innerHTML='';
+  (p.supplier_urls||[]).forEach(function(s){addUrlRow(s.label,s.url);});
+  if(!p.supplier_urls||p.supplier_urls.length===0)clearUrlRows();
+  products=products.filter(function(x){return x.id!==id;});
+  save();switchTab('add');previewPrices();checkNgWarning();
+  const btn=document.querySelector('#panel-add .add-btn');btn.textContent='✏️ 更新する';setTimeout(function(){btn.textContent='商品を追加する';},3000);
+}
+
+function renderSummary(){
+  const count=products.length;document.getElementById('s-count').textContent=count;
+  let listings=0,allMargins=[],totalProfit=0;
+  products.forEach(function(p){Object.entries(p.markets||{}).forEach(function(e){const m=e[0],md=e[1];listings++;const c=calcProfit(md.price,p.cost,p.weight,m,md.isNew);allMargins.push(c.margin);totalProfit+=c.profit;});});
+  document.getElementById('s-listings').textContent=listings;
+  document.getElementById('s-margin').textContent=allMargins.length?fmtPct(allMargins.reduce(function(a,b){return a+b;},0)/allMargins.length):'-%';
+  document.getElementById('s-profit').textContent=(totalProfit<0?'−':'')+fmt(totalProfit);
+  document.getElementById('s-profit').className='summary-box-val '+(totalProfit>=0?'green':'');
+  let checked=0,stale=0,unchecked=0;
+  products.forEach(function(p){const s=getCheckStatus(p.last_checked);if(s==='fresh')checked++;else if(s==='old')stale++;else unchecked++;});
+  document.getElementById('s-checked').textContent=checked;document.getElementById('s-stale').textContent=stale;document.getElementById('s-unchecked').textContent=unchecked;
+}
+
+function exportJSON(){
+  const descData={};
+  products.forEach(function(p){const d=getSavedDesc(p.id);if(d)descData['desc_'+p.id]=d;const s=getSavedShippingSpec(p.id);if(s&&Object.keys(s).length)descData['shipping_'+p.id]=s;});
+  const payload={version:1,exported_at:new Date().toISOString(),products:products,descriptions:descData,fee_settings:JSON.parse(localStorage.getItem('fee_settings')||'{}'),target_margin:targetMargin};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');const date=new Date().toISOString().slice(0,10);a.href=url;a.download='shopee_data_'+date+'.json';a.click();URL.revokeObjectURL(url);
+}
+
+function importJSON(event){
+  const file=event.target.files[0];if(!file)return;
+  const st=document.getElementById('import-status');
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const payload=JSON.parse(e.target.result);
+      if(!payload.products||!Array.isArray(payload.products)){st.textContent='❌ ファイルが正しくありません';st.style.color='var(--red)';return;}
+      const ok=confirm('データをマージします。\nインポート商品数: '+payload.products.length+'件\nエクスポート日時: '+(payload.exported_at?payload.exported_at.slice(0,16).replace('T',' '):'不明')+'\n\n※ 同じIDの商品はインポート側で上書きされます。\n続けますか？');
+      if(!ok){event.target.value='';return;}
+      const importedIds=new Set(payload.products.map(function(p){return p.id;}));
+      const kept=products.filter(function(p){return!importedIds.has(p.id);});
+      products=kept.concat(payload.products.map(migrateProduct));
+      localStorage.setItem('shopee_products',JSON.stringify(products));
+      if(payload.descriptions){Object.keys(payload.descriptions).forEach(function(key){try{localStorage.setItem(key,JSON.stringify(payload.descriptions[key]));}catch(err){}});}
+      if(payload.fee_settings){try{localStorage.setItem('fee_settings',JSON.stringify(payload.fee_settings));}catch(err){}fees=loadFees();}
+      if(payload.target_margin){targetMargin=payload.target_margin;try{localStorage.setItem('target_margin',targetMargin);}catch(err){}}
+      renderList();renderSummary();
+      st.textContent='✅ '+products.length+'件のデータをインポートしました！';st.style.color='var(--green)';event.target.value='';
+    }catch(err){st.textContent='❌ 読み込みに失敗しました。正しいJSONファイルか確認してください。';st.style.color='var(--red)';}
   };
   reader.readAsText(file);
 }
 
-// ── CSV ──
-function exportCSV() {
-  if (products.length===0){alert('商品がありません');return;}
+function exportCSV(){
+  if(products.length===0){alert('商品がありません');return;}
   const header='商品名,マーケット,仕入れ値,販売価格,送料,利益,利益率,最終確認日\n';
   const rows=[];
-  products.forEach(function(p){
-    Object.entries(p.markets||{}).forEach(function(e){
-      const m=e[0],md=e[1];
-      const c=calcProfit(md.price,p.cost,p.weight,m,md.isNew);
-      const checked=p.last_checked?new Date(p.last_checked).toLocaleDateString('ja-JP'):'未確認';
-      rows.push('"'+p.name+'",'+marketNames[m]+','+p.cost+','+md.price+','+c.shipping+','+Math.round(c.profit)+','+Math.round(c.margin*10)/10+'%,'+checked);
-    });
-  });
+  products.forEach(function(p){Object.entries(p.markets||{}).forEach(function(e){const m=e[0],md=e[1];const c=calcProfit(md.price,p.cost,p.weight,m,md.isNew);const checked=p.last_checked?new Date(p.last_checked).toLocaleDateString('ja-JP'):'未確認';rows.push('"'+p.name+'",'+marketNames[m]+','+p.cost+','+md.price+','+c.shipping+','+Math.round(c.profit)+','+Math.round(c.margin*10)/10+'%,'+checked);});});
   const blob=new Blob(['\uFEFF'+header+rows.join('\n')],{type:'text/csv;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;a.download='shopee_products.csv';a.click();URL.revokeObjectURL(url);
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='shopee_products.csv';a.click();URL.revokeObjectURL(url);
 }
 
-// ── 説明文 localStorage helpers ──
-function saveDesc(id, desc) {
-  try { localStorage.setItem('desc_'+id, JSON.stringify(desc)); } catch(e) {}
-}
-function getSavedDesc(id) {
-  try { const s=localStorage.getItem('desc_'+id); return s?JSON.parse(s):null; } catch(e) { return null; }
-}
+function saveDesc(id,desc){try{localStorage.setItem('desc_'+id,JSON.stringify(desc));}catch(e){}}
+function getSavedDesc(id){try{const s=localStorage.getItem('desc_'+id);return s?JSON.parse(s):null;}catch(e){return null;}}
 
-// ── 説明文フォーマット組み立て（JS側） ──
-function formatDesc(parsed, lang, productName) {
-  var SEP = '━━━━━━━━━━━━━━━━━━━';
-  var configs = {
-    ja: {
-      flag: '🇯🇵【日本直送】',
-      whyTitle: '【選ばれる理由】',
-      featureIcon: '✨ ',
-      howTitle: '🎯 使い方',
-      qualityTitle: '⭐ 日本製品質保証',
-      useIcon: '✅ ',
-      warnTitle: '⚠️ 注意事項',
-      warnIcon: '• ',
-      shipTitle: '🚚 出荷情報',
-      shipLines: ['✅ 日本から直送', '✅ 迅速発送（1〜2営業日）', '✅ 正規品保証'],
-      closing: '今すぐ注文して、日本品質を体験しよう！✨'
-    },
-    zh: {
-      flag: '🇯🇵【日本直送】',
-      whyTitle: '【為什麼選擇這個商品？】',
-      featureIcon: '✨ ',
-      howTitle: '🎯 使用方法（超簡單！）',
-      qualityTitle: '⭐ 日本製品質保證',
-      useIcon: '✅ ',
-      warnTitle: '⚠️ 注意事項',
-      warnIcon: '• ',
-      shipTitle: '🚚 出貨資訊',
-      shipLines: ['✅ 台灣直送', '✅ 現貨供應', '✅ 快速出貨（1-2個工作天）', '✅ 完整包裝，確保品質'],
-      closing: '立即下單，體驗日本品質的魅力！✨'
-    },
-    en: {
-      flag: '🇯🇵【Direct from Japan】',
-      whyTitle: '【Why choose this?】',
-      featureIcon: '✨ ',
-      howTitle: '🎯 How to Use',
-      qualityTitle: '⭐ Japanese Quality Guaranteed',
-      useIcon: '✅ ',
-      warnTitle: '⚠️ Precautions',
-      warnIcon: '• ',
-      shipTitle: '🚚 Shipping Info',
-      shipLines: ['✅ Ships directly from Japan', '✅ Fast shipping (1-2 business days)', '✅ Authentic product guaranteed'],
-      closing: 'Order now and experience Japanese quality! ✨'
-    },
-    th: {
-      flag: '🇯🇵【ส่งตรงจากญี่ปุ่น】',
-      whyTitle: '【ทำไมต้องเลือกสินค้านี้？】',
-      featureIcon: '✨ ',
-      howTitle: '🎯 วิธีใช้งาน',
-      qualityTitle: '⭐ รับประกันคุณภาพจากญี่ปุ่น',
-      useIcon: '✅ ',
-      warnTitle: '⚠️ ข้อควรระวัง',
-      warnIcon: '• ',
-      shipTitle: '🚚 ข้อมูลการจัดส่ง',
-      shipLines: ['✅ จัดส่งตรงจากญี่ปุ่น', '✅ จัดส่งเร็ว (1-2 วันทำการ)', '✅ สินค้าแท้รับประกัน'],
-      closing: 'สั่งซื้อเลยวันนี้! ✨'
-    },
-    vn: {
-      flag: '🇯🇵【Giao thẳng từ Nhật】',
-      whyTitle: '【Tại sao chọn sản phẩm này？】',
-      featureIcon: '✨ ',
-      howTitle: '🎯 Cách sử dụng',
-      qualityTitle: '⭐ Chất lượng Nhật Bản đảm bảo',
-      useIcon: '✅ ',
-      warnTitle: '⚠️ Lưu ý',
-      warnIcon: '• ',
-      shipTitle: '🚚 Thông tin vận chuyển',
-      shipLines: ['✅ Giao hàng trực tiếp từ Nhật Bản', '✅ Giao hàng nhanh (1-2 ngày làm việc)', '✅ Hàng chính hãng đảm bảo'],
-      closing: 'Đặt hàng ngay hôm nay! ✨'
-    }
+function formatDesc(parsed,lang,productName){
+  var SEP='━━━━━━━━━━━━━━━━━━━';
+  var configs={
+    ja:{flag:'🇯🇵【日本直送】',whyTitle:'【選ばれる理由】',featureIcon:'✨ ',howTitle:'🎯 使い方',qualityTitle:'⭐ 日本製品質保証',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出荷情報',shipLines:['✅ 日本から直送','✅ 迅速発送（1〜2営業日）','✅ 正規品保証'],closing:'今すぐ注文して、日本品質を体験しよう！✨'},
+    zh:{flag:'🇯🇵【日本直送】',whyTitle:'【為什麼選擇這個商品？】',featureIcon:'✨ ',howTitle:'🎯 使用方法（超簡單！）',qualityTitle:'⭐ 日本製品質保證',useIcon:'✅ ',warnTitle:'⚠️ 注意事項',warnIcon:'• ',shipTitle:'🚚 出貨資訊',shipLines:['✅ 台灣直送','✅ 現貨供應','✅ 快速出貨（1-2個工作天）','✅ 完整包裝，確保品質'],closing:'立即下單，體驗日本品質的魅力！✨'},
+    en:{flag:'🇯🇵【Direct from Japan】',whyTitle:'【Why choose this?】',featureIcon:'✨ ',howTitle:'🎯 How to Use',qualityTitle:'⭐ Japanese Quality Guaranteed',useIcon:'✅ ',warnTitle:'⚠️ Precautions',warnIcon:'• ',shipTitle:'🚚 Shipping Info',shipLines:['✅ Ships directly from Japan','✅ Fast shipping (1-2 business days)','✅ Authentic product guaranteed'],closing:'Order now and experience Japanese quality! ✨'},
+    th:{flag:'🇯🇵【ส่งตรงจากญี่ปุ่น】',whyTitle:'【ทำไมต้องเลือกสินค้านี้？】',featureIcon:'✨ ',howTitle:'🎯 วิธีใช้งาน',qualityTitle:'⭐ รับประกันคุณภาพจากญี่ปุ่น',useIcon:'✅ ',warnTitle:'⚠️ ข้อควรระวัง',warnIcon:'• ',shipTitle:'🚚 ข้อมูลการจัดส่ง',shipLines:['✅ จัดส่งตรงจากญี่ปุ่น','✅ จัดส่งเร็ว (1-2 วันทำการ)','✅ สินค้าแท้รับประกัน'],closing:'สั่งซื้อเลยวันนี้! ✨'},
+    vn:{flag:'🇯🇵【Giao thẳng từ Nhật】',whyTitle:'【Tại sao chọn sản phẩm này？】',featureIcon:'✨ ',howTitle:'🎯 Cách sử dụng',qualityTitle:'⭐ Chất lượng Nhật Bản đảm bảo',useIcon:'✅ ',warnTitle:'⚠️ Lưu ý',warnIcon:'• ',shipTitle:'🚚 Thông tin vận chuyển',shipLines:['✅ Giao hàng trực tiếp từ Nhật Bản','✅ Giao hàng nhanh (1-2 ngày làm việc)','✅ Hàng chính hãng đảm bảo'],closing:'Đặt hàng ngay hôm nay! ✨'},
   };
-
-  var c = configs[lang] || configs.en;
-  var features = parsed['features_' + lang] || [];
-  var steps    = parsed['steps_'    + lang] || [];
-  var uses     = parsed['uses_'     + lang] || [];
-  var warnings = parsed['warnings_' + lang] || [];
-  var catchcopy = parsed['catchcopy_' + lang] || '';
-  var titleLocal = parsed['title_' + lang] || productName;
-  var nums = ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'];
-
-  var lines = [];
-  lines.push(c.flag + ' ' + titleLocal);
-  lines.push('');
-  lines.push(SEP);
-  lines.push('🔥 ' + catchcopy);
-  lines.push(SEP);
-  lines.push('');
-  lines.push(c.whyTitle);
-  features.forEach(function(f){ lines.push(c.featureIcon + f); });
-  lines.push('');
-  lines.push(SEP);
-  lines.push(c.howTitle);
-  lines.push(SEP);
-  lines.push('');
-  steps.forEach(function(s, i){ lines.push((nums[i]||((i+1)+'.')) + ' ' + s); });
-  lines.push('');
-  lines.push(SEP);
-  lines.push(c.qualityTitle);
-  lines.push(SEP);
-  lines.push('');
-  uses.forEach(function(u){ lines.push(c.useIcon + u); });
-  lines.push('');
-  lines.push(SEP);
-  lines.push(c.warnTitle);
-  lines.push(SEP);
-  lines.push('');
-  warnings.forEach(function(w){ lines.push(c.warnIcon + w); });
-  lines.push('');
-  lines.push(SEP);
-  lines.push(c.shipTitle);
-  lines.push(SEP);
-  lines.push('');
-  c.shipLines.forEach(function(l){ lines.push(l); });
-  lines.push('');
-  lines.push(SEP);
-  lines.push('');
-  lines.push(c.closing);
-
+  var c=configs[lang]||configs.en;
+  var features=parsed['features_'+lang]||[];
+  var steps=parsed['steps_'+lang]||[];
+  var uses=parsed['uses_'+lang]||[];
+  var warnings=parsed['warnings_'+lang]||[];
+  var catchcopy=parsed['catchcopy_'+lang]||'';
+  var titleLocal=parsed['title_'+lang]||productName;
+  var nums=['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'];
+  var lines=[];
+  lines.push(c.flag+' '+titleLocal);lines.push('');lines.push(SEP);lines.push('🔥 '+catchcopy);lines.push(SEP);lines.push('');
+  lines.push(c.whyTitle);features.forEach(function(f){lines.push(c.featureIcon+f);});lines.push('');
+  lines.push(SEP);lines.push(c.howTitle);lines.push(SEP);lines.push('');
+  steps.forEach(function(s,i){lines.push((nums[i]||((i+1)+'.'))+ ' '+s);});lines.push('');
+  lines.push(SEP);lines.push(c.qualityTitle);lines.push(SEP);lines.push('');
+  uses.forEach(function(u){lines.push(c.useIcon+u);});lines.push('');
+  lines.push(SEP);lines.push(c.warnTitle);lines.push(SEP);lines.push('');
+  warnings.forEach(function(w){lines.push(c.warnIcon+w);});lines.push('');
+  lines.push(SEP);lines.push(c.shipTitle);lines.push(SEP);lines.push('');
+  c.shipLines.forEach(function(l){lines.push(l);});lines.push('');
+  lines.push(SEP);lines.push('');lines.push(c.closing);
   return lines.join('\n');
 }
 
-// ── 保存済みを表示 ──
-function showDesc(id) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p) return;
-  const saved = getSavedDesc(id);
-  if (!saved) { alert('保存済みの説明文がありません。「🔄 再生成」で生成してください。'); return; }
-  currentProduct = p;
-  currentDesc = saved;
-  currentLang = 'ja';
-
-  const marketKeys = Object.keys(p.markets||{});
-  const isThaiMarket = marketKeys.includes('th');
-  const isVnMarket   = marketKeys.includes('vn');
-  document.getElementById('tab-th').style.display = isThaiMarket?'':'none';
-  document.getElementById('tab-vn').style.display = isVnMarket?'':'none';
-  document.getElementById('lf-title-th').style.display = isThaiMarket?'':'none';
-  document.getElementById('lf-title-vn').style.display = isVnMarket?'':'none';
-  document.getElementById('lf-desc-th').style.display  = isThaiMarket?'':'none';
-  document.getElementById('lf-desc-vn').style.display  = isVnMarket?'':'none';
-
+function showDesc(id){
+  const p=products.find(function(x){return x.id===id;});if(!p)return;
+  const saved=getSavedDesc(id);if(!saved){alert('保存済みの説明文がありません。「🔄 再生成」で生成してください。');return;}
+  currentProduct=p;currentDesc=saved;currentLang='ja';
+  const marketKeys=Object.keys(p.markets||{});
+  const isThaiMarket=marketKeys.includes('th');const isVnMarket=marketKeys.includes('vn');
+  document.getElementById('tab-th').style.display=isThaiMarket?'':'none';
+  document.getElementById('tab-vn').style.display=isVnMarket?'':'none';
+  document.getElementById('lf-title-th').style.display=isThaiMarket?'':'none';
+  document.getElementById('lf-title-vn').style.display=isVnMarket?'':'none';
+  document.getElementById('lf-desc-th').style.display=isThaiMarket?'':'none';
+  document.getElementById('lf-desc-vn').style.display=isVnMarket?'':'none';
   document.querySelectorAll('.lang-tab').forEach(function(t,i){t.classList.toggle('active',i===0);});
-  document.getElementById('modal-title').textContent = p.name;
-  document.getElementById('modal-sub').textContent = '保存済みの説明文を表示しています';
-  document.getElementById('desc-content').textContent = saved.ja||'';
-  document.getElementById('lv-category').textContent = p.category;
-  document.getElementById('lv-price').textContent = marketKeys.map(function(m){return marketNames[m]+':'+fmt(p.markets[m].price);}).join(' / ');
-  document.getElementById('lv-title-en').textContent = saved.title_en||'-';
-  document.getElementById('lv-title-zh').textContent = saved.title_zh||'-';
-  document.getElementById('lv-desc-ja').textContent  = saved.ja||'-';
-  document.getElementById('lv-desc-en').textContent  = saved.en||'-';
-  document.getElementById('lv-desc-zh').textContent  = saved.zh||'-';
-  if (saved.title_th) document.getElementById('lv-title-th').textContent = saved.title_th;
-  if (saved.title_vn) document.getElementById('lv-title-vn').textContent = saved.title_vn;
-  if (saved.th) document.getElementById('lv-desc-th').textContent = saved.th;
-  if (saved.vn) document.getElementById('lv-desc-vn').textContent = saved.vn;
-  document.getElementById('lv-brand').textContent = saved.brand || '-';
-  document.getElementById('lv-material').textContent = saved.material || '-';
-  document.getElementById('lv-features').textContent = (saved.features||[]).join('\n');
-  const wkMap = ['0.08','0.2','0.4','0.8','1.5'];
-  const savedSpec2 = getSavedShippingSpec(p.id);
-  document.getElementById('lv-weight-kg-input').value = savedSpec2.weight || (wkMap[p.weight]||'0.4');
-  document.getElementById('lv-parcel-w').value = savedSpec2.w || saved.parcel_w || '';
-  document.getElementById('lv-parcel-l').value = savedSpec2.l || saved.parcel_l || '';
-  document.getElementById('lv-parcel-h').value = savedSpec2.h || saved.parcel_h || '';
+  document.getElementById('modal-title').textContent=p.name;
+  document.getElementById('modal-sub').textContent='保存済みの説明文を表示しています';
+  document.getElementById('desc-content').textContent=saved.ja||'';
+  document.getElementById('lv-category').textContent=p.category;
+  document.getElementById('lv-price').textContent=marketKeys.map(function(m){return marketNames[m]+':'+fmt(p.markets[m].price);}).join(' / ');
+  document.getElementById('lv-title-en').textContent=saved.title_en||'-';
+  document.getElementById('lv-title-zh').textContent=saved.title_zh||'-';
+  document.getElementById('lv-desc-ja').textContent=saved.ja||'-';
+  document.getElementById('lv-desc-en').textContent=saved.en||'-';
+  document.getElementById('lv-desc-zh').textContent=saved.zh||'-';
+  if(saved.title_th)document.getElementById('lv-title-th').textContent=saved.title_th;
+  if(saved.title_vn)document.getElementById('lv-title-vn').textContent=saved.title_vn;
+  if(saved.th)document.getElementById('lv-desc-th').textContent=saved.th;
+  if(saved.vn)document.getElementById('lv-desc-vn').textContent=saved.vn;
+  document.getElementById('lv-brand').textContent=saved.brand||'-';
+  document.getElementById('lv-material').textContent=saved.material||'-';
+  document.getElementById('lv-features').textContent=(saved.features||[]).join('\n');
+  const wkMap=['0.08','0.2','0.4','0.8','1.5'];
+  const savedSpec2=getSavedShippingSpec(p.id);
+  document.getElementById('lv-weight-kg-input').value=savedSpec2.weight||(wkMap[p.weight]||'0.4');
+  document.getElementById('lv-parcel-w').value=savedSpec2.w||saved.parcel_w||'';
+  document.getElementById('lv-parcel-l').value=savedSpec2.l||saved.parcel_l||'';
+  document.getElementById('lv-parcel-h').value=savedSpec2.h||saved.parcel_h||'';
   document.getElementById('modal').classList.add('open');
 }
 
-// ── AI MODAL（再生成） ──
-async function openModal(id) {
-  const p = products.find(function(x){return x.id===id;});
-  if (!p) return;
-  currentProduct = p;
-  const marketKeys = Object.keys(p.markets||{});
-  const isThaiMarket = marketKeys.includes('th');
-  const isVnMarket   = marketKeys.includes('vn');
-  currentDesc = {}; currentLang = 'ja';
+// ── AI MODAL（DeepL対応版） ──
+async function openModal(id){
+  const p=products.find(function(x){return x.id===id;});if(!p)return;
+  currentProduct=p;
+  const marketKeys=Object.keys(p.markets||{});
+  const isThaiMarket=marketKeys.includes('th');
+  const isVnMarket=marketKeys.includes('vn');
+  currentDesc={};currentLang='ja';
 
-  document.getElementById('tab-th').style.display = isThaiMarket?'':'none';
-  document.getElementById('tab-vn').style.display = isVnMarket?'':'none';
-  document.getElementById('lf-title-th').style.display = isThaiMarket?'':'none';
-  document.getElementById('lf-title-vn').style.display = isVnMarket?'':'none';
-  document.getElementById('lf-desc-th').style.display  = isThaiMarket?'':'none';
-  document.getElementById('lf-desc-vn').style.display  = isVnMarket?'':'none';
+  document.getElementById('tab-th').style.display=isThaiMarket?'':'none';
+  document.getElementById('tab-vn').style.display=isVnMarket?'':'none';
+  document.getElementById('lf-title-th').style.display=isThaiMarket?'':'none';
+  document.getElementById('lf-title-vn').style.display=isVnMarket?'':'none';
+  document.getElementById('lf-desc-th').style.display=isThaiMarket?'':'none';
+  document.getElementById('lf-desc-vn').style.display=isVnMarket?'':'none';
 
   document.querySelectorAll('.lang-tab').forEach(function(t,i){t.classList.toggle('active',i===0);});
-  document.getElementById('modal-title').textContent = p.name;
-  document.getElementById('modal-sub').textContent = 'AIが出品用データを生成中...';
-  document.getElementById('desc-content').innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
-  ['lv-title-en','lv-title-zh','lv-title-th','lv-title-vn','lv-desc-ja','lv-desc-en','lv-desc-zh','lv-desc-th','lv-desc-vn'].forEach(function(eid){
-    const el=document.getElementById(eid); if(el) el.textContent='生成中...';
-  });
-  const marketNamesStr = marketKeys.map(function(m){return marketNames[m];}).join('・');
-  document.getElementById('lv-category').textContent = p.category;
-  document.getElementById('lv-price').textContent = marketKeys.map(function(m){return marketNames[m]+':'+fmt(p.markets[m].price);}).join(' / ');
+  document.getElementById('modal-title').textContent=p.name;
+  document.getElementById('modal-sub').textContent='AIが出品用データを生成中...';
+  document.getElementById('desc-content').innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
+  ['lv-title-en','lv-title-zh','lv-title-th','lv-title-vn','lv-desc-ja','lv-desc-en','lv-desc-zh','lv-desc-th','lv-desc-vn'].forEach(function(eid){const el=document.getElementById(eid);if(el)el.textContent='生成中...';});
+  const marketNamesStr=marketKeys.map(function(m){return marketNames[m];}).join('・');
+  document.getElementById('lv-category').textContent=p.category;
+  document.getElementById('lv-price').textContent=marketKeys.map(function(m){return marketNames[m]+':'+fmt(p.markets[m].price);}).join(' / ');
   document.getElementById('modal').classList.add('open');
 
-  const weightKgMap = ['0.08','0.2','0.4','0.8','1.5'];
-  const weightKg = weightKgMap[p.weight] || '0.4';
+  const weightKgMap=['0.08','0.2','0.4','0.8','1.5'];
+  const weightKg=weightKgMap[p.weight]||'0.4';
+  const hasDeepL=!!getDeeplKey();
 
-  // ── Gemini へのプロンプト：構造化JSONのみ返させる ──
-  const thFields = isThaiMarket ? [
-    '"title_th": "ชื่อสินค้าภาษาไทย (ไม่เกิน 100 ตัวอักษร, ระบุว่านำเข้าจากญี่ปุ่น)",',
-    '"catchcopy_th": "สโลแกนภาษาไทย (ไม่เกิน 30 ตัวอักษร)",',
-    '"features_th": ["คุณสมบัติ 1 (สั้น)","คุณสมบัติ 2","คุณสมบัติ 3","คุณสมบัติ 4"],',
-    '"steps_th": ["ขั้นตอน 1","ขั้นตอน 2","ขั้นตอน 3"],',
-    '"uses_th": ["การใช้งาน 1","การใช้งาน 2","การใช้งาน 3","การใช้งาน 4"],',
-    '"warnings_th": ["ข้อควรระวัง 1","ข้อควรระวัง 2"],'
-  ].join('\n  ') : '';
+  // DeepLが使える場合：Geminiで日本語＋構造データのみ生成し、翻訳はDeepLに任せる
+  // DeepLが使えない場合：従来通りGemini一括生成
+  const prompt=hasDeepL
+    ? buildPromptWithDeepL(p.name, p.category, marketNamesStr, isThaiMarket, isVnMarket)
+    : buildPromptGeminiOnly(p.name, p.category, marketNamesStr, isThaiMarket, isVnMarket);
 
-  const vnFields = isVnMarket ? [
-    '"title_vn": "Tên tiếng Việt (tối đa 100 ký tự, ghi rõ hàng Nhật)",',
-    '"catchcopy_vn": "Slogan tiếng Việt (tối đa 30 ký tự)",',
-    '"features_vn": ["Đặc điểm 1 (ngắn)","Đặc điểm 2","Đặc điểm 3","Đặc điểm 4"],',
-    '"steps_vn": ["Bước 1","Bước 2","Bước 3"],',
-    '"uses_vn": ["Công dụng 1","Công dụng 2","Công dụng 3","Công dụng 4"],',
-    '"warnings_vn": ["Lưu ý 1","Lưu ý 2"],'
-  ].join('\n  ') : '';
+  try{
+    const apiKey=localStorage.getItem('gemini_api_key')||'';
+    if(!apiKey){document.getElementById('desc-content').textContent='⚙️ APIキーが未設定です。「設定」タブから登録してください。';return;}
 
-  const prompt = 'あなたはShopeeで' + marketNamesStr + 'に日本製品を販売するプロのECセラーです。\n'
-    + '商品名: ' + p.name + '\n'
-    + 'カテゴリー: ' + p.category + '\n'
-    + '出品マーケット: ' + marketNamesStr + '\n\n'
-    + '以下のJSON形式のみで返答してください（マークダウン・コードブロック不要）。各言語で自然な表現にしてください。\n\n'
-    + '{\n'
-    + '  "title_en": "English title (max 100 chars, MUST start with 【Direct from Japan】)",\n'
-    + '  "title_zh": "繁體中文標題（最多100字，開頭必須是【日本直送】）",\n'
-    + (isThaiMarket ? '  "title_th": "ชื่อสินค้าภาษาไทย (ไม่เกิน 100 ตัวอักษร, ขึ้นต้นด้วย【ส่งตรงจากญี่ปุ่น】)",\n' : '')
-    + (isVnMarket   ? '  "title_vn": "Tên tiếng Việt (tối đa 100 ký tự, bắt đầu bằng【Giao thẳng từ Nhật】)",\n' : '')
-    + '  "catchcopy_ja": "日本語キャッチコピー1文（20〜30字・インパクト重視）",\n'
-    + '  "catchcopy_zh": "繁體中文標語（20〜30字）",\n'
-    + '  "catchcopy_en": "English catchphrase (max 30 chars)",\n'
-    + (isThaiMarket ? '  "catchcopy_th": "สโลแกนภาษาไทย (ไม่เกิน 30 ตัวอักษร)",\n' : '')
-    + (isVnMarket   ? '  "catchcopy_vn": "Slogan tiếng Việt (tối đa 30 ký tự)",\n' : '')
-    + '  "features_ja": ["特徴1（15〜20字）","特徴2","特徴3","特徴4"],\n'
-    + '  "features_zh": ["特點1（繁體・15〜20字）","特點2","特點3","特點4"],\n'
-    + '  "features_en": ["Feature 1 (max 20 chars)","Feature 2","Feature 3","Feature 4"],\n'
-    + (isThaiMarket ? '  "features_th": ["คุณสมบัติ 1","คุณสมบัติ 2","คุณสมบัติ 3","คุณสมบัติ 4"],\n' : '')
-    + (isVnMarket   ? '  "features_vn": ["Đặc điểm 1","Đặc điểm 2","Đặc điểm 3","Đặc điểm 4"],\n' : '')
-    + '  "steps_ja": ["手順1（簡潔に）","手順2","手順3"],\n'
-    + '  "steps_zh": ["步驟1","步驟2","步驟3"],\n'
-    + '  "steps_en": ["Step 1","Step 2","Step 3"],\n'
-    + (isThaiMarket ? '  "steps_th": ["ขั้นตอน 1","ขั้นตอน 2","ขั้นตอน 3"],\n' : '')
-    + (isVnMarket   ? '  "steps_vn": ["Bước 1","Bước 2","Bước 3"],\n' : '')
-    + '  "uses_ja": ["用途1","用途2","用途3","用途4"],\n'
-    + '  "uses_zh": ["用途1（繁體）","用途2","用途3","用途4"],\n'
-    + '  "uses_en": ["Use case 1","Use case 2","Use case 3","Use case 4"],\n'
-    + (isThaiMarket ? '  "uses_th": ["การใช้งาน 1","การใช้งาน 2","การใช้งาน 3","การใช้งาน 4"],\n' : '')
-    + (isVnMarket   ? '  "uses_vn": ["Công dụng 1","Công dụng 2","Công dụng 3","Công dụng 4"],\n' : '')
-    + '  "warnings_ja": ["注意事項1","注意事項2"],\n'
-    + '  "warnings_zh": ["注意事項1（繁體）","注意事項2"],\n'
-    + '  "warnings_en": ["Warning 1","Warning 2"],\n'
-    + (isThaiMarket ? '  "warnings_th": ["ข้อควรระวัง 1","ข้อควรระวัง 2"],\n' : '')
-    + (isVnMarket   ? '  "warnings_vn": ["Lưu ý 1","Lưu ý 2"],\n' : '')
-    + '  "brand": "ブランド名（英語表記）",\n'
-    + '  "material": "主な素材（英語1〜3語）",\n'
-    + '  "features": ["Feature1 (max 15 chars)","Feature2","Feature3","Feature4","Feature5"],\n'
-    + '  "parcel_w": "梱包幅（整数のみ 例:15）",\n'
-    + '  "parcel_l": "梱包長さ（整数のみ）",\n'
-    + '  "parcel_h": "梱包高さ（整数のみ）"\n'
-    + '}';
-
-  try {
-    const apiKey = localStorage.getItem('gemini_api_key')||'';
-    if (!apiKey) {
-      document.getElementById('desc-content').textContent = '⚙️ APIキーが未設定です。「設定」タブから登録してください。';
-      return;
-    }
-    let resp, data;
-    for (let attempt=0; attempt<3; attempt++) {
-      resp = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contents:[{parts:[{text:prompt}]}]})
-      });
-      data = await resp.json();
-      if (resp.status!==429) break;
-      document.getElementById('modal-sub').textContent = '混雑中。リトライ中（'+(attempt+1)+'/3）...';
+    let resp,data;
+    for(let attempt=0;attempt<3;attempt++){
+      resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+      data=await resp.json();
+      if(resp.status!==429)break;
+      document.getElementById('modal-sub').textContent='混雑中。リトライ中（'+(attempt+1)+'/3）...';
       await new Promise(function(r){setTimeout(r,10000);});
     }
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
 
-    // ── JS側でフォーマット組み立て ──
-    var langs = ['ja','zh','en'];
-    if (isThaiMarket) langs.push('th');
-    if (isVnMarket)   langs.push('vn');
-    langs.forEach(function(lang){
-      parsed[lang] = formatDesc(parsed, lang, p.name);
-    });
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
 
-    currentDesc = parsed;
-    saveDesc(p.id, parsed);
-    document.getElementById('modal-sub').textContent = '生成完了！保存しました ✅';
-    document.getElementById('desc-content').textContent = parsed.ja||'';
-    document.getElementById('lv-title-en').textContent = parsed.title_en||'-';
-    document.getElementById('lv-title-zh').textContent = parsed.title_zh||'-';
-    document.getElementById('lv-desc-ja').textContent  = parsed.ja||'-';
-    document.getElementById('lv-desc-en').textContent  = parsed.en||'-';
-    document.getElementById('lv-desc-zh').textContent  = parsed.zh||'-';
-    if (parsed.title_th) document.getElementById('lv-title-th').textContent = parsed.title_th;
-    if (parsed.title_vn) document.getElementById('lv-title-vn').textContent = parsed.title_vn;
-    if (parsed.th) document.getElementById('lv-desc-th').textContent = parsed.th;
-    if (parsed.vn) document.getElementById('lv-desc-vn').textContent = parsed.vn;
-    document.getElementById('lv-brand').textContent    = parsed.brand||'-';
-    document.getElementById('lv-material').textContent = parsed.material||'-';
-    document.getElementById('lv-features').textContent = (parsed.features||[]).join('\n');
-    const savedSpec = getSavedShippingSpec(p.id);
-    document.getElementById('lv-weight-kg-input').value = savedSpec.weight||weightKg;
-    document.getElementById('lv-parcel-w').value = savedSpec.w||parsed.parcel_w||'';
-    document.getElementById('lv-parcel-l').value = savedSpec.l||parsed.parcel_l||'';
-    document.getElementById('lv-parcel-h').value = savedSpec.h||parsed.parcel_h||'';
-  } catch(e) {
-    document.getElementById('desc-content').textContent = '生成に失敗しました。再度お試しください。';
+    // DeepLで翻訳する場合
+    if(hasDeepL){
+      document.getElementById('modal-sub').textContent='DeepLで翻訳中... 🌐';
+
+      // 日本語説明文を組み立て（先にformatDescを呼ぶためのダミーデータ確保）
+      parsed.ja=formatDesc(parsed,'ja',p.name);
+
+      // DeepL翻訳対象：タイトル・説明文の素材（日本語）をまとめて翻訳
+      // features, steps, uses, warnings を日本語で取得済み前提でDeepL翻訳
+      const deeplLangs=['en','zh'];
+      if(isThaiMarket)deeplLangs.push('th');
+      if(isVnMarket)deeplLangs.push('vn');
+
+      // 各言語・各フィールドを翻訳
+      for(const lang of deeplLangs){
+        const targetCode=DEEPL_LANG_MAP[lang];
+        if(!targetCode)continue;
+
+        // タイトル翻訳（日本語タイトルから）
+        const translatedTitle=await deeplTranslate(p.name,targetCode);
+        if(translatedTitle){
+          // タイトルにプレフィックスを付与
+          const prefixes={en:'【Direct from Japan】',zh:'【日本直送】',th:'【ส่งตรงจากญี่ปุ่น】',vn:'【Giao thẳng từ Nhật】'};
+          parsed['title_'+lang]=(prefixes[lang]||'')+' '+translatedTitle;
+        }
+
+        // キャッチコピー翻訳
+        if(parsed.catchcopy_ja){
+          const tc=await deeplTranslate(parsed.catchcopy_ja,targetCode);
+          if(tc)parsed['catchcopy_'+lang]=tc;
+        }
+
+        // features翻訳
+        if(parsed.features_ja&&parsed.features_ja.length){
+          const translated=await Promise.all(parsed.features_ja.map(f=>deeplTranslate(f,targetCode)));
+          parsed['features_'+lang]=translated.filter(Boolean);
+        }
+        // steps翻訳
+        if(parsed.steps_ja&&parsed.steps_ja.length){
+          const translated=await Promise.all(parsed.steps_ja.map(s=>deeplTranslate(s,targetCode)));
+          parsed['steps_'+lang]=translated.filter(Boolean);
+        }
+        // uses翻訳
+        if(parsed.uses_ja&&parsed.uses_ja.length){
+          const translated=await Promise.all(parsed.uses_ja.map(u=>deeplTranslate(u,targetCode)));
+          parsed['uses_'+lang]=translated.filter(Boolean);
+        }
+        // warnings翻訳
+        if(parsed.warnings_ja&&parsed.warnings_ja.length){
+          const translated=await Promise.all(parsed.warnings_ja.map(w=>deeplTranslate(w,targetCode)));
+          parsed['warnings_'+lang]=translated.filter(Boolean);
+        }
+
+        parsed[lang]=formatDesc(parsed,lang,p.name);
+      }
+
+      // フィリピン語・マレー語はGemini生成済みの値をそのまま使用
+    } else {
+      // Geminiのみモード
+      const langs=['ja','zh','en'];
+      if(isThaiMarket)langs.push('th');
+      if(isVnMarket)langs.push('vn');
+      langs.forEach(function(lang){parsed[lang]=formatDesc(parsed,lang,p.name);});
+    }
+
+    currentDesc=parsed;
+    saveDesc(p.id,parsed);
+    const modeStr=hasDeepL?'生成完了！（DeepL翻訳） ✅':'生成完了！保存しました ✅';
+    document.getElementById('modal-sub').textContent=modeStr;
+    document.getElementById('desc-content').textContent=parsed.ja||'';
+    document.getElementById('lv-title-en').textContent=parsed.title_en||'-';
+    document.getElementById('lv-title-zh').textContent=parsed.title_zh||'-';
+    document.getElementById('lv-desc-ja').textContent=parsed.ja||'-';
+    document.getElementById('lv-desc-en').textContent=parsed.en||'-';
+    document.getElementById('lv-desc-zh').textContent=parsed.zh||'-';
+    if(parsed.title_th)document.getElementById('lv-title-th').textContent=parsed.title_th;
+    if(parsed.title_vn)document.getElementById('lv-title-vn').textContent=parsed.title_vn;
+    if(parsed.th)document.getElementById('lv-desc-th').textContent=parsed.th;
+    if(parsed.vn)document.getElementById('lv-desc-vn').textContent=parsed.vn;
+    document.getElementById('lv-brand').textContent=parsed.brand||'-';
+    document.getElementById('lv-material').textContent=parsed.material||'-';
+    document.getElementById('lv-features').textContent=(parsed.features||[]).join('\n');
+    const savedSpec=getSavedShippingSpec(p.id);
+    document.getElementById('lv-weight-kg-input').value=savedSpec.weight||weightKg;
+    document.getElementById('lv-parcel-w').value=savedSpec.w||parsed.parcel_w||'';
+    document.getElementById('lv-parcel-l').value=savedSpec.l||parsed.parcel_l||'';
+    document.getElementById('lv-parcel-h').value=savedSpec.h||parsed.parcel_h||'';
+  }catch(e){
+    document.getElementById('desc-content').textContent='生成に失敗しました。再度お試しください。';
   }
 }
 
-// ── Shipping Spec ──
-function getSavedShippingSpec(id) {
-  try { return JSON.parse(localStorage.getItem('shipping_'+id)||'{}'); } catch(e) { return {}; }
+// DeepLあり用プロンプト（日本語のみ生成、翻訳はDeepLが担当）
+function buildPromptWithDeepL(name,category,marketNamesStr,isThaiMarket,isVnMarket){
+  return 'あなたはShopeeで'+marketNamesStr+'に日本製品を販売するプロのECセラーです。\n'
+    +'商品名: '+name+'\nカテゴリー: '+category+'\n出品マーケット: '+marketNamesStr+'\n\n'
+    +'日本語のみで以下のJSON形式で返答してください（マークダウン・コードブロック不要）。翻訳は別途行うので日本語だけ丁寧に書いてください。\n\n'
+    +'{\n'
+    +'  "catchcopy_ja": "日本語キャッチコピー1文（20〜30字・インパクト重視）",\n'
+    +'  "features_ja": ["特徴1（15〜20字）","特徴2","特徴3","特徴4"],\n'
+    +'  "steps_ja": ["手順1（簡潔に）","手順2","手順3"],\n'
+    +'  "uses_ja": ["用途1","用途2","用途3","用途4"],\n'
+    +'  "warnings_ja": ["注意事項1","注意事項2"],\n'
+    +'  "brand": "ブランド名（英語表記）",\n'
+    +'  "material": "主な素材（英語1〜3語）",\n'
+    +'  "features": ["Feature1 (max 15 chars)","Feature2","Feature3","Feature4","Feature5"],\n'
+    +'  "parcel_w": "梱包幅（整数のみ 例:15）",\n'
+    +'  "parcel_l": "梱包長さ（整数のみ）",\n'
+    +'  "parcel_h": "梱包高さ（整数のみ）"\n'
+    +'}';
 }
-function saveShippingSpec() {
-  if (!currentProduct) return;
-  const id = currentProduct.id;
-  const spec = {
-    weight: document.getElementById('lv-weight-kg-input').value,
-    w: document.getElementById('lv-parcel-w').value,
-    l: document.getElementById('lv-parcel-l').value,
-    h: document.getElementById('lv-parcel-h').value,
-  };
-  try { localStorage.setItem('shipping_'+id, JSON.stringify(spec)); } catch(e) {}
-  document.querySelectorAll('[onclick="saveShippingSpec()"]').forEach(function(btn){
-    btn.textContent='✅'; setTimeout(function(){btn.textContent='保存';},1500);
-  });
+
+// DeepLなし用プロンプト（従来通り全言語Geminiで生成）
+function buildPromptGeminiOnly(name,category,marketNamesStr,isThaiMarket,isVnMarket){
+  return 'あなたはShopeeで'+marketNamesStr+'に日本製品を販売するプロのECセラーです。\n'
+    +'商品名: '+name+'\nカテゴリー: '+category+'\n出品マーケット: '+marketNamesStr+'\n\n'
+    +'以下のJSON形式のみで返答してください（マークダウン・コードブロック不要）。各言語で自然な表現にしてください。\n\n'
+    +'{\n'
+    +'  "title_en": "English title (max 100 chars, MUST start with 【Direct from Japan】)",\n'
+    +'  "title_zh": "繁體中文標題（最多100字，開頭必須是【日本直送】）",\n'
+    +(isThaiMarket?'  "title_th": "ชื่อสินค้าภาษาไทย (ไม่เกิน 100 ตัวอักษร, ขึ้นต้นด้วย【ส่งตรงจากญี่ปุ่น】)",\n':'')
+    +(isVnMarket?'  "title_vn": "Tên tiếng Việt (tối đa 100 ký tự, bắt đầu bằng【Giao thẳng từ Nhật】)",\n':'')
+    +'  "catchcopy_ja": "日本語キャッチコピー1文（20〜30字）",\n'
+    +'  "catchcopy_zh": "繁體中文標語",\n'
+    +'  "catchcopy_en": "English catchphrase (max 30 chars)",\n'
+    +(isThaiMarket?'  "catchcopy_th": "สโลแกนภาษาไทย",\n':'')
+    +(isVnMarket?'  "catchcopy_vn": "Slogan tiếng Việt",\n':'')
+    +'  "features_ja": ["特徴1","特徴2","特徴3","特徴4"],\n'
+    +'  "features_zh": ["特點1","特點2","特點3","特點4"],\n'
+    +'  "features_en": ["Feature 1","Feature 2","Feature 3","Feature 4"],\n'
+    +(isThaiMarket?'  "features_th": ["คุณสมบัติ 1","คุณสมบัติ 2","คุณสมบัติ 3","คุณสมบัติ 4"],\n':'')
+    +(isVnMarket?'  "features_vn": ["Đặc điểm 1","Đặc điểm 2","Đặc điểm 3","Đặc điểm 4"],\n':'')
+    +'  "steps_ja": ["手順1","手順2","手順3"],\n'
+    +'  "steps_zh": ["步驟1","步驟2","步驟3"],\n'
+    +'  "steps_en": ["Step 1","Step 2","Step 3"],\n'
+    +(isThaiMarket?'  "steps_th": ["ขั้นตอน 1","ขั้นตอน 2","ขั้นตอน 3"],\n':'')
+    +(isVnMarket?'  "steps_vn": ["Bước 1","Bước 2","Bước 3"],\n':'')
+    +'  "uses_ja": ["用途1","用途2","用途3","用途4"],\n'
+    +'  "uses_zh": ["用途1","用途2","用途3","用途4"],\n'
+    +'  "uses_en": ["Use case 1","Use case 2","Use case 3","Use case 4"],\n'
+    +(isThaiMarket?'  "uses_th": ["การใช้งาน 1","การใช้งาน 2","การใช้งาน 3","การใช้งาน 4"],\n':'')
+    +(isVnMarket?'  "uses_vn": ["Công dụng 1","Công dụng 2","Công dụng 3","Công dụng 4"],\n':'')
+    +'  "warnings_ja": ["注意事項1","注意事項2"],\n'
+    +'  "warnings_zh": ["注意事項1","注意事項2"],\n'
+    +'  "warnings_en": ["Warning 1","Warning 2"],\n'
+    +(isThaiMarket?'  "warnings_th": ["ข้อควรระวัง 1","ข้อควรระวัง 2"],\n':'')
+    +(isVnMarket?'  "warnings_vn": ["Lưu ý 1","Lưu ý 2"],\n':'')
+    +'  "brand": "ブランド名（英語表記）",\n'
+    +'  "material": "主な素材（英語1〜3語）",\n'
+    +'  "features": ["Feature1 (max 15 chars)","Feature2","Feature3","Feature4","Feature5"],\n'
+    +'  "parcel_w": "梱包幅（整数のみ）",\n'
+    +'  "parcel_l": "梱包長さ（整数のみ）",\n'
+    +'  "parcel_h": "梱包高さ（整数のみ）"\n'
+    +'}';
 }
-function copyInputVal(inputId, btn) {
-  const val = document.getElementById(inputId).value;
-  if (!val) return;
-  navigator.clipboard.writeText(val).catch(function(){
-    const ta=document.createElement('textarea');ta.value=val;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-  });
-  const orig=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=orig;},1500);
+
+// ── キーワード翻訳（DeepL対応版） ──
+async function translateKeyword(){
+  const keyword=document.getElementById('search-keyword').value.trim();
+  if(!keyword){alert('商品名を入力してください');return;}
+  const btn=document.getElementById('translate-btn');
+  btn.textContent='翻訳中...';btn.disabled=true;
+
+  const deeplKey=getDeeplKey();
+  const geminiKey=localStorage.getItem('gemini_api_key')||'';
+
+  try{
+    if(deeplKey){
+      // DeepLで翻訳
+      const [enResult,zhResult,thResult,vnResult]=await Promise.all([
+        deeplTranslate(keyword,'EN'),
+        deeplTranslate(keyword,'ZH-HANT'),
+        deeplTranslate(keyword,'TH'),
+        deeplTranslate(keyword,'VI'),
+      ]);
+      document.getElementById('search-keyword-en').value=enResult||keyword;
+      document.getElementById('search-keyword-zh').value=zhResult||keyword;
+      document.getElementById('search-keyword-th').value=thResult||keyword;
+      document.getElementById('search-keyword-vn').value=vnResult||keyword;
+    } else if(geminiKey){
+      // Geminiで翻訳（従来通り）
+      const prompt='以下の日本語の商品名をShopee検索用キーワードに翻訳してください。商品名: '+keyword+'\nJSON形式のみで返答（マークダウン不要）:\n{"en":"2-5 words","zh":"2-4個詞","th":"2-4 คำ","vn":"2-4 từ"}';
+      const resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+geminiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
+      const data=await resp.json();
+      const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+      const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+      document.getElementById('search-keyword-en').value=parsed.en||'';
+      document.getElementById('search-keyword-zh').value=parsed.zh||'';
+      document.getElementById('search-keyword-th').value=parsed.th||'';
+      document.getElementById('search-keyword-vn').value=parsed.vn||'';
+    } else {
+      alert('設定タブからGemini APIキーまたはDeepL APIキーを登録してください');
+      return;
+    }
+    document.getElementById('translated-keywords').style.display='block';
+  }catch(e){
+    document.getElementById('search-keyword-en').value=keyword;
+    document.getElementById('translated-keywords').style.display='block';
+    alert('翻訳に失敗しました。');
+  }finally{
+    btn.textContent='🌐 翻訳して検索準備';btn.disabled=false;
+  }
 }
-function copyParcelSize(btn) {
-  const w=document.getElementById('lv-parcel-w').value||'-';
-  const l=document.getElementById('lv-parcel-l').value||'-';
-  const h=document.getElementById('lv-parcel-h').value||'-';
-  const text=w+' × '+l+' × '+h;
-  navigator.clipboard.writeText(text).catch(function(){
-    const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
-  });
-  const orig=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=orig;},1500);
+
+function getSavedShippingSpec(id){try{return JSON.parse(localStorage.getItem('shipping_'+id)||'{}');}catch(e){return{};}}
+function saveShippingSpec(){
+  if(!currentProduct)return;
+  const id=currentProduct.id;
+  const spec={weight:document.getElementById('lv-weight-kg-input').value,w:document.getElementById('lv-parcel-w').value,l:document.getElementById('lv-parcel-l').value,h:document.getElementById('lv-parcel-h').value};
+  try{localStorage.setItem('shipping_'+id,JSON.stringify(spec));}catch(e){}
+  document.querySelectorAll('[onclick="saveShippingSpec()"]').forEach(function(btn){btn.textContent='✅';setTimeout(function(){btn.textContent='保存';},1500);});
 }
-function copyField(elId, btn) {
-  const text=document.getElementById(elId).textContent;
-  if (!text||text==='生成中...'||text==='生成失敗') return;
-  navigator.clipboard.writeText(text).catch(function(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
-  const orig=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=orig;},1500);
-}
-function copyAllListing() {
-  if (!currentProduct) return;
-  const p=currentProduct;
+function copyInputVal(inputId,btn){const val=document.getElementById(inputId).value;if(!val)return;navigator.clipboard.writeText(val).catch(function(){const ta=document.createElement('textarea');ta.value=val;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});const orig=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=orig;},1500);}
+function copyParcelSize(btn){const w=document.getElementById('lv-parcel-w').value||'-';const l=document.getElementById('lv-parcel-l').value||'-';const h=document.getElementById('lv-parcel-h').value||'-';const text=w+' × '+l+' × '+h;navigator.clipboard.writeText(text).catch(function(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});const orig=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=orig;},1500);}
+function copyField(elId,btn){const text=document.getElementById(elId).textContent;if(!text||text==='生成中...'||text==='生成失敗')return;navigator.clipboard.writeText(text).catch(function(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});const orig=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=orig;},1500);}
+function copyAllListing(){
+  if(!currentProduct)return;const p=currentProduct;
   const text=['【商品名】'+p.name,'【タイトル(英)】'+(currentDesc.title_en||'-'),'【タイトル(中)】'+(currentDesc.title_zh||'-'),'【カテゴリー】'+p.category,'','【説明文・日本語】',currentDesc.ja||'-','','【説明文・英語】',currentDesc.en||'-','','【説明文・中国語】',currentDesc.zh||'-'].join('\n');
   navigator.clipboard.writeText(text).catch(function(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
-  const btn=document.querySelector('[onclick="copyAllListing()"]');
-  btn.textContent='✅ コピーしました！';setTimeout(function(){btn.textContent='📦 全データをまとめてコピー';},1800);
+  const btn=document.querySelector('[onclick="copyAllListing()"]');btn.textContent='✅ コピーしました！';setTimeout(function(){btn.textContent='📦 全データをまとめてコピー';},1800);
 }
-function switchLang(lang, btn) {
-  currentLang=lang;
-  document.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});
-  btn.classList.add('active');
-  document.getElementById('desc-content').textContent = currentDesc[lang]||'（まだ生成されていません）';
-}
-function copyDesc() {
-  const text=currentDesc[currentLang];
-  if (!text){alert('説明文がまだ生成されていません');return;}
-  navigator.clipboard.writeText(text).then(function(){
-    const btn=document.querySelector('.copy-btn');btn.textContent='✅ コピーしました！';setTimeout(function(){btn.textContent='📋 コピーする';},1500);
-  }).catch(function(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});
-}
+function switchLang(lang,btn){currentLang=lang;document.querySelectorAll('.lang-tab').forEach(function(t){t.classList.remove('active');});btn.classList.add('active');document.getElementById('desc-content').textContent=currentDesc[lang]||'（まだ生成されていません）';}
+function copyDesc(){const text=currentDesc[currentLang];if(!text){alert('説明文がまだ生成されていません');return;}navigator.clipboard.writeText(text).then(function(){const btn=document.querySelector('.copy-btn');btn.textContent='✅ コピーしました！';setTimeout(function(){btn.textContent='📋 コピーする';},1500);}).catch(function(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);});}
 function closeModal(){document.getElementById('modal').classList.remove('open');renderList();}
 function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
 
-// ── SETTINGS ──
 function saveApiKey(){const key=document.getElementById('gemini-key-input').value.trim();if(!key){alert('APIキーを入力してください');return;}try{localStorage.setItem('gemini_api_key',key);}catch(e){}const st=document.getElementById('key-status');st.innerHTML='✅ 保存しました！';st.style.color='var(--green)';setTimeout(function(){st.textContent='';},2000);}
 function loadKeyToInput(){const key=localStorage.getItem('gemini_api_key')||'';document.getElementById('gemini-key-input').value=key;if(key){const st=document.getElementById('key-status');st.innerHTML='✅ APIキーが設定されています';st.style.color='var(--green)';}}
-function toggleKeyVisibility(){const inp=document.getElementById('gemini-key-input');const btn=document.getElementById('toggle-vis-btn');if(inp.type==='password'){inp.type='text';btn.textContent='隠す';}else{inp.type='password';btn.textContent='表示';}}
+function toggleKeyVisibility(inputId,btnId){const inp=document.getElementById(inputId);const btn=document.getElementById(btnId);if(inp.type==='password'){inp.type='text';btn.textContent='隠す';}else{inp.type='password';btn.textContent='表示';}}
 function saveFeeSettings(){const saved={sls:document.getElementById('fee-sls').value||DEFAULT_SLS,payoneer:document.getElementById('fee-payoneer').value||DEFAULT_PAYONEER,tw:document.getElementById('fee-tw').value||DEFAULT_SALE_FEE.tw,th:document.getElementById('fee-th').value||DEFAULT_SALE_FEE.th,ph:document.getElementById('fee-ph').value||DEFAULT_SALE_FEE.ph,my:document.getElementById('fee-my').value||DEFAULT_SALE_FEE.my,vn:document.getElementById('fee-vn').value||DEFAULT_SALE_FEE.vn,sg:document.getElementById('fee-sg').value||DEFAULT_SALE_FEE.sg};try{localStorage.setItem('fee_settings',JSON.stringify(saved));}catch(e){}fees=loadFees();renderList();renderSummary();const st=document.getElementById('fee-status');st.innerHTML='✅ 保存しました！';st.style.color='var(--green)';setTimeout(function(){st.textContent='';},2000);}
 function loadFeeToInput(){const s=JSON.parse(localStorage.getItem('fee_settings')||'{}');['sls','payoneer','tw','sg','th','my','ph','vn'].forEach(function(k){const el=document.getElementById('fee-'+k);if(el)el.value=s[k]||'';});}
 function saveTargetMargin(){const val=parseFloat(document.getElementById('target-margin-input').value);if(isNaN(val)||val<0){alert('正しい数値を入力してください');return;}targetMargin=val;try{localStorage.setItem('target_margin',val);}catch(e){}const st=document.getElementById('margin-status');st.innerHTML='✅ 保存しました！（目標：'+val+'%）';st.style.color='var(--green)';setTimeout(function(){st.textContent='';},2000);renderList();}
 function loadTargetMargin(){document.getElementById('target-margin-input').value=targetMargin;}
 
-// ── SHOPEE SEARCH ──
 const shopeeUrls={tw:'https://shopee.tw/search?keyword=',sg:'https://shopee.sg/search?keyword=',th:'https://shopee.co.th/search?keyword=',my:'https://shopee.com.my/search?keyword=',ph:'https://shopee.ph/search?keyword=',vn:'https://shopee.vn/search?keyword='};
-async function translateKeyword(){const keyword=document.getElementById('search-keyword').value.trim();if(!keyword){alert('商品名を入力してください');return;}const apiKey=localStorage.getItem('gemini_api_key')||'';if(!apiKey){alert('設定タブからGemini APIキーを登録してください');return;}const btn=document.getElementById('translate-btn');btn.textContent='翻訳中...';btn.disabled=true;const prompt='以下の日本語の商品名をShopee検索用キーワードに翻訳してください。商品名: '+keyword+'\nJSON形式のみで返答（マークダウン不要）:\n{"en":"2-5 words","zh":"2-4個詞","th":"2-4 คำ","vn":"2-4 từ"}';try{const resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});const data=await resp.json();const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());document.getElementById('search-keyword-en').value=parsed.en||'';document.getElementById('search-keyword-zh').value=parsed.zh||'';document.getElementById('search-keyword-th').value=parsed.th||'';document.getElementById('search-keyword-vn').value=parsed.vn||'';document.getElementById('translated-keywords').style.display='block';}catch(e){document.getElementById('search-keyword-en').value=keyword;document.getElementById('translated-keywords').style.display='block';alert('翻訳に失敗しました。');}finally{btn.textContent='🌐 翻訳して検索準備';btn.disabled=false;}}
 function openShopee(market){const ja=document.getElementById('search-keyword').value.trim();const en=document.getElementById('search-keyword-en')?.value?.trim()||'';const zh=document.getElementById('search-keyword-zh')?.value?.trim()||'';const th=document.getElementById('search-keyword-th')?.value?.trim()||'';const vn=document.getElementById('search-keyword-vn')?.value?.trim()||'';if(!ja&&!en&&!zh){alert('商品名を入力してください');return;}let kw=en||ja;if(market==='tw')kw=zh||en||ja;if(market==='th')kw=th||en||ja;if(market==='vn')kw=vn||en||ja;window.open(shopeeUrls[market]+encodeURIComponent(kw),'_blank');}
 function calcExchange(){const jpy=parseFloat(document.getElementById('calc-jpy').value);const market=document.getElementById('calc-market').value;const resultEl=document.getElementById('calc-result');if(!jpy||isNaN(jpy)){resultEl.style.display='none';return;}const rate=exchangeRates[market];const converted=jpy*rate;const unit=unitMap[market];const fmt2=market==='vn'?Math.round(converted).toLocaleString():(converted<100?converted.toFixed(2):Math.round(converted).toLocaleString());document.getElementById('calc-value').textContent=unit+' '+fmt2;document.getElementById('calc-rate').textContent='¥1 = '+(rate<1?rate.toFixed(4):rate.toFixed(2))+' '+unit+'（自動取得レート）';resultEl.style.display='block';}
 
-// ── TREND CALENDAR ──
 const trendEvents=[
   {month:1,day:1,name:'元旦セール',markets:['台湾','シンガポール','マレーシア'],tags:['全般'],tip:'新年向けギフト・生活用品が狙い目'},
   {month:1,day:25,name:'旧正月（春節）',markets:['台湾','シンガポール','マレーシア','ベトナム'],tags:['ギフト','掃除用品'],tip:'家の掃除・新生活グッズが売れる。2〜3週前から準備を'},
@@ -1458,101 +1482,59 @@ const trendEvents=[
   {month:12,day:12,name:'12.12 年末大セール',markets:['全マーケット'],tags:['全般'],tip:'クリスマス需要と重なりギフト系が売れる'},
   {month:12,day:25,name:'クリスマス',markets:['台湾','シンガポール','フィリピン','マレーシア'],tags:['ギフト','雑貨'],tip:'プレゼント需要。ギフト向け日本製品が好評'},
 ];
-const monthlyBase={
-  1:{theme:'新年・旧正月準備',reason:'新年の新生活スタートと旧正月準備が重なる',items:['掃除用品','収納ボックス','加湿器','保湿クリーム','日用品まとめ買い','防災グッズ','鍋・調理器具','空気清浄機フィルター','タオルセット','ルームフレグランス']},
-  2:{theme:'バレンタイン・旧正月',reason:'バレンタインとアジア圏の旧正月ギフト需要が重なる',items:['スキンケア','コスメ','ギフトセット','入浴剤','ハンドクリーム','アイクリーム','美容液','マスクパック','ネイルケア','ルームフレグランス']},
-  3:{theme:'新生活・春支度',reason:'新学期・新生活シーズン',items:['収納グッズ','キッチン用品','文具','アロマ','洗濯グッズ','掃除道具','食器','ランチボックス','エコバッグ','インテリア雑貨']},
-  4:{theme:'春・暑さ対策',reason:'ソンクラーン・暑さ対策シーズン',items:['日焼け止め','虫除け','冷感タオル','携帯扇風機','防水グッズ','水筒・ボトル','帽子・日傘','冷却スプレー','UVカットウェア','スポーツサングラス']},
-  5:{theme:'母の日・初夏',reason:'母の日ギフト需要がピーク',items:['スキンケア','ハンドクリーム','キッチン雑貨','フェイスマスク','美容オイル','アロマキャンドル','入浴剤','ヘアケア','食器・カップ','エコ用品']},
-  6:{theme:'雨季・夏準備',reason:'東南アジアの雨季。日本の防カビ・除湿グッズが刺さる',items:['除湿剤','防カビグッズ','冷感タオル','制汗グッズ','消臭スプレー','防水スプレー','冷感インナー','携帯扇風機','日焼け止め','アイスノン']},
-  7:{theme:'真夏・UV対策',reason:'最も暑い時期。日本製UVケア商品は差別化できる',items:['日焼け止め','冷感グッズ','虫除け','UV美容液','冷感スプレー','水筒・ボトル','冷感マスク','日傘','アフターサンケア','スポーツドリンク']},
-  8:{theme:'8.8セール・夏本番',reason:'8.8ビッグセール',items:['健康グッズ','美容家電','スポーツ用品','ダイエット用品','サプリメント','マッサージグッズ','ヘアアイロン','電動歯ブラシ','フィットネス用品','スキンケアセット']},
-  9:{theme:'9.9スーパーセール',reason:'年間最大級セールの一つ',items:['スキンケア','日用品まとめ','キッチン用品','ヘルスケア','美容液','掃除グッズ','収納用品','食品・お菓子','インテリア','ペット用品']},
-  10:{theme:'秋・乾燥対策',reason:'乾燥シーズン突入。保湿系スキンケアの需要が上がる',items:['保湿クリーム','ボディケア','リップケア','ヘアオイル','ハンドマスク','保湿パック','美容オイル','入浴剤','加湿器','コスメ']},
-  11:{theme:'11.11 最大セール',reason:'年間最大のショッピングデー',items:['スキンケアセット','美容家電','キッチン家電','健康食品','ヘアケアセット','サプリメント','収納グッズ','インテリア雑貨','ペット用品','掃除ロボット']},
-  12:{theme:'12.12・年末・ギフト',reason:'クリスマスギフトと12.12セール、年末大掃除需要が重なる',items:['ギフトセット','スキンケア','掃除用品','お菓子・食品','アロマグッズ','キッチン用品','タオルセット','入浴剤セット','文具セット','雑貨']},
-};
+const monthlyBase={1:{theme:'新年・旧正月準備',reason:'新年の新生活スタートと旧正月準備が重なる',items:['掃除用品','収納ボックス','加湿器','保湿クリーム','日用品まとめ買い','防災グッズ','鍋・調理器具','空気清浄機フィルター','タオルセット','ルームフレグランス']},2:{theme:'バレンタイン・旧正月',reason:'バレンタインとアジア圏の旧正月ギフト需要が重なる',items:['スキンケア','コスメ','ギフトセット','入浴剤','ハンドクリーム','アイクリーム','美容液','マスクパック','ネイルケア','ルームフレグランス']},3:{theme:'新生活・春支度',reason:'新学期・新生活シーズン',items:['収納グッズ','キッチン用品','文具','アロマ','洗濯グッズ','掃除道具','食器','ランチボックス','エコバッグ','インテリア雑貨']},4:{theme:'春・暑さ対策',reason:'ソンクラーン・暑さ対策シーズン',items:['日焼け止め','虫除け','冷感タオル','携帯扇風機','防水グッズ','水筒・ボトル','帽子・日傘','冷却スプレー','UVカットウェア','スポーツサングラス']},5:{theme:'母の日・初夏',reason:'母の日ギフト需要がピーク',items:['スキンケア','ハンドクリーム','キッチン雑貨','フェイスマスク','美容オイル','アロマキャンドル','入浴剤','ヘアケア','食器・カップ','エコ用品']},6:{theme:'雨季・夏準備',reason:'東南アジアの雨季。日本の防カビ・除湿グッズが刺さる',items:['除湿剤','防カビグッズ','冷感タオル','制汗グッズ','消臭スプレー','防水スプレー','冷感インナー','携帯扇風機','日焼け止め','アイスノン']},7:{theme:'真夏・UV対策',reason:'最も暑い時期。日本製UVケア商品は差別化できる',items:['日焼け止め','冷感グッズ','虫除け','UV美容液','冷感スプレー','水筒・ボトル','冷感マスク','日傘','アフターサンケア','スポーツドリンク']},8:{theme:'8.8セール・夏本番',reason:'8.8ビッグセール',items:['健康グッズ','美容家電','スポーツ用品','ダイエット用品','サプリメント','マッサージグッズ','ヘアアイロン','電動歯ブラシ','フィットネス用品','スキンケアセット']},9:{theme:'9.9スーパーセール',reason:'年間最大級セールの一つ',items:['スキンケア','日用品まとめ','キッチン用品','ヘルスケア','美容液','掃除グッズ','収納用品','食品・お菓子','インテリア','ペット用品']},10:{theme:'秋・乾燥対策',reason:'乾燥シーズン突入。保湿系スキンケアの需要が上がる',items:['保湿クリーム','ボディケア','リップケア','ヘアオイル','ハンドマスク','保湿パック','美容オイル','入浴剤','加湿器','コスメ']},11:{theme:'11.11 最大セール',reason:'年間最大のショッピングデー',items:['スキンケアセット','美容家電','キッチン家電','健康食品','ヘアケアセット','サプリメント','収納グッズ','インテリア雑貨','ペット用品','掃除ロボット']},12:{theme:'12.12・年末・ギフト',reason:'クリスマスギフトと12.12セール、年末大掃除需要が重なる',items:['ギフトセット','スキンケア','掃除用品','お菓子・食品','アロマグッズ','キッチン用品','タオルセット','入浴剤セット','文具セット','雑貨']}};
 const countryOverrides={台湾:{1:['花粉対策マスク','空気清浄機'],6:['防カビグッズ','除湿剤'],9:['中秋節ギフト']},シンガポール:{6:['除湿剤','冷感グッズ','虫除けスプレー']},タイ:{4:['防水グッズ','ソンクラーン関連'],6:['熱中症対策グッズ']},マレーシア:{4:['ハリラヤギフト','スキンケア'],6:['除湿剤','防カビグッズ']},フィリピン:{6:['防水グッズ','台風対策用品'],9:['美白スキンケア']},ベトナム:{1:['テトギフト','縁起物'],6:['雨季対策グッズ'],9:['中秋節ギフト']}};
 function getMonthlyItems(market,month){const base=monthlyBase[month];const overrides=countryOverrides[market]?.[month]||[];return{theme:base.theme,items:[...new Set([...overrides,...base.items])].slice(0,10)};}
-function renderMonthlyRecommend(){const el=document.getElementById('monthly-recommend');if(!el)return;const month=new Date().getMonth()+1;const market=document.getElementById('r-market')?.value||'台湾';const rec=getMonthlyItems(market,month);if(!rec)return;el.innerHTML='<div style="margin-bottom:8px;"><span style="font-size:12px;font-weight:700;color:var(--orange);">'+month+'月 '+market+'：'+rec.theme+'</span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">'+rec.items.map(function(item){return '<button onclick="runResearchWithGenre(\''+item+'\')" style="background:var(--orange-pale);color:var(--orange);font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1.5px solid var(--orange);cursor:pointer;">'+item+'</button>';}).join('')+'</div><div style="font-size:11px;color:var(--mid);background:var(--light);border-radius:8px;padding:8px 10px;line-height:1.7;">💡 '+monthlyBase[month].reason+'</div>';}
-function renderCalendar(){const el=document.getElementById('calendar-list');if(!el)return;const now=new Date();const upcoming=[];for(let offset=0;offset<=180;offset++){const d=new Date(now);d.setDate(d.getDate()+offset);trendEvents.forEach(function(ev){if(ev.month===d.getMonth()+1&&ev.day===d.getDate())upcoming.push(Object.assign({},ev,{date:d,daysLeft:offset}));});}if(upcoming.length===0){el.innerHTML='<div style="text-align:center;color:var(--mid);font-size:13px;padding:16px;">今後180日間の主要イベントはありません</div>';return;}el.innerHTML=upcoming.map(function(ev){const isToday=ev.daysLeft===0;const isSoon=ev.daysLeft<=14;const urgency=isToday?'#EF4444':isSoon?'#F59E0B':'var(--border)';const urgencyBg=isToday?'rgba(239,68,68,.06)':isSoon?'rgba(245,158,11,.06)':'var(--white)';const daysStr=isToday?'🔴 今日！':ev.daysLeft<=7?'🟡 あと'+ev.daysLeft+'日':'あと'+ev.daysLeft+'日';const tagsStr=ev.tags.map(function(t){return '<span style="display:inline-block;background:var(--orange-pale);color:var(--orange);font-size:10px;padding:1px 6px;border-radius:4px;margin-right:3px;">'+t+'</span>';}).join('');return'<div style="border:1.5px solid '+urgency+';border-radius:10px;padding:12px;margin-bottom:10px;background:'+urgencyBg+';"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;color:var(--dark);flex:1;">'+ev.name+'</div><div style="font-size:11px;color:var(--mid);white-space:nowrap;margin-left:8px;">'+(ev.date.getMonth()+1)+'/'+ev.date.getDate()+'（'+daysStr+'）</div></div><div style="font-size:11px;color:var(--mid);margin-bottom:6px;">📍 '+ev.markets.join('・')+'</div><div style="margin-bottom:6px;">'+tagsStr+'</div><div style="font-size:11px;color:var(--dark);background:var(--light);border-radius:6px;padding:6px 8px;">💡 '+ev.tip+'</div></div>';}).join('');}
+function renderMonthlyRecommend(){const el=document.getElementById('monthly-recommend');if(!el)return;const month=new Date().getMonth()+1;const market=document.getElementById('r-market')?.value||'台湾';const rec=getMonthlyItems(market,month);if(!rec)return;el.innerHTML='<div style="margin-bottom:8px;"><span style="font-size:12px;font-weight:700;color:var(--orange);">'+month+'月 '+market+'：'+rec.theme+'</span></div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">'+rec.items.map(function(item){return'<button onclick="runResearchWithGenre(\''+item+'\')" style="background:var(--orange-pale);color:var(--orange);font-size:12px;font-weight:700;padding:6px 12px;border-radius:20px;border:1.5px solid var(--orange);cursor:pointer;">'+item+'</button>';}).join('')+'</div><div style="font-size:11px;color:var(--mid);background:var(--light);border-radius:8px;padding:8px 10px;line-height:1.7;">💡 '+monthlyBase[month].reason+'</div>';}
+function renderCalendar(){const el=document.getElementById('calendar-list');if(!el)return;const now=new Date();const upcoming=[];for(let offset=0;offset<=180;offset++){const d=new Date(now);d.setDate(d.getDate()+offset);trendEvents.forEach(function(ev){if(ev.month===d.getMonth()+1&&ev.day===d.getDate())upcoming.push(Object.assign({},ev,{date:d,daysLeft:offset}));});}if(upcoming.length===0){el.innerHTML='<div style="text-align:center;color:var(--mid);font-size:13px;padding:16px;">今後180日間の主要イベントはありません</div>';return;}el.innerHTML=upcoming.map(function(ev){const isToday=ev.daysLeft===0;const isSoon=ev.daysLeft<=14;const urgency=isToday?'#EF4444':isSoon?'#F59E0B':'var(--border)';const urgencyBg=isToday?'rgba(239,68,68,.06)':isSoon?'rgba(245,158,11,.06)':'var(--white)';const daysStr=isToday?'🔴 今日！':ev.daysLeft<=7?'🟡 あと'+ev.daysLeft+'日':'あと'+ev.daysLeft+'日';const tagsStr=ev.tags.map(function(t){return'<span style="display:inline-block;background:var(--orange-pale);color:var(--orange);font-size:10px;padding:1px 6px;border-radius:4px;margin-right:3px;">'+t+'</span>';}).join('');return'<div style="border:1.5px solid '+urgency+';border-radius:10px;padding:12px;margin-bottom:10px;background:'+urgencyBg+';"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;"><div style="font-size:13px;font-weight:700;color:var(--dark);flex:1;">'+ev.name+'</div><div style="font-size:11px;color:var(--mid);white-space:nowrap;margin-left:8px;">'+(ev.date.getMonth()+1)+'/'+ev.date.getDate()+'（'+daysStr+'）</div></div><div style="font-size:11px;color:var(--mid);margin-bottom:6px;">📍 '+ev.markets.join('・')+'</div><div style="margin-bottom:6px;">'+tagsStr+'</div><div style="font-size:11px;color:var(--dark);background:var(--light);border-radius:6px;padding:6px 8px;">💡 '+ev.tip+'</div></div>';}).join('');}
 
 async function doResearch(market,genre){
   const apiKey=localStorage.getItem('gemini_api_key')||'';
   if(!apiKey){alert('設定タブからGemini APIキーを登録してください');return;}
-  const btn=document.getElementById('research-btn');
-  btn.textContent='調査中...';btn.disabled=true;
-  const resultEl=document.getElementById('research-result');
-  const contentEl=document.getElementById('research-content');
-  const titleEl=document.getElementById('research-title');
-  resultEl.style.display='none';
+  const btn=document.getElementById('research-btn');btn.textContent='調査中...';btn.disabled=true;
+  const resultEl=document.getElementById('research-result');const contentEl=document.getElementById('research-content');const titleEl=document.getElementById('research-title');resultEl.style.display='none';
   const prompt='あなたはShopee越境ECの専門家です。'+market+'マーケットで「'+genre+'」ジャンルの日本製品を無在庫で販売する場合のおすすめ商品を5品教えてください。AmazonやYahoo!ショッピング・楽天で仕入れられる実在の商品を優先してください。\n\n以下のJSON形式のみで返答してください（マークダウン・コードブロック不要）:\n{"items":[{"name":"商品名（ブランド名含む正式名称）","amazon_keyword":"Amazon検索用キーワード（日本語・3〜6語）","reason":"'+market+'で売れる理由（1〜2文）","strength":"日本製ならではの強み（1文）","price_local":"現地価格帯（例: NT$300-500）","price_jpy":"円換算（例: 約1,200〜2,000円）"}]}';
   try{
     let resp,data;
-    for(let attempt=0;attempt<3;attempt++){
-      resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});
-      data=await resp.json();
-      if(resp.status!==429)break;
-      contentEl.textContent='混雑中。リトライ（'+(attempt+1)+'/3）...';
-      resultEl.style.display='block';
-      await new Promise(function(r){setTimeout(r,10000);});
-    }
-    const raw=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    let items=[];
-    try{items=JSON.parse(clean).items||[];}catch(e){items=[];}
-    titleEl.textContent=market+' × '+genre+' のおすすめ商品';
-    window._researchItems=items;
-    window._researchMarket=market;
-    if(items.length===0){
-      contentEl.innerHTML=clean.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
-    } else {
+    for(let attempt=0;attempt<3;attempt++){resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})});data=await resp.json();if(resp.status!==429)break;contentEl.textContent='混雑中。リトライ（'+(attempt+1)+'/3）...';resultEl.style.display='block';await new Promise(function(r){setTimeout(r,10000);});}
+    const raw=data.candidates?.[0]?.content?.parts?.[0]?.text||'';const clean=raw.replace(/```json|```/g,'').trim();let items=[];try{items=JSON.parse(clean).items||[];}catch(e){items=[];}
+    titleEl.textContent=market+' × '+genre+' のおすすめ商品';window._researchItems=items;window._researchMarket=market;
+    if(items.length===0){contentEl.innerHTML=clean.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');}
+    else{
       contentEl.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:11px;color:var(--mid);">追加したい商品にチェックを入れてください</div><button onclick="bulkAddFromResearch()" style="padding:7px 14px;background:var(--orange);color:white;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">＋ まとめて追加</button></div>'
         +items.map(function(item,i){
           const amzUrl='https://www.amazon.co.jp/s?k='+encodeURIComponent(item.amazon_keyword||item.name);
           const rakuUrl='https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(item.amazon_keyword||item.name)+'/';
           const yahooUrl='https://shopping.yahoo.co.jp/search?p='+encodeURIComponent(item.amazon_keyword||item.name);
-          return '<div style="border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--white);"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;"><input type="checkbox" data-idx="'+i+'" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--orange);"><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:6px;">'+(i+1)+'. '+item.name+'</div><div style="font-size:12px;color:var(--mid);margin-bottom:4px;line-height:1.6;">📍 <strong style="color:var(--dark);">売れる理由：</strong>'+item.reason+'</div><div style="font-size:12px;color:var(--mid);margin-bottom:4px;line-height:1.6;">🇯🇵 <strong style="color:var(--dark);">日本製の強み：</strong>'+item.strength+'</div><div style="font-size:12px;color:var(--mid);margin-bottom:8px;line-height:1.6;">💰 <strong style="color:var(--dark);">価格帯：</strong>'+item.price_local+'（'+item.price_jpy+'）</div><div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:4px;letter-spacing:.05em;">仕入れ先を探す</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><a href="'+amzUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#FF9900;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 Amazon</a><a href="'+rakuUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#BF0000;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 楽天</a><a href="'+yahooUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#FF0033;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 Yahoo!</a></div><div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:4px;letter-spacing:.05em;">Shopeeでの競合価格を確認</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'+buildShopeeButtonsByKeyword(item.amazon_keyword||item.name)+'</div></div></label></div>';
+          return'<div style="border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--white);"><label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;"><input type="checkbox" data-idx="'+i+'" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;accent-color:var(--orange);"><div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:6px;">'+(i+1)+'. '+item.name+'</div><div style="font-size:12px;color:var(--mid);margin-bottom:4px;line-height:1.6;">📍 <strong style="color:var(--dark);">売れる理由：</strong>'+item.reason+'</div><div style="font-size:12px;color:var(--mid);margin-bottom:4px;line-height:1.6;">🇯🇵 <strong style="color:var(--dark);">日本製の強み：</strong>'+item.strength+'</div><div style="font-size:12px;color:var(--mid);margin-bottom:8px;line-height:1.6;">💰 <strong style="color:var(--dark);">価格帯：</strong>'+item.price_local+'（'+item.price_jpy+'）</div><div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:4px;letter-spacing:.05em;">仕入れ先を探す</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><a href="'+amzUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#FF9900;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 Amazon</a><a href="'+rakuUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#BF0000;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 楽天</a><a href="'+yahooUrl+'" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:#FF0033;color:white;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;">🛒 Yahoo!</a></div><div style="font-size:10px;font-weight:700;color:var(--mid);margin-bottom:4px;letter-spacing:.05em;">Shopeeでの競合価格を確認</div><div style="display:flex;gap:6px;flex-wrap:wrap;">'+buildShopeeButtonsByKeyword(item.amazon_keyword||item.name)+'</div></div></label></div>';
         }).join('');
     }
-    resultEl.style.display='block';
-    resultEl.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(e){
-    alert('調査に失敗しました。');
-  }finally{
-    btn.textContent='🔍 この国×カテゴリーで調べる';btn.disabled=false;
-  }
+    resultEl.style.display='block';resultEl.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){alert('調査に失敗しました。');}
+  finally{btn.textContent='🔍 この国×カテゴリーで調べる';btn.disabled=false;}
 }
 function runResearch(){doResearch(document.getElementById('r-market').value,document.getElementById('r-category').value);}
 function runResearchWithGenre(genre){doResearch(document.getElementById('r-market').value,genre);}
 
-// ── 調査結果から一括追加 ──
-function bulkAddFromResearch() {
-  const items=window._researchItems||[];
-  if(items.length===0)return;
+function bulkAddFromResearch(){
+  const items=window._researchItems||[];if(items.length===0)return;
   const checked=[...document.querySelectorAll('#research-content input[type=checkbox]:checked')].map(function(el){return parseInt(el.dataset.idx);});
   if(checked.length===0){alert('追加したい商品にチェックを入れてください');return;}
   const selectedItems=checked.map(function(i){return items[i];});
   try{localStorage.setItem('research_pending',JSON.stringify(selectedItems));}catch(e){}
-  switchTab('add');
-  renderPendingItems();
+  switchTab('add');renderPendingItems();
 }
-
-function renderPendingItems() {
-  const pending=JSON.parse(localStorage.getItem('research_pending')||'[]');
-  if(pending.length===0)return;
-  const existing=document.getElementById('pending-items-area');
-  if(existing)existing.remove();
-  const area=document.createElement('div');
-  area.id='pending-items-area';
-  area.style.cssText='margin-top:14px;';
+function renderPendingItems(){
+  const pending=JSON.parse(localStorage.getItem('research_pending')||'[]');if(pending.length===0)return;
+  const existing=document.getElementById('pending-items-area');if(existing)existing.remove();
+  const area=document.createElement('div');area.id='pending-items-area';area.style.cssText='margin-top:14px;';
   area.innerHTML='<div class="card"><div class="card-title">調査結果から追加（'+pending.length+'件）</div>'
     +'<div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.7;">仕入れ値と出品マーケットを入力して「追加」してください。<br>仕入れ先URLはAmazon・楽天の検索URLを自動設定します。</div>'
     +pending.map(function(item,i){
       if(!item)return'';
       const amzUrl='https://www.amazon.co.jp/s?k='+encodeURIComponent(item.amazon_keyword||item.name);
       const rakuUrl='https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(item.amazon_keyword||item.name)+'/';
-      return '<div style="border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;" id="pending-item-'+i+'">'
+      return'<div style="border:1.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;" id="pending-item-'+i+'">'
         +'<div style="font-size:13px;font-weight:700;color:var(--dark);margin-bottom:8px;">'+item.name+'</div>'
         +'<div style="font-size:11px;color:var(--mid);margin-bottom:10px;">💰 '+item.price_jpy+'</div>'
         +'<div class="form-grid" style="margin-bottom:8px;"><div class="field"><label>仕入れ値（円）</label><input type="number" id="pi-cost-'+i+'" placeholder="例: 800" inputmode="numeric"></div>'
@@ -1564,55 +1546,47 @@ function renderPendingItems() {
         +'<button onclick="removePendingItem('+i+')" style="padding:9px 14px;background:var(--white);color:var(--red);border:1.5px solid #fecaca;border-radius:9px;font-size:12px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">✕</button>'
         +'</div></div>';
     }).join('')+'</div>';
-  document.getElementById('panel-add').appendChild(area);
-  area.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('panel-add').appendChild(area);area.scrollIntoView({behavior:'smooth',block:'start'});
 }
-
 function addPendingItem(idx,encodedName,encodedAmzUrl,encodedRakuUrl){
-  const name=decodeURIComponent(encodedName);
-  const amzUrl=decodeURIComponent(encodedAmzUrl);
-  const rakuUrl=decodeURIComponent(encodedRakuUrl);
-  const cost=parseFloat(document.getElementById('pi-cost-'+idx).value);
-  const weight=parseInt(document.getElementById('pi-weight-'+idx).value);
+  const name=decodeURIComponent(encodedName);const amzUrl=decodeURIComponent(encodedAmzUrl);const rakuUrl=decodeURIComponent(encodedRakuUrl);
+  const cost=parseFloat(document.getElementById('pi-cost-'+idx).value);const weight=parseInt(document.getElementById('pi-weight-'+idx).value);
   const selected=['tw','th','ph','my','vn','sg'].filter(function(m){return document.getElementById('pi-mc-'+idx+'-'+m)?.checked;});
-  if(!cost){alert('仕入れ値を入力してください');return;}
-  if(selected.length===0){alert('マーケットを1つ以上選択してください');return;}
-  const markets={};
-  selected.forEach(function(m){const price=calcAutoPrice(cost,weight,m,false);markets[m]={price:price||0,isNew:false};});
+  if(!cost){alert('仕入れ値を入力してください');return;}if(selected.length===0){alert('マーケットを1つ以上選択してください');return;}
+  const markets={};selected.forEach(function(m){const price=calcAutoPrice(cost,weight,m,false);markets[m]={price:price||0,isNew:false};});
   products.push({id:Date.now()+idx,name,cost,weight,category:'Home & Living',markets,supplier_urls:[{label:'Amazon',url:amzUrl},{label:'楽天',url:rakuUrl}],last_checked:null});
-  save();
-  const card=document.getElementById('pending-item-'+idx);
-  if(card){card.style.opacity='0.4';card.style.pointerEvents='none';card.innerHTML='<div style="text-align:center;padding:12px;font-size:13px;color:var(--green);font-weight:700;">✅ 追加しました！</div>';}
-  const pending=JSON.parse(localStorage.getItem('research_pending')||'[]');
-  pending[idx]=null;
-  try{localStorage.setItem('research_pending',JSON.stringify(pending));}catch(e){}
+  save();const card=document.getElementById('pending-item-'+idx);if(card){card.style.opacity='0.4';card.style.pointerEvents='none';card.innerHTML='<div style="text-align:center;padding:12px;font-size:13px;color:var(--green);font-weight:700;">✅ 追加しました！</div>';}
+  const pending=JSON.parse(localStorage.getItem('research_pending')||'[]');pending[idx]=null;try{localStorage.setItem('research_pending',JSON.stringify(pending));}catch(e){}
 }
 function removePendingItem(idx){const card=document.getElementById('pending-item-'+idx);if(card)card.remove();}
 
 // ── INIT ──
-renderList(); renderSummary(); updateExchangeRates();
+renderList();renderSummary();updateExchangeRates();
 
-window.switchTab=switchTab; window.addProduct=addProduct; window.addUrlRow=addUrlRow;
-window.removeUrlRow=removeUrlRow; window.previewPrices=previewPrices;
-window.deleteProduct=deleteProduct; window.editProduct=editProduct;
-window.savePrice=savePrice; window.toggleNew=toggleNew;
-window.markChecked=markChecked; window.toggleCheckArea=toggleCheckArea;
-window.toggleMarkets=toggleMarkets; window.runResearch=runResearch;
-window.runResearchWithGenre=runResearchWithGenre; window.openModal=openModal;
-window.showDesc=showDesc; window.getSavedDesc=getSavedDesc;
-window.closeModal=closeModal; window.closeModalOutside=closeModalOutside;
-window.switchLang=switchLang; window.copyDesc=copyDesc;
-window.copyField=copyField; window.copyAllListing=copyAllListing;
-window.saveApiKey=saveApiKey; window.saveTargetMargin=saveTargetMargin;
-window.saveFeeSettings=saveFeeSettings; window.toggleKeyVisibility=toggleKeyVisibility;
-window.translateKeyword=translateKeyword; window.openShopee=openShopee;
-window.calcExchange=calcExchange; window.exportCSV=exportCSV;
-window.exportJSON=exportJSON; window.importJSON=importJSON;
+window.switchTab=switchTab;window.addProduct=addProduct;window.addUrlRow=addUrlRow;
+window.removeUrlRow=removeUrlRow;window.previewPrices=previewPrices;
+window.deleteProduct=deleteProduct;window.editProduct=editProduct;
+window.savePrice=savePrice;window.toggleNew=toggleNew;
+window.markChecked=markChecked;window.toggleCheckArea=toggleCheckArea;
+window.toggleMarkets=toggleMarkets;window.runResearch=runResearch;
+window.runResearchWithGenre=runResearchWithGenre;window.openModal=openModal;
+window.showDesc=showDesc;window.getSavedDesc=getSavedDesc;
+window.closeModal=closeModal;window.closeModalOutside=closeModalOutside;
+window.switchLang=switchLang;window.copyDesc=copyDesc;
+window.copyField=copyField;window.copyAllListing=copyAllListing;
+window.saveApiKey=saveApiKey;window.saveTargetMargin=saveTargetMargin;
+window.saveFeeSettings=saveFeeSettings;window.toggleKeyVisibility=toggleKeyVisibility;
+window.translateKeyword=translateKeyword;window.openShopee=openShopee;
+window.calcExchange=calcExchange;window.exportCSV=exportCSV;
+window.exportJSON=exportJSON;window.importJSON=importJSON;
 window.bulkAddFromResearch=bulkAddFromResearch;
-window.addPendingItem=addPendingItem; window.removePendingItem=removePendingItem;
-window.toggleCompetitor=toggleCompetitor; window.saveCompetitorNote=saveCompetitorNote;
-window.saveShippingSpec=saveShippingSpec; window.copyInputVal=copyInputVal;
+window.addPendingItem=addPendingItem;window.removePendingItem=removePendingItem;
+window.toggleCompetitor=toggleCompetitor;window.saveCompetitorNote=saveCompetitorNote;
+window.saveShippingSpec=saveShippingSpec;window.copyInputVal=copyInputVal;
 window.copyParcelSize=copyParcelSize;
+window.checkNgWarning=checkNgWarning;window.uncheckMarket=uncheckMarket;
+window.filterRestrictions=filterRestrictions;
+window.saveDeeplKey=saveDeeplKey;
 </script>
 </body>
 </html>
