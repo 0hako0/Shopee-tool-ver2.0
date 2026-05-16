@@ -405,6 +405,7 @@
       <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">📱 デバイス間データ同期</div>
       <div style="font-size:11px;color:var(--mid);margin-bottom:10px;line-height:1.7;">iPhoneとPCで同じデータを使うには、エクスポートしたJSONを別デバイスでインポートしてください。</div>
       <button class="csv-btn" onclick="exportJSON()" style="margin-bottom:8px;">💾 全データをJSONで保存</button>
+      <button class="csv-btn" onclick="exportPostJSON()" style="margin-bottom:8px;background:#16a34a;">Shopee投稿ツール用JSONを保存</button>
       <label style="display:block;width:100%;padding:13px;background:var(--white);border:1.5px solid var(--border);border-radius:11px;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;color:var(--dark);text-align:center;">
         📂 JSONを読み込む（インポート）
         <input type="file" accept=".json" onchange="importJSON(event)" style="display:none;">
@@ -963,6 +964,10 @@ function renderList(){
     var status=getCheckStatus(p.last_checked);
     var overallChip=avgMargin>=15?'good':avgMargin>=5?'ok':'bad';
     var hasSavedDesc=getSavedDesc(p.id);
+    var descStatus=getDescStatus(hasSavedDesc);
+    var postStatusBadge=descStatus.ready
+      ?'<span style="font-size:10px;color:var(--green);font-weight:700;">POST READY</span>'
+      :'<span style="font-size:10px;color:var(--red);font-weight:700;">NO TRANSLATION: '+descStatus.missing.join(', ')+'</span>';
 
     // 現地価格バッジ（常時表示）
     var localPriceBadges=marketKeys.map(function(m){
@@ -1043,6 +1048,7 @@ function renderList(){
           +'<span style="font-size:10px;color:var(--border);">|</span>'
           +statusBadge
           +(hasSavedDesc?'<span style="font-size:10px;color:var(--orange);">📄説明文あり</span>':'')
+          +postStatusBadge
         +'</div>'
         +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;">'+localPriceBadges+'</div>'
       +'</div>'
@@ -1259,6 +1265,74 @@ function exportJSON(){
   const payload={version:1,exported_at:new Date().toISOString(),products:products,descriptions:descData,fee_settings:JSON.parse(localStorage.getItem('fee_settings')||'{}'),target_margin:targetMargin};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');const date=new Date().toISOString().slice(0,10);a.href=url;a.download='shopee_data_'+date+'.json';a.click();URL.revokeObjectURL(url);
+}
+
+function collectExportDescriptions(){
+  const descData={};
+  products.forEach(function(p){
+    const d=getSavedDesc(p.id);
+    if(d)descData['desc_'+p.id]=d;
+    const s=getSavedShippingSpec(p.id);
+    if(s&&Object.keys(s).length)descData['shipping_'+p.id]=s;
+  });
+  return descData;
+}
+
+function getDescStatus(desc){
+  if(!desc)return{ready:false,missing:['description']};
+  const missing=[];
+  if(!desc.title_en)missing.push('title_en');
+  if(!desc.title_zh)missing.push('title_zh');
+  if(!desc.en)missing.push('en');
+  if(!desc.zh)missing.push('zh');
+  return{ready:missing.length===0,missing:missing};
+}
+
+function normalizeSupplierUrlForExport(item){
+  if(typeof item==='string')return{label:'Supplier',url:item};
+  if(item&&typeof item==='object')return{label:item.label||'Supplier',url:item.url||item.href||item.link||''};
+  return{label:'Supplier',url:''};
+}
+
+function exportPostJSON(){
+  if(products.length===0){alert('商品がありません');return;}
+  const descData=collectExportDescriptions();
+  const normalizedProducts=products.map(function(p){
+    const desc=descData['desc_'+p.id]||null;
+    const status=getDescStatus(desc);
+    return Object.assign({},p,{
+      supplier_urls:(p.supplier_urls||[]).map(normalizeSupplierUrlForExport).filter(function(s){return !!s.url;}),
+      post_tool_status:{
+        ready:status.ready,
+        missing:status.missing,
+        has_title_en:!!(desc&&desc.title_en),
+        has_title_zh:!!(desc&&desc.title_zh),
+        has_desc_en:!!(desc&&desc.en),
+        has_desc_zh:!!(desc&&desc.zh)
+      }
+    });
+  });
+  const readyCount=normalizedProducts.filter(function(p){return p.post_tool_status.ready;}).length;
+  const payload={
+    version:2,
+    source:'Shopee-tool-ver2.0',
+    export_type:'shopee_post_tool',
+    exported_at:new Date().toISOString(),
+    products:normalizedProducts,
+    descriptions:descData,
+    fee_settings:JSON.parse(localStorage.getItem('fee_settings')||'{}'),
+    target_margin:targetMargin,
+    summary:{total:normalizedProducts.length,ready:readyCount,needs_translation:normalizedProducts.length-readyCount}
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const date=new Date().toISOString().slice(0,10);
+  a.href=url;
+  a.download='shopee_post_tool_'+date+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  alert('Shopee投稿ツール用JSONを保存しました。Ready: '+readyCount+' / '+normalizedProducts.length);
 }
 
 function importJSON(event){
@@ -1877,7 +1951,7 @@ window.saveApiKey=saveApiKey;window.saveTargetMargin=saveTargetMargin;
 window.saveFeeSettings=saveFeeSettings;window.toggleKeyVisibility=toggleKeyVisibility;
 window.translateKeyword=translateKeyword;window.openShopee=openShopee;
 window.calcExchange=calcExchange;window.exportCSV=exportCSV;
-window.exportJSON=exportJSON;window.importJSON=importJSON;
+window.exportJSON=exportJSON;window.exportPostJSON=exportPostJSON;window.importJSON=importJSON;
 window.bulkAddFromResearch=bulkAddFromResearch;
 window.addPendingItem=addPendingItem;window.removePendingItem=removePendingItem;
 window.toggleCompetitor=toggleCompetitor;window.saveCompetitorNote=saveCompetitorNote;
