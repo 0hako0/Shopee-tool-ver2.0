@@ -539,19 +539,23 @@
   <div class="card">
     <div class="card-title">手数料設定</div>
     <div style="font-size:11px;color:var(--mid);margin-bottom:12px;line-height:1.7;">未入力の場合はデフォルト値を使用します。</div>
+    <div style="font-size:11px;color:var(--mid);line-height:1.7;margin-bottom:10px;background:var(--light);border-radius:9px;padding:10px;">
+      2026年公開情報をもとに、国別手数料はShopee販売手数料・決済手数料・サポート/プラットフォーム系手数料をまとめた目安にしています。カテゴリや任意プログラムで変わるため、Seller Centreの実値が分かれば上書きしてください。
+    </div>
+    <button class="csv-btn" onclick="applyRecommendedFees()" style="margin-bottom:12px;background:var(--orange-pale);color:var(--orange);border-color:var(--orange);">2026目安を反映</button>
     <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">共通手数料</div>
     <div class="form-grid" style="margin-bottom:12px;">
       <div class="field"><label>SLS手数料（%）</label><div style="position:relative;"><input type="number" id="fee-sls" placeholder="1.75" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
       <div class="field"><label>Payoneer手数料（%）</label><div style="position:relative;"><input type="number" id="fee-payoneer" placeholder="2.0" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">販売手数料（国別）</div>
+    <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">Shopee手数料（国別・概算）</div>
     <div class="form-grid" style="margin-bottom:12px;">
-      <div class="field"><label>台湾（%）</label><div style="position:relative;"><input type="number" id="fee-tw" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
-      <div class="field"><label>シンガポール（%）</label><div style="position:relative;"><input type="number" id="fee-sg" placeholder="7" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
-      <div class="field"><label>タイ（%）</label><div style="position:relative;"><input type="number" id="fee-th" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
-      <div class="field"><label>マレーシア（%）</label><div style="position:relative;"><input type="number" id="fee-my" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
-      <div class="field"><label>フィリピン（%）</label><div style="position:relative;"><input type="number" id="fee-ph" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
-      <div class="field"><label>ベトナム（%）</label><div style="position:relative;"><input type="number" id="fee-vn" placeholder="6" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>台湾（%）</label><div style="position:relative;"><input type="number" id="fee-tw" placeholder="8" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>シンガポール（%）</label><div style="position:relative;"><input type="number" id="fee-sg" placeholder="16" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>タイ（%）</label><div style="position:relative;"><input type="number" id="fee-th" placeholder="13" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>マレーシア（%）</label><div style="position:relative;"><input type="number" id="fee-my" placeholder="15" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>フィリピン（%）</label><div style="position:relative;"><input type="number" id="fee-ph" placeholder="12" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
+      <div class="field"><label>ベトナム（%）</label><div style="position:relative;"><input type="number" id="fee-vn" placeholder="18" inputmode="decimal" step="0.01" style="padding-right:30px;"><span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--mid);">%</span></div></div>
     </div>
     <button class="add-btn" onclick="saveFeeSettings()">手数料を保存する</button>
     <div id="fee-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
@@ -913,7 +917,10 @@ function filterRestrictions(market,btn){
 
 // ── CONSTANTS ──
 const DEFAULT_SLS=1.75,DEFAULT_PAYONEER=2.0;
-const DEFAULT_SALE_FEE={tw:6,th:6,ph:6,my:6,vn:6,sg:7};
+// 2026-05時点の公開情報をもとにした保守的な目安です。
+// 国別手数料は Shopee commission + transaction/payment + support/platform系の概算で、
+// SLS と Payoneer は別枠で加算します。正確な値はSeller Centreで上書きしてください。
+const DEFAULT_SALE_FEE={tw:8,th:13,ph:12,my:15,vn:18,sg:16};
 const unitMap={sg:'S$',tw:'NT$',th:'฿',my:'RM',ph:'₱',vn:'₫'};
 const shippingByMarket={tw:[250,320,450,700,1100],th:[300,380,520,800,1300],ph:[350,430,600,900,1400],my:[300,380,520,800,1300],vn:[280,360,490,760,1200],sg:[250,310,430,680,1050]};
 const ALL_MARKETS=['tw','th','ph','my','vn','sg'];
@@ -2227,6 +2234,7 @@ function saveApiKey(){const key=document.getElementById('gemini-key-input').valu
 function loadKeyToInput(){const key=localStorage.getItem('gemini_api_key')||'';document.getElementById('gemini-key-input').value=key;if(key){const st=document.getElementById('key-status');st.innerHTML='✅ APIキーが設定されています';st.style.color='var(--green)';}}
 function toggleKeyVisibility(inputId,btnId){const inp=document.getElementById(inputId);const btn=document.getElementById(btnId);if(inp.type==='password'){inp.type='text';btn.textContent='隠す';}else{inp.type='password';btn.textContent='表示';}}
 function saveFeeSettings(){const saved={sls:document.getElementById('fee-sls').value||DEFAULT_SLS,payoneer:document.getElementById('fee-payoneer').value||DEFAULT_PAYONEER,tw:document.getElementById('fee-tw').value||DEFAULT_SALE_FEE.tw,th:document.getElementById('fee-th').value||DEFAULT_SALE_FEE.th,ph:document.getElementById('fee-ph').value||DEFAULT_SALE_FEE.ph,my:document.getElementById('fee-my').value||DEFAULT_SALE_FEE.my,vn:document.getElementById('fee-vn').value||DEFAULT_SALE_FEE.vn,sg:document.getElementById('fee-sg').value||DEFAULT_SALE_FEE.sg};try{localStorage.setItem('fee_settings',JSON.stringify(saved));}catch(e){}fees=loadFees();renderList();renderSummary();const st=document.getElementById('fee-status');st.innerHTML='✅ 保存しました！';st.style.color='var(--green)';setTimeout(function(){st.textContent='';},2000);}
+function applyRecommendedFees(){const saved={sls:DEFAULT_SLS,payoneer:DEFAULT_PAYONEER,tw:DEFAULT_SALE_FEE.tw,th:DEFAULT_SALE_FEE.th,ph:DEFAULT_SALE_FEE.ph,my:DEFAULT_SALE_FEE.my,vn:DEFAULT_SALE_FEE.vn,sg:DEFAULT_SALE_FEE.sg};try{localStorage.setItem('fee_settings',JSON.stringify(saved));}catch(e){}fees=loadFees();loadFeeToInput();renderList();renderSummary();const st=document.getElementById('fee-status');st.innerHTML='✅ 2026目安を反映しました。実際のSeller Centre手数料が分かれば上書きしてください。';st.style.color='var(--green)';setTimeout(function(){st.textContent='';},3500);}
 function loadFeeToInput(){const s=JSON.parse(localStorage.getItem('fee_settings')||'{}');['sls','payoneer','tw','sg','th','my','ph','vn'].forEach(function(k){const el=document.getElementById('fee-'+k);if(el)el.value=s[k]||'';});}
 function saveTargetMargin(){const val=parseFloat(document.getElementById('target-margin-input').value);if(isNaN(val)||val<0){alert('正しい数値を入力してください');return;}targetMargin=val;try{localStorage.setItem('target_margin',val);}catch(e){}const st=document.getElementById('margin-status');st.innerHTML='✅ 保存しました！（目標：'+val+'%）';st.style.color='var(--green)';setTimeout(function(){st.textContent='';},2000);renderList();}
 function loadTargetMargin(){document.getElementById('target-margin-input').value=targetMargin;}
@@ -2374,7 +2382,7 @@ window.closeModal=closeModal;window.closeModalOutside=closeModalOutside;
 window.switchLang=switchLang;window.copyDesc=copyDesc;
 window.copyField=copyField;window.copyAllListing=copyAllListing;
 window.saveApiKey=saveApiKey;window.saveTargetMargin=saveTargetMargin;
-window.saveFeeSettings=saveFeeSettings;window.toggleKeyVisibility=toggleKeyVisibility;
+window.saveFeeSettings=saveFeeSettings;window.applyRecommendedFees=applyRecommendedFees;window.toggleKeyVisibility=toggleKeyVisibility;
 window.translateKeyword=translateKeyword;window.openShopee=openShopee;
 window.calcExchange=calcExchange;window.exportCSV=exportCSV;
 window.exportJSON=exportJSON;window.exportPostJSON=exportPostJSON;window.exportSelectedPostJSON=exportSelectedPostJSON;window.importJSON=importJSON;
