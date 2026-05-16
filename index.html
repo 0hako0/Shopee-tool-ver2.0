@@ -164,6 +164,20 @@
   .market-filter-tabs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
   .market-filter-tab{padding:5px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;background:var(--white);color:var(--mid);}
   .market-filter-tab.active{border-color:var(--orange);color:var(--orange);background:var(--orange-pale);}
+
+  .tool-filter-card{background:var(--white);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+  .tool-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+  .tool-input,.tool-select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--white);font-size:13px;font-family:'Noto Sans JP',sans-serif;color:var(--dark);}
+  .tool-input:focus,.tool-select:focus{outline:none;border-color:var(--orange);}
+  .tool-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .mini-btn{padding:8px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--white);color:var(--mid);font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;}
+  .mini-btn.primary{border-color:var(--orange);background:var(--orange-pale);color:var(--orange);}
+  .mini-btn.green{border-color:var(--green);background:rgba(34,197,94,.08);color:var(--green);}
+  .list-summary-line{font-size:11px;color:var(--mid);line-height:1.7;}
+  .workflow-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+  .workflow-step{border:1.5px solid var(--border);border-radius:10px;padding:10px;background:var(--light);font-size:12px;line-height:1.6;}
+  .workflow-step strong{display:block;font-size:11px;color:var(--orange);margin-bottom:2px;}
+  @media(max-width:720px){.tool-grid{grid-template-columns:1fr 1fr}.tool-grid .wide{grid-column:1/-1}.workflow-strip{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -186,6 +200,12 @@
 <div class="panel active" id="panel-add">
   <div class="card">
     <div class="card-title">商品情報を入力</div>
+    <div id="add-market-quick-actions" class="tool-actions" style="margin-bottom:12px;">
+      <button type="button" class="mini-btn primary" onclick="selectAddMarkets('all')">全マーケット選択</button>
+      <button type="button" class="mini-btn" onclick="selectAddMarkets('main')">SG/TWだけ</button>
+      <button type="button" class="mini-btn" onclick="selectAddMarkets('clear')">国を全解除</button>
+      <button type="button" class="mini-btn" onclick="resetAddForm()">入力をクリア</button>
+    </div>
     <div class="form-grid">
       <div class="field form-full">
         <label>商品名（日本語）</label>
@@ -266,6 +286,40 @@
 
 <!-- ── LIST PANEL ── -->
 <div class="panel" id="panel-list">
+  <div class="tool-filter-card" id="list-filter-card">
+    <div class="card-title">商品一覧を探す</div>
+    <div class="tool-grid">
+      <input class="tool-input wide" id="list-search" placeholder="商品名・カテゴリ・URLで検索" oninput="renderList()">
+      <select class="tool-select" id="list-market-filter" onchange="renderList()">
+        <option value="all">全マーケット</option>
+        <option value="sg">🇸🇬 SG</option>
+        <option value="tw">🇹🇼 台湾</option>
+        <option value="th">🇹🇭 タイ</option>
+        <option value="my">🇲🇾 マレーシア</option>
+        <option value="ph">🇵🇭 フィリピン</option>
+        <option value="vn">🇻🇳 ベトナム</option>
+      </select>
+      <select class="tool-select" id="list-status-filter" onchange="renderList()">
+        <option value="all">全ステータス</option>
+        <option value="ready">POST READY</option>
+        <option value="missing">翻訳不足</option>
+        <option value="unchecked">仕入れ未確認</option>
+        <option value="low-margin">利益率低め</option>
+      </select>
+      <select class="tool-select" id="list-sort" onchange="renderList()">
+        <option value="newest">新しい順</option>
+        <option value="name">商品名順</option>
+        <option value="margin-low">利益率が低い順</option>
+        <option value="cost-high">仕入れ値が高い順</option>
+      </select>
+    </div>
+    <div class="tool-actions">
+      <button class="mini-btn" onclick="clearListFilters()">絞り込み解除</button>
+      <button class="mini-btn green" onclick="switchTab('prep')">出品準備へ</button>
+      <button class="mini-btn primary" onclick="exportPostJSON()">投稿ツール用JSON保存</button>
+    </div>
+    <div class="list-summary-line" id="list-summary-line">表示条件を選ぶとここに件数が出ます。</div>
+  </div>
   <div id="product-list">
     <div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>
   </div>
@@ -408,6 +462,16 @@
       <div class="summary-box"><div class="summary-box-label">出品マーケット数</div><div class="summary-box-val orange" id="s-listings">0</div></div>
       <div class="summary-box"><div class="summary-box-label">平均利益率</div><div class="summary-box-val green" id="s-margin">-%</div></div>
       <div class="summary-box"><div class="summary-box-label">合計想定利益</div><div class="summary-box-val green" id="s-profit">¥0</div></div>
+    </div>
+
+    <div id="summary-workflow-strip" class="workflow-strip">
+      <div class="workflow-step"><strong>1. 翻訳</strong>一覧で説明文を生成してPOST READYにします。</div>
+      <div class="workflow-step"><strong>2. 出品準備</strong>出したい商品だけ選んでJSON保存します。</div>
+      <div class="workflow-step"><strong>3. 投稿ツール</strong>shopee-postでJSONを読み込みます。</div>
+    </div>
+    <div class="tool-actions">
+      <button class="mini-btn green" onclick="switchTab('prep')">出品準備を開く</button>
+      <button class="mini-btn primary" onclick="exportPostJSON()">全商品を投稿JSON保存</button>
     </div>
     <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
       <div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:8px;">仕入れ先確認状況</div>
@@ -989,10 +1053,84 @@ function addProduct(){
   btn.textContent='✅ 追加しました！';setTimeout(()=>{btn.textContent='商品を追加する';},1500);
 }
 
+function getAverageMarginForProduct(p){
+  const marketKeys=Object.keys(p.markets||{});
+  if(marketKeys.length===0)return 0;
+  const vals=marketKeys.map(function(m){return calcProfit(p.markets[m].price,p.cost,p.weight,m,p.markets[m].isNew).margin;});
+  return vals.reduce(function(a,b){return a+b;},0)/vals.length;
+}
+
+function getSearchTextForProduct(p){
+  const supplier=(p.supplier_urls||[]).map(function(s){return typeof s==='string'?s:(s&&s.url)||'';}).join(' ');
+  const desc=getSavedDesc(p.id)||{};
+  return [p.name,p.category,supplier,desc.title_en,desc.title_zh,desc.en,desc.zh].join(' ').toLowerCase();
+}
+
+function getFilteredListProducts(){
+  const q=(document.getElementById('list-search')?.value||'').trim().toLowerCase();
+  const market=document.getElementById('list-market-filter')?.value||'all';
+  const status=document.getElementById('list-status-filter')?.value||'all';
+  const sort=document.getElementById('list-sort')?.value||'newest';
+  let rows=products.slice();
+  if(q)rows=rows.filter(function(p){return getSearchTextForProduct(p).includes(q);});
+  if(market!=='all')rows=rows.filter(function(p){return !!(p.markets&&p.markets[market]);});
+  rows=rows.filter(function(p){
+    const post=getProductPostStatus(p);
+    if(status==='ready')return post.ready;
+    if(status==='missing')return !post.ready;
+    if(status==='unchecked')return getCheckStatus(p.last_checked)!=='fresh';
+    if(status==='low-margin')return getAverageMarginForProduct(p)<targetMargin;
+    return true;
+  });
+  rows.sort(function(a,b){
+    if(sort==='name')return String(a.name||'').localeCompare(String(b.name||''),'ja');
+    if(sort==='margin-low')return getAverageMarginForProduct(a)-getAverageMarginForProduct(b);
+    if(sort==='cost-high')return (b.cost||0)-(a.cost||0);
+    return (b.id||0)-(a.id||0);
+  });
+  return rows;
+}
+
+function updateListSummary(rows){
+  const el=document.getElementById('list-summary-line');if(!el)return;
+  const ready=rows.filter(function(p){return getProductPostStatus(p).ready;}).length;
+  const low=rows.filter(function(p){return getAverageMarginForProduct(p)<targetMargin;}).length;
+  const unchecked=rows.filter(function(p){return getCheckStatus(p.last_checked)!=='fresh';}).length;
+  el.textContent='表示: '+rows.length+'件 / POST READY: '+ready+'件 / 利益率'+targetMargin+'%未満: '+low+'件 / 仕入れ要確認: '+unchecked+'件';
+}
+
+function clearListFilters(){
+  const ids=['list-search','list-market-filter','list-status-filter','list-sort'];
+  ids.forEach(function(id){
+    const el=document.getElementById(id);if(!el)return;
+    if(id==='list-sort')el.value='newest';else el.value='all';
+    if(id==='list-search')el.value='';
+  });
+  renderList();
+}
+
+function selectAddMarkets(mode){
+  const targets=mode==='main'?['sg','tw']:mode==='clear'?[]:ALL_MARKETS;
+  ALL_MARKETS.forEach(function(m){const el=document.getElementById('mc-'+m);if(el)el.checked=targets.includes(m);});
+  previewPrices();checkNgWarning();
+}
+
+function resetAddForm(){
+  document.getElementById('f-name').value='';
+  document.getElementById('f-cost').value='';
+  document.getElementById('f-weight').value='2';
+  document.getElementById('f-category').value='Home & Living';
+  selectAddMarkets('clear');
+  clearUrlRows();
+}
+
 function renderList(){
   var el=document.getElementById('product-list');
+  var rows=getFilteredListProducts();
+  updateListSummary(rows);
   if(products.length===0){el.innerHTML='<div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>';return;}
-  el.innerHTML=products.map(function(p){
+  if(rows.length===0){el.innerHTML='<div class="empty-state"><div class="icon">🔎</div>条件に合う商品がありません<br>検索や絞り込みを変更してください</div>';return;}
+  el.innerHTML=rows.map(function(p){
     var marketKeys=Object.keys(p.markets||{});
     var allProfits=marketKeys.map(function(m){return calcProfit(p.markets[m].price,p.cost,p.weight,m,p.markets[m].isNew);});
     var avgMargin=allProfits.length?allProfits.reduce(function(a,c){return a+c.margin;},0)/allProfits.length:0;
@@ -2075,6 +2213,7 @@ window.copyParcelSize=copyParcelSize;
 window.checkNgWarning=checkNgWarning;window.uncheckMarket=uncheckMarket;
 window.filterRestrictions=filterRestrictions;
 window.renderPrepList=renderPrepList;window.selectPrepReady=selectPrepReady;
+window.clearListFilters=clearListFilters;window.selectAddMarkets=selectAddMarkets;window.resetAddForm=resetAddForm;
 window.saveDeeplKey=saveDeeplKey;
 </script>
 </body>
