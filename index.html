@@ -578,14 +578,16 @@
   </div>
   <div class="card">
     <div class="card-title">AI設定（Gemini API）</div>
-    <div class="field" style="margin-bottom:12px;">
-      <label>Gemini APIキー</label>
-      <div style="position:relative;">
-        <input type="password" id="gemini-key-input" placeholder="AIza..." style="padding-right:70px;">
-        <button onclick="toggleKeyVisibility('gemini-key-input','toggle-vis-btn-gemini')" id="toggle-vis-btn-gemini" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+    <form onsubmit="saveApiKey();return false;">
+      <div class="field" style="margin-bottom:12px;">
+        <label>Gemini APIキー</label>
+        <div style="position:relative;">
+          <input type="password" id="gemini-key-input" placeholder="AIza..." autocomplete="off" style="padding-right:70px;">
+          <button type="button" onclick="toggleKeyVisibility('gemini-key-input','toggle-vis-btn-gemini')" id="toggle-vis-btn-gemini" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+        </div>
       </div>
-    </div>
-    <button class="add-btn" onclick="saveApiKey()">APIキーを保存する</button>
+      <button class="add-btn" type="submit">APIキーを保存する</button>
+    </form>
     <div id="key-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
   </div>
   <div class="card">
@@ -603,15 +605,17 @@
       <div>✅ 英語 / 繁体字中国語 / タイ語 / ベトナム語</div>
       <div style="color:var(--mid);">⚠️ フィリピン語・マレー語はGeminiが担当（DeepL非対応）</div>
     </div>
-    <div class="field" style="margin-bottom:12px;">
-      <label>DeepL APIキー（無料版）</label>
-      <div style="position:relative;">
-        <input type="password" id="deepl-key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx" style="padding-right:70px;">
-        <button onclick="toggleKeyVisibility('deepl-key-input','toggle-vis-btn-deepl')" id="toggle-vis-btn-deepl" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+    <form onsubmit="saveDeeplKey();return false;">
+      <div class="field" style="margin-bottom:12px;">
+        <label>DeepL APIキー（無料版）</label>
+        <div style="position:relative;">
+          <input type="password" id="deepl-key-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx" autocomplete="off" style="padding-right:70px;">
+          <button type="button" onclick="toggleKeyVisibility('deepl-key-input','toggle-vis-btn-deepl')" id="toggle-vis-btn-deepl" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;font-size:12px;color:var(--mid);cursor:pointer;padding:4px;">表示</button>
+        </div>
+        <div style="font-size:10px;color:var(--mid);margin-top:4px;">※ 無料版のキーは末尾に「:fx」が付きます</div>
       </div>
-      <div style="font-size:10px;color:var(--mid);margin-top:4px;">※ 無料版のキーは末尾に「:fx」が付きます</div>
-    </div>
-    <button class="add-btn" onclick="saveDeeplKey()">DeepL APIキーを保存する</button>
+      <button class="add-btn" type="submit">DeepL APIキーを保存する</button>
+    </form>
     <div id="deepl-key-status" style="margin-top:10px;font-size:12px;text-align:center;color:var(--mid);"></div>
     <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;font-size:12px;color:var(--mid);line-height:1.9;">
       1. <a href="https://www.deepl.com/ja/pro-api" target="_blank" style="color:var(--orange);">DeepL APIページ</a> でアカウント作成<br>
@@ -1113,22 +1117,7 @@ function extractAmazonPriceFromHtml(html){
 }
 
 async function fetchAmazonPriceByUrl(url){
-  const asin=extractAmazonAsin(url);
-  const target=url;
-  const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(target);
-  const resp=await fetch(proxy,{cache:'no-store'});
-  if(!resp.ok)throw new Error('Amazon page fetch failed: '+resp.status);
-  const html=await resp.text();
-  const price=extractAmazonPriceFromHtml(html);
-  if(!price)throw new Error('Price was not found on Amazon page');
-  return{asin:asin,price:price,url:target};
-}
-
-function recalcProductMarketPrices(p){
-  Object.keys(p.markets||{}).forEach(function(m){
-    const price=calcAutoPrice(p.cost,p.weight,m,p.markets[m].isNew);
-    if(price)p.markets[m].price=price;
-  });
+  throw new Error('GitHub PagesからAmazon価格を直接取得できません。CORSでブロックされるため、価格取得はshopee-post側のPlaywright/PA-APIで行ってください。');
 }
 
 async function fetchAmazonPriceForProduct(id){
@@ -1141,21 +1130,15 @@ async function fetchAmazonPriceForProduct(id){
     return;
   }
   const asin=extractAmazonAsin(supplier.url);
-  p.amazon_price=p.amazon_price||{};
-  p.amazon_price.asin=asin;
-  p.amazon_price.url=supplier.url;
-  if(statusEl)statusEl.textContent='Amazon価格を取得中です...';
-  try{
-    const result=await fetchAmazonPriceByUrl(supplier.url);
-    p.cost=result.price;
-    p.amazon_price={asin:result.asin||asin,price:result.price,url:result.url,checked_at:new Date().toISOString(),error:''};
-    recalcProductMarketPrices(p);
-    save();renderList();renderSummary();
-  }catch(e){
-    p.amazon_price={asin:asin,price:0,url:supplier.url,checked_at:new Date().toISOString(),error:e.message||String(e)};
-    save();renderList();
-    alert('Amazon価格を取得できませんでした。仕入れ値は変更していません。\n理由: '+p.amazon_price.error);
-  }
+  p.amazon_price={
+    asin:asin,
+    price:0,
+    url:supplier.url,
+    checked_at:'',
+    error:'GitHub PagesではAmazon価格を直接取得できません。CORS対策としてshopee-post側で取得してください。'
+  };
+  save();renderList();
+  alert('ASIN/URLを保存しました。\nASIN: '+(asin||'未検出')+'\n\nAmazon価格はブラウザ上ではCORSで取得できないため、shopee-post側で取得します。');
 }
 
 function getAverageMarginForProduct(p){
@@ -1363,7 +1346,7 @@ function buildInlineEditHTML(p){
     +'<div class="tool-actions">'
       +'<button class="mini-btn" type="button" onclick="addInlineUrlRow('+id+')">URLを追加</button>'
       +'<button class="mini-btn green" type="button" onclick="saveInlineProduct('+id+')">この内容で保存</button>'
-      +'<button class="mini-btn primary" type="button" onclick="fetchAmazonPriceForProduct('+id+')">Amazon価格取得</button>'
+      +'<button class="mini-btn primary" type="button" onclick="fetchAmazonPriceForProduct('+id+')">ASIN/URL保存</button>'
     +'</div>'
     +'<div class="amazon-price-status" id="amazon-price-status-'+id+'">ASIN: '+(asin||'未検出')+' / 価格確認: '+checked+priceText+errorText+'</div>'
   +'</div>';
