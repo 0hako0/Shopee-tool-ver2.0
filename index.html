@@ -176,6 +176,7 @@
 <div class="tabs">
   <button class="tab active" onclick="switchTab('add')">追加</button>
   <button class="tab" onclick="switchTab('list')">一覧</button>
+  <button class="tab" onclick="switchTab('prep')">出品準備</button>
   <button class="tab" onclick="switchTab('research')">🔍 調査</button>
   <button class="tab" onclick="switchTab('summary')">集計</button>
   <button class="tab" onclick="switchTab('settings')">設定</button>
@@ -267,6 +268,39 @@
 <div class="panel" id="panel-list">
   <div id="product-list">
     <div class="empty-state"><div class="icon">📦</div>まだ商品がありません<br>「追加」タブから追加してください</div>
+  </div>
+</div>
+
+
+
+<!-- ── POST PREP PANEL ── -->
+<div class="panel" id="panel-prep">
+  <div class="card">
+    <div class="card-title">Shopee出品準備</div>
+    <div style="font-size:12px;color:var(--mid);line-height:1.7;margin-bottom:12px;">POST READYの商品を確認し、投稿ツールへ渡したい商品だけ選択できます。</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+      <select id="prep-market-filter" onchange="renderPrepList()">
+        <option value="all">全マーケット</option>
+        <option value="sg">🇸🇬 Singapore</option>
+        <option value="tw">🇹🇼 Taiwan</option>
+        <option value="th">🇹🇭 Thailand</option>
+        <option value="my">🇲🇾 Malaysia</option>
+        <option value="ph">🇵🇭 Philippines</option>
+        <option value="vn">🇻🇳 Vietnam</option>
+      </select>
+      <select id="prep-status-filter" onchange="renderPrepList()">
+        <option value="all">すべて</option>
+        <option value="ready">POST READYのみ</option>
+        <option value="missing">翻訳不足のみ</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <button class="action-btn" onclick="selectPrepReady(true)">READYを選択</button>
+      <button class="action-btn" onclick="selectPrepReady(false)">全解除</button>
+      <button class="action-btn ai" onclick="exportSelectedPostJSON()">選択商品だけJSON保存</button>
+    </div>
+    <div id="prep-summary" style="font-size:12px;color:var(--mid);margin-bottom:10px;"></div>
+    <div id="prep-list"></div>
   </div>
 </div>
 
@@ -875,11 +909,12 @@ function renderRates(){
 }
 
 function switchTab(tab){
-  const tabIds=['add','list','research','summary','settings'];
+  const tabIds=['add','list','prep','research','summary','settings'];
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',tabIds[i]===tab));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
   if(tab==='list')renderList();
+  if(tab==='prep')renderPrepList();
   if(tab==='summary'){renderSummary();renderRates();}
   if(tab==='settings'){loadKeyToInput();loadTargetMargin();loadFeeToInput();loadDeeplKeyToInput();renderRestrictionTable('all');}
   if(tab==='research'){renderCalendar();renderMonthlyRecommend();updateResearchTranslateBadge();}
@@ -1267,6 +1302,77 @@ function exportJSON(){
   const url=URL.createObjectURL(blob);const a=document.createElement('a');const date=new Date().toISOString().slice(0,10);a.href=url;a.download='shopee_data_'+date+'.json';a.click();URL.revokeObjectURL(url);
 }
 
+
+function getProductPostStatus(p){
+  return getDescStatus(getSavedDesc(p.id));
+}
+
+function renderPrepList(){
+  const area=document.getElementById('prep-list');if(!area)return;
+  const summary=document.getElementById('prep-summary');
+  const market=document.getElementById('prep-market-filter')?.value||'all';
+  const status=document.getElementById('prep-status-filter')?.value||'all';
+  let rows=products.slice();
+  if(market!=='all')rows=rows.filter(function(p){return p.markets&&p.markets[market];});
+  rows=rows.filter(function(p){
+    const st=getProductPostStatus(p);
+    if(status==='ready')return st.ready;
+    if(status==='missing')return !st.ready;
+    return true;
+  });
+  const readyTotal=products.filter(function(p){return getProductPostStatus(p).ready;}).length;
+  if(summary)summary.textContent='表示: '+rows.length+'件 / POST READY: '+readyTotal+'件 / 全体: '+products.length+'件';
+  if(rows.length===0){area.innerHTML='<div class="empty-state"><div class="icon">📦</div>条件に合う商品がありません</div>';return;}
+  area.innerHTML=rows.map(function(p){
+    const desc=getSavedDesc(p.id)||{};
+    const st=getProductPostStatus(p);
+    const marketKeys=Object.keys(p.markets||{});
+    const priceText=marketKeys.map(function(m){return marketFlags[m]+' '+marketNames[m]+': '+fmt(p.markets[m].price);}).join(' / ');
+    const supplier=(p.supplier_urls||[]).map(normalizeSupplierUrlForExport).find(function(s){return s.url;});
+    const missing=st.ready?'':'<div style="font-size:11px;color:var(--red);margin-top:4px;">不足: '+st.missing.join(', ')+'</div>';
+    const badge=st.ready?'<span style="font-size:10px;color:var(--green);font-weight:700;">POST READY</span>':'<span style="font-size:10px;color:var(--red);font-weight:700;">NO TRANSLATION</span>';
+    return '<div class="product-item" style="padding:12px 14px;margin-bottom:10px;">'
+      +'<div style="display:flex;gap:10px;align-items:flex-start;">'
+        +'<input class="prep-select" type="checkbox" data-id="'+p.id+'" '+(st.ready?'checked':'')+' style="width:18px;height:18px;margin-top:2px;">'
+        +'<div style="flex:1;min-width:0;">'
+          +'<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">'
+            +'<div style="font-size:13px;font-weight:700;color:var(--dark);line-height:1.45;">'+escapeHtml(desc.title_en||p.name)+'</div>'
+            +badge
+          +'</div>'
+          +'<div style="font-size:11px;color:var(--mid);line-height:1.6;margin-top:5px;">原題: '+escapeHtml(p.name)+'</div>'
+          +'<div style="font-size:11px;color:var(--mid);line-height:1.6;">ZH: '+escapeHtml(desc.title_zh||'-')+'</div>'
+          +'<div style="font-size:11px;color:var(--mid);line-height:1.6;">カテゴリ: '+escapeHtml(p.category||'-')+' / '+priceText+'</div>'
+          +(supplier?'<div style="font-size:11px;color:var(--mid);line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">URL: '+escapeHtml(supplier.url)+'</div>':'')
+          +missing
+          +'<div style="display:flex;gap:6px;margin-top:8px;">'
+            +(getSavedDesc(p.id)?'<button class="action-btn ai" style="padding:6px 10px;" onclick="showDesc('+p.id+')">説明を見る</button>':'<button class="action-btn" style="padding:6px 10px;" onclick="openModal('+p.id+')">説明生成</button>')
+            +'<button class="action-btn" style="padding:6px 10px;" onclick="openModal('+p.id+')">再生成</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function selectPrepReady(checked){
+  document.querySelectorAll('#prep-list .prep-select').forEach(function(input){
+    if(!checked){input.checked=false;return;}
+    const p=products.find(function(item){return String(item.id)===String(input.dataset.id);});
+    input.checked=!!(p&&getProductPostStatus(p).ready);
+  });
+}
+
+function exportSelectedPostJSON(){
+  const ids=[...document.querySelectorAll('#prep-list .prep-select:checked')].map(function(input){return String(input.dataset.id);});
+  if(ids.length===0){alert('出品したい商品にチェックを入れてください');return;}
+  const selected=products.filter(function(p){return ids.includes(String(p.id));});
+  downloadPostPayload(selected,'shopee_post_selected_');
+}
+
+function escapeHtml(value){
+  return String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+}
+
 function collectExportDescriptions(){
   const descData={};
   products.forEach(function(p){
@@ -1296,8 +1402,12 @@ function normalizeSupplierUrlForExport(item){
 
 function exportPostJSON(){
   if(products.length===0){alert('商品がありません');return;}
+  downloadPostPayload(products,'shopee_post_tool_');
+}
+
+function downloadPostPayload(sourceProducts,prefix){
   const descData=collectExportDescriptions();
-  const normalizedProducts=products.map(function(p){
+  const normalizedProducts=sourceProducts.map(function(p){
     const desc=descData['desc_'+p.id]||null;
     const status=getDescStatus(desc);
     return Object.assign({},p,{
@@ -1312,6 +1422,11 @@ function exportPostJSON(){
       }
     });
   });
+  const selectedDescData={};
+  normalizedProducts.forEach(function(p){
+    if(descData['desc_'+p.id])selectedDescData['desc_'+p.id]=descData['desc_'+p.id];
+    if(descData['shipping_'+p.id])selectedDescData['shipping_'+p.id]=descData['shipping_'+p.id];
+  });
   const readyCount=normalizedProducts.filter(function(p){return p.post_tool_status.ready;}).length;
   const payload={
     version:2,
@@ -1319,7 +1434,7 @@ function exportPostJSON(){
     export_type:'shopee_post_tool',
     exported_at:new Date().toISOString(),
     products:normalizedProducts,
-    descriptions:descData,
+    descriptions:selectedDescData,
     fee_settings:JSON.parse(localStorage.getItem('fee_settings')||'{}'),
     target_margin:targetMargin,
     summary:{total:normalizedProducts.length,ready:readyCount,needs_translation:normalizedProducts.length-readyCount}
@@ -1329,7 +1444,7 @@ function exportPostJSON(){
   const a=document.createElement('a');
   const date=new Date().toISOString().slice(0,10);
   a.href=url;
-  a.download='shopee_post_tool_'+date+'.json';
+  a.download=prefix+date+'.json';
   a.click();
   URL.revokeObjectURL(url);
   alert('Shopee投稿ツール用JSONを保存しました。Ready: '+readyCount+' / '+normalizedProducts.length);
@@ -1951,7 +2066,7 @@ window.saveApiKey=saveApiKey;window.saveTargetMargin=saveTargetMargin;
 window.saveFeeSettings=saveFeeSettings;window.toggleKeyVisibility=toggleKeyVisibility;
 window.translateKeyword=translateKeyword;window.openShopee=openShopee;
 window.calcExchange=calcExchange;window.exportCSV=exportCSV;
-window.exportJSON=exportJSON;window.exportPostJSON=exportPostJSON;window.importJSON=importJSON;
+window.exportJSON=exportJSON;window.exportPostJSON=exportPostJSON;window.exportSelectedPostJSON=exportSelectedPostJSON;window.importJSON=importJSON;
 window.bulkAddFromResearch=bulkAddFromResearch;
 window.addPendingItem=addPendingItem;window.removePendingItem=removePendingItem;
 window.toggleCompetitor=toggleCompetitor;window.saveCompetitorNote=saveCompetitorNote;
@@ -1959,6 +2074,7 @@ window.saveShippingSpec=saveShippingSpec;window.copyInputVal=copyInputVal;
 window.copyParcelSize=copyParcelSize;
 window.checkNgWarning=checkNgWarning;window.uncheckMarket=uncheckMarket;
 window.filterRestrictions=filterRestrictions;
+window.renderPrepList=renderPrepList;window.selectPrepReady=selectPrepReady;
 window.saveDeeplKey=saveDeeplKey;
 </script>
 </body>
