@@ -1706,6 +1706,17 @@ function exportPostJSON(){
   downloadPostPayload(products,'shopee_post_tool_');
 }
 
+function getPricingSettingsForExport(){
+  return {
+    target_margin: targetMargin,
+    fee_settings: Object.assign({}, fees),
+    exchange_rates: Object.assign({}, exchangeRates),
+    shipping_by_market: Object.assign({}, shippingByMarket),
+    currency_units: Object.assign({}, unitMap),
+    generated_at: new Date().toISOString()
+  };
+}
+
 function downloadPostPayload(sourceProducts,prefix){
   const descData=collectExportDescriptions();
   const normalizedProducts=sourceProducts.map(function(p){
@@ -1736,7 +1747,9 @@ function downloadPostPayload(sourceProducts,prefix){
     exported_at:new Date().toISOString(),
     products:normalizedProducts,
     descriptions:selectedDescData,
-    fee_settings:JSON.parse(localStorage.getItem('fee_settings')||'{}'),
+    pricing_settings:getPricingSettingsForExport(),
+    fee_settings:Object.assign({}, fees),
+    exchange_rates:Object.assign({}, exchangeRates),
     target_margin:targetMargin,
     summary:{total:normalizedProducts.length,ready:readyCount,needs_translation:normalizedProducts.length-readyCount}
   };
