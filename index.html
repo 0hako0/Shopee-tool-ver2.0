@@ -178,6 +178,14 @@
   .workflow-step{border:1.5px solid var(--border);border-radius:10px;padding:10px;background:var(--light);font-size:12px;line-height:1.6;}
   .workflow-step strong{display:block;font-size:11px;color:var(--orange);margin-bottom:2px;}
   @media(max-width:720px){.tool-grid{grid-template-columns:1fr 1fr}.tool-grid .wide{grid-column:1/-1}.workflow-strip{grid-template-columns:1fr}}
+
+  .inline-edit-panel{margin-top:10px;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;background:#fff;}
+  .inline-edit-grid{display:grid;grid-template-columns:1.3fr .7fr 1fr;gap:8px;margin-bottom:8px;}
+  .inline-url-row{display:grid;grid-template-columns:90px 1fr auto;gap:6px;margin-bottom:6px;align-items:center;}
+  .inline-small-input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:12px;font-family:'Noto Sans JP',sans-serif;color:var(--dark);}
+  .inline-small-input:focus{outline:none;border-color:var(--orange);}
+  .amazon-price-status{font-size:11px;color:var(--mid);line-height:1.7;margin-top:6px;}
+  @media(max-width:720px){.inline-edit-grid{grid-template-columns:1fr}.inline-url-row{grid-template-columns:70px 1fr auto}}
 </style>
 </head>
 <body>
@@ -305,6 +313,7 @@
         <option value="missing">翻訳不足</option>
         <option value="unchecked">仕入れ未確認</option>
         <option value="low-margin">利益率低め</option>
+        <option value="amazon-unchecked">Amazon価格未取得</option>
       </select>
       <select class="tool-select" id="list-sort" onchange="renderList()">
         <option value="newest">新しい順</option>
@@ -1053,6 +1062,95 @@ function addProduct(){
   btn.textContent='✅ 追加しました！';setTimeout(()=>{btn.textContent='商品を追加する';},1500);
 }
 
+function extractAmazonAsin(url){
+  const text=String(url||'');
+  const decoded=decodeURIComponent(text);
+  const patterns=[
+    /\/(?:dp|gp\/product|product)\/([A-Z0-9]{10})(?:[/?#]|$)/i,
+    /(?:ASIN|asin)=([A-Z0-9]{10})(?:[&#]|$)/i,
+    /\/([A-Z0-9]{10})(?:[/?#]|$)/i
+  ];
+  for(const ptn of patterns){const m=decoded.match(ptn);if(m)return m[1].toUpperCase();}
+  return '';
+}
+
+function getAmazonSupplier(p){
+  const urls=(p.supplier_urls||[]).map(normalizeSupplierUrlForExport);
+  return urls.find(function(s){return /amazon\.|amzn\.asia/i.test(s.url||'');})||urls.find(function(s){return extractAmazonAsin(s.url);})||null;
+}
+
+function normalizeAmazonPriceText(text){
+  const cleaned=String(text||'').replace(/[,\s]/g,'');
+  const m=cleaned.match(/(?:￥|¥|JPY)(\d{2,8})/i) || cleaned.match(/(\d{2,8})円/) || cleaned.match(/^(\d{2,8})$/);
+  if(!m)return 0;
+  return parseInt(m[1],10)||0;
+}
+
+function extractAmazonPriceFromHtml(html){
+  const text=String(html||'');
+  const candidates=[
+    /class=["'][^"']*a-price-whole[^"']*["'][^>]*>([\d,]+)</i,
+    /id=["']priceblock_ourprice["'][^>]*>([^<]+)/i,
+    /id=["']priceblock_dealprice["'][^>]*>([^<]+)/i,
+    /id=["']price_inside_buybox["'][^>]*>([^<]+)/i,
+    /"priceToPay"[^\d]+(\d{2,8})/i,
+    /"displayPrice"\s*:\s*"(.*?)"/i
+  ];
+  for(const ptn of candidates){
+    const m=text.match(ptn);
+    if(!m)continue;
+    const price=normalizeAmazonPriceText(m[1]);
+    if(price>0)return price;
+  }
+  return 0;
+}
+
+async function fetchAmazonPriceByUrl(url){
+  const asin=extractAmazonAsin(url);
+  const target=url;
+  const proxy='https://api.allorigins.win/raw?url='+encodeURIComponent(target);
+  const resp=await fetch(proxy,{cache:'no-store'});
+  if(!resp.ok)throw new Error('Amazon page fetch failed: '+resp.status);
+  const html=await resp.text();
+  const price=extractAmazonPriceFromHtml(html);
+  if(!price)throw new Error('Price was not found on Amazon page');
+  return{asin:asin,price:price,url:target};
+}
+
+function recalcProductMarketPrices(p){
+  Object.keys(p.markets||{}).forEach(function(m){
+    const price=calcAutoPrice(p.cost,p.weight,m,p.markets[m].isNew);
+    if(price)p.markets[m].price=price;
+  });
+}
+
+async function fetchAmazonPriceForProduct(id){
+  const p=products.find(function(x){return x.id===id;});if(!p)return;
+  const supplier=getAmazonSupplier(p);
+  const statusEl=document.getElementById('amazon-price-status-'+id);
+  if(!supplier||!supplier.url){
+    if(statusEl)statusEl.textContent='Amazon URLが登録されていません。URLを追加して保存してください。';
+    alert('Amazon URLが登録されていません。');
+    return;
+  }
+  const asin=extractAmazonAsin(supplier.url);
+  p.amazon_price=p.amazon_price||{};
+  p.amazon_price.asin=asin;
+  p.amazon_price.url=supplier.url;
+  if(statusEl)statusEl.textContent='Amazon価格を取得中です...';
+  try{
+    const result=await fetchAmazonPriceByUrl(supplier.url);
+    p.cost=result.price;
+    p.amazon_price={asin:result.asin||asin,price:result.price,url:result.url,checked_at:new Date().toISOString(),error:''};
+    recalcProductMarketPrices(p);
+    save();renderList();renderSummary();
+  }catch(e){
+    p.amazon_price={asin:asin,price:0,url:supplier.url,checked_at:new Date().toISOString(),error:e.message||String(e)};
+    save();renderList();
+    alert('Amazon価格を取得できませんでした。仕入れ値は変更していません。\n理由: '+p.amazon_price.error);
+  }
+}
+
 function getAverageMarginForProduct(p){
   const marketKeys=Object.keys(p.markets||{});
   if(marketKeys.length===0)return 0;
@@ -1080,6 +1178,7 @@ function getFilteredListProducts(){
     if(status==='missing')return !post.ready;
     if(status==='unchecked')return getCheckStatus(p.last_checked)!=='fresh';
     if(status==='low-margin')return getAverageMarginForProduct(p)<targetMargin;
+    if(status==='amazon-unchecked')return !(p.amazon_price&&p.amazon_price.checked_at);
     return true;
   });
   rows.sort(function(a,b){
@@ -1231,6 +1330,38 @@ function renderList(){
   }).join('');
 }
 
+function buildInlineEditHTML(p){
+  const id=p.id;
+  const urls=(p.supplier_urls&&p.supplier_urls.length?p.supplier_urls:[{label:'Amazon',url:''},{label:'楽天',url:''}]).map(normalizeSupplierUrlForExport);
+  const urlRows=urls.map(function(s,i){
+    return '<div class="inline-url-row" data-url-row="'+i+'">'
+      +'<input class="inline-small-input inline-url-label" value="'+escapeAttr(s.label||'リンク')+'" placeholder="Amazon">'
+      +'<input class="inline-small-input inline-url-value" value="'+escapeAttr(s.url||'')+'" placeholder="https://www.amazon.co.jp/...">'
+      +'<button class="mini-btn" type="button" onclick="removeInlineUrlRow('+id+',this)">×</button>'
+    +'</div>';
+  }).join('');
+  const ap=p.amazon_price||{};
+  const checked=ap.checked_at?new Date(ap.checked_at).toLocaleString('ja-JP'):'未取得';
+  const asin=ap.asin||extractAmazonAsin((getAmazonSupplier(p)||{}).url||'');
+  const priceText=ap.price?' / 取得価格: ¥'+Number(ap.price).toLocaleString():'';
+  const errorText=ap.error?' / 前回失敗: '+escapeHtml(ap.error):'';
+  return '<div class="inline-edit-panel" id="inline-edit-'+id+'">'
+    +'<div style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:8px;">その場で修正</div>'
+    +'<div class="inline-edit-grid">'
+      +'<input class="inline-small-input" id="inline-name-'+id+'" value="'+escapeAttr(p.name||'')+'" placeholder="商品名">'
+      +'<input class="inline-small-input" id="inline-cost-'+id+'" type="number" value="'+escapeAttr(p.cost||'')+'" placeholder="仕入れ値">'
+      +'<select class="inline-small-input" id="inline-category-'+id+'">'+['Home & Living','Health','Beauty','Food & Beverages','Mom & Baby','Sports & Outdoors','Hobbies & Collections'].map(function(c){return '<option value="'+c+'" '+(p.category===c?'selected':'')+'>'+c+'</option>';}).join('')+'</select>'
+    +'</div>'
+    +'<div id="inline-urls-'+id+'">'+urlRows+'</div>'
+    +'<div class="tool-actions">'
+      +'<button class="mini-btn" type="button" onclick="addInlineUrlRow('+id+')">URLを追加</button>'
+      +'<button class="mini-btn green" type="button" onclick="saveInlineProduct('+id+')">この内容で保存</button>'
+      +'<button class="mini-btn primary" type="button" onclick="fetchAmazonPriceForProduct('+id+')">Amazon価格取得</button>'
+    +'</div>'
+    +'<div class="amazon-price-status" id="amazon-price-status-'+id+'">ASIN: '+(asin||'未検出')+' / 価格確認: '+checked+priceText+errorText+'</div>'
+  +'</div>';
+}
+
 function buildDetailHTML(p,marketsHtml,supplierBody,hasSavedDesc){
   var id=p.id;
   var weights=['〜100g','〜250g','〜500g','〜1kg','〜2kg'];
@@ -1259,6 +1390,7 @@ function buildDetailHTML(p,marketsHtml,supplierBody,hasSavedDesc){
     +'</div>'
     // 重量・カテゴリ
     +'<div style="font-size:11px;color:var(--mid);margin-bottom:10px);">重量：'+weights[p.weight]+'　カテゴリ：'+p.category+'</div>'
+    +buildInlineEditHTML(p)
     // ② 国別利益 + マーケット追加ボタン
     +'<div style="font-size:11px;font-weight:700;color:var(--dark);margin-bottom:6px;">📊 国別利益'
       +'<button onclick="showAddMarketModal('+id+')" style="margin-left:8px;font-size:10px;font-weight:700;font-family:\'Noto Sans JP\',sans-serif;color:var(--orange);background:var(--orange-pale);border:1px solid var(--orange);border-radius:6px;padding:2px 8px;cursor:pointer;">＋ 国を追加</button>'
@@ -1276,6 +1408,53 @@ function buildDetailHTML(p,marketsHtml,supplierBody,hasSavedDesc){
   +'</div>';
 }
 
+
+function addInlineUrlRow(id){
+  const list=document.getElementById('inline-urls-'+id);if(!list)return;
+  const row=document.createElement('div');
+  row.className='inline-url-row';
+  row.innerHTML='<input class="inline-small-input inline-url-label" value="Amazon" placeholder="Amazon">'
+    +'<input class="inline-small-input inline-url-value" value="" placeholder="https://www.amazon.co.jp/...">'
+    +'<button class="mini-btn" type="button" onclick="removeInlineUrlRow('+id+',this)">×</button>';
+  list.appendChild(row);
+}
+
+function removeInlineUrlRow(id,btn){
+  const list=document.getElementById('inline-urls-'+id);if(!list)return;
+  if(list.children.length<=1)return;
+  btn.closest('.inline-url-row').remove();
+}
+
+function collectInlineUrls(id){
+  const result=[];
+  document.querySelectorAll('#inline-urls-'+id+' .inline-url-row').forEach(function(row){
+    const label=row.querySelector('.inline-url-label')?.value.trim()||'リンク';
+    const url=row.querySelector('.inline-url-value')?.value.trim()||'';
+    if(url)result.push({label:label,url:url});
+  });
+  return result;
+}
+
+function saveInlineProduct(id){
+  const p=products.find(function(x){return x.id===id;});if(!p)return;
+  const name=document.getElementById('inline-name-'+id)?.value.trim();
+  const cost=parseFloat(document.getElementById('inline-cost-'+id)?.value);
+  const category=document.getElementById('inline-category-'+id)?.value||p.category;
+  if(!name){alert('商品名を入力してください');return;}
+  if(!cost||cost<=0){alert('正しい仕入れ値を入力してください');return;}
+  const costChanged=Number(p.cost)!==Number(cost);
+  p.name=name;
+  p.cost=cost;
+  p.category=category;
+  p.supplier_urls=collectInlineUrls(id);
+  if(costChanged)recalcProductMarketPrices(p);
+  save();renderList();renderSummary();
+}
+
+function showInlineEdit(id){
+  const el=document.getElementById('inline-edit-'+id);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'center'});
+}
 
 function showAddMarketModal(id){
   var p=products.find(function(x){return x.id===id;});
@@ -1407,17 +1586,7 @@ function deleteProduct(id){const p=products.find(function(x){return x.id===id;})
 function getCheckStatus(lc){if(!lc)return'never';const days=(Date.now()-new Date(lc).getTime())/(1000*60*60*24);if(days<=7)return'fresh';if(days<=30)return'old';return'never';}
 function getCheckLabel(lc){if(!lc)return'未確認';const days=Math.floor((Date.now()-new Date(lc).getTime())/(1000*60*60*24));if(days===0)return'今日確認済み';if(days<=7)return days+'日前に確認';if(days<=30)return days+'日前（要再確認）';return days+'日前（期限切れ）';}
 
-function editProduct(id){
-  const p=products.find(function(x){return x.id===id;});if(!p)return;
-  document.getElementById('f-name').value=p.name;document.getElementById('f-cost').value=p.cost;document.getElementById('f-weight').value=p.weight;document.getElementById('f-category').value=p.category;
-  ALL_MARKETS.forEach(function(m){const el=document.getElementById('mc-'+m);if(el)el.checked=!!p.markets[m];});
-  const list=document.getElementById('supplier-url-list');list.innerHTML='';
-  (p.supplier_urls||[]).forEach(function(s){addUrlRow(s.label,s.url);});
-  if(!p.supplier_urls||p.supplier_urls.length===0)clearUrlRows();
-  products=products.filter(function(x){return x.id!==id;});
-  save();switchTab('add');previewPrices();checkNgWarning();
-  const btn=document.querySelector('#panel-add .add-btn');btn.textContent='✏️ 更新する';setTimeout(function(){btn.textContent='商品を追加する';},3000);
-}
+function editProduct(id){showInlineEdit(id);}
 
 function renderSummary(){
   const count=products.length;document.getElementById('s-count').textContent=count;
@@ -1509,6 +1678,10 @@ function exportSelectedPostJSON(){
 
 function escapeHtml(value){
   return String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+}
+
+function escapeAttr(value){
+  return escapeHtml(value).replaceAll('\n',' ');
 }
 
 function collectExportDescriptions(){
@@ -2214,6 +2387,7 @@ window.checkNgWarning=checkNgWarning;window.uncheckMarket=uncheckMarket;
 window.filterRestrictions=filterRestrictions;
 window.renderPrepList=renderPrepList;window.selectPrepReady=selectPrepReady;
 window.clearListFilters=clearListFilters;window.selectAddMarkets=selectAddMarkets;window.resetAddForm=resetAddForm;
+window.fetchAmazonPriceForProduct=fetchAmazonPriceForProduct;window.saveInlineProduct=saveInlineProduct;window.addInlineUrlRow=addInlineUrlRow;window.removeInlineUrlRow=removeInlineUrlRow;
 window.saveDeeplKey=saveDeeplKey;
 </script>
 </body>
